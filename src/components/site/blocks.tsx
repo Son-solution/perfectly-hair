@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { LogoMark } from "@/components/brand/LogoMark";
 import { Reveal } from "@/components/motion";
 import { ButtonLink, Container, Eyebrow } from "@/components/ui/primitives";
 import { businessHours, flyerServices, site } from "@/config/site";
@@ -184,8 +185,8 @@ export function RotatingBadge({
           <textPath href="#badge-circle">{text}</textPath>
         </text>
       </svg>
-      <span className="absolute inset-0 flex items-center justify-center font-display text-3xl italic md:text-4xl">
-        PH
+      <span className="absolute inset-0 flex items-center justify-center">
+        <LogoMark decorative className="h-12 w-12 md:h-14 md:w-14" />
       </span>
     </div>
   );

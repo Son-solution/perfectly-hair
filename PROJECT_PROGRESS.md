@@ -4,7 +4,7 @@ Resume point after any interruption: read this file, then `git log --oneline`.
 
 ## Current status
 
-**Phase 2 — Ultra-luxury public frontend: complete, awaiting owner review / approval for Phase 3.**
+**Phase 2 — Ultra-luxury public frontend + official logo (2.1): complete, awaiting owner review / approval for Phase 3.**
 Last update: 2026-11-20
 
 Priority change (owner, Phase 2): finish and visually review the public website BEFORE
@@ -65,9 +65,25 @@ Supabase client factories (not connected). Details: `docs/`.
 | Built CSS colour scan | ✅ grayscale only (one Tailwind internal feature-test value, never rendered) |
 | Visual check (headless Edge) | ✅ desktop 1440 (home, Damen), tablet 1024, mobile 480–492 (home, Termin) |
 
+### Phase 2.1 — Official logo ✅ (2026-11-20)
+- Source: `public/images/logo.pdf` (Adobe Illustrator 28.2, single page 1920×1080, white artwork on black).
+- Converted 1:1 to SVG: all 7 shapes (X, scissors ×3, moustache, P, H) with exact coordinates;
+  "P" and "H" outlined from the font embedded in the PDF (Alice Regular, SIL OFL); black page
+  background omitted; tight crop (viewBox 571 144 789 786). Verified by overlaying on a 1920×1080
+  black page — matches the PDF.
+- `src/components/brand/LogoMark.tsx` (generated, inline SVG, `currentColor` → white on dark, black on light)
+- `public/images/brand/logo-white.svg`, `logo-black.svg` for print / e-mail / social
+- Integrated: header (mark + wordmark), mobile menu, footer, rotating hero badge (replaces the
+  hand-set "PH"), favicon `src/app/icon.svg` (default Next.js favicon removed)
+- Header nav spacing tightened at 1280–1535 px so the logo + full navigation fit
+- Checks: typecheck ✅ · lint ✅ · build ✅ · routes incl. `/icon.svg` 200 ✅ · screenshots 492 / 1280 / 1440 ✅
+
 ### Known limitations of testing
 - Headless Edge cannot render viewports narrower than 492 px; 390 px phones were checked by
   calculation (hero title and audience row sized to fit 350 px content width), not by screenshot.
+- Screenshot method: use `--timeout=9000` (real time). With `--virtual-time-budget`, headless Edge
+  does not fire scroll-reveal (IntersectionObserver) animations and lower sections look blank —
+  a tooling artifact, verified not to be a site bug.
 - Interactive behaviour (mobile menu open/close, gallery filter, booking steps) is implemented
   and type-checked but was not click-tested automatically — please check manually in `npm run dev`.
 - Canonical URLs use `NEXT_PUBLIC_SITE_URL` (default `http://localhost:3000`) — set the real domain at deployment.

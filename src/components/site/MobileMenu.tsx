@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
+import { LogoMark } from "@/components/brand/LogoMark";
 import { audiences, businessHours, secondaryNav, site } from "@/config/site";
 import { cn } from "@/lib/utils";
 
@@ -130,7 +131,22 @@ export function MobileMenu({
               </ul>
             </nav>
 
-            <div className="mt-auto grid gap-6 pt-14 text-sm text-ash sm:grid-cols-2">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 1, delay: 0.45 }}
+              className="mt-14 flex items-center gap-5 border-t border-white/10 pt-10"
+            >
+              <LogoMark decorative className="h-16 w-16 shrink-0" />
+              <p className="leading-none">
+                <span className="block font-display text-2xl">Perfectly Hair</span>
+                <span className="mt-2 block text-[0.625rem] uppercase tracking-[0.34em] text-ash">
+                  by Gabriel
+                </span>
+              </p>
+            </motion.div>
+
+            <div className="mt-auto grid gap-6 pt-10 text-sm text-ash sm:grid-cols-2">
               <address className="not-italic leading-relaxed">
                 {site.address.street}, {site.address.postalCode} {site.address.city}
                 <br />

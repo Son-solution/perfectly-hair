@@ -16,6 +16,17 @@ All site imagery is registered in `src/content/images.ts`. To replace a placehol
 - Until a real photo exists, the site renders an abstract monochrome artwork labelled
   "Bild folgt". These artworks are generated in code and contain no third-party material.
 
+## Brand / logo
+
+- `logo.pdf` — **official source file** supplied by the salon (Adobe Illustrator 28.2). Keep it.
+- `brand/logo-white.svg`, `brand/logo-black.svg` — 1:1 vector conversions for use outside the
+  website (print, e-mail, social media).
+- In the app the logo is the inline component `src/components/brand/LogoMark.tsx` (colour follows
+  the surrounding text, so it is white on dark and black on light backgrounds). Favicon: `src/app/icon.svg`.
+- Conversion: every path coordinate was copied exactly from the PDF; the letters "P" and "H" were
+  converted to outlines from the font embedded in the PDF (Alice Regular, SIL Open Font License).
+  The black page background was omitted. Nothing was redrawn or altered.
+
 ## External imagery currently used
 
 None. All visuals are code-generated placeholders.

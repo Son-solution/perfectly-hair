@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { audiences, secondaryNav, site } from "@/config/site";
+import { LogoMark } from "@/components/brand/LogoMark";
 import { cn } from "@/lib/utils";
 import { MobileMenu } from "./MobileMenu";
 
@@ -69,18 +70,25 @@ export function SiteHeader() {
         <div className="container-luxe flex h-18 items-center justify-between gap-6 md:h-22">
           <Link
             href="/"
-            className="relative z-10 flex items-baseline gap-2 font-display text-xl tracking-wide md:text-2xl"
+            className="group relative z-10 flex shrink-0 items-center gap-3.5 md:gap-4"
             aria-label={`${site.name} – Startseite`}
             onClick={() => setMenuOpen(false)}
           >
-            Perfectly Hair
-            <span className="hidden font-sans text-[0.625rem] uppercase tracking-[0.3em] text-ash sm:inline">
-              by Gabriel
+            <LogoMark
+              decorative
+              className="h-10 w-10 transition-opacity duration-500 group-hover:opacity-80 md:h-12 md:w-12"
+            />
+            <span aria-hidden="true" className="h-8 w-px bg-white/25 md:h-9" />
+            <span aria-hidden="true" className="flex flex-col leading-none">
+              <span className="font-display text-lg tracking-wide md:text-xl">Perfectly Hair</span>
+              <span className="mt-1.5 text-[0.5625rem] uppercase tracking-[0.34em] text-ash">
+                by Gabriel
+              </span>
             </span>
           </Link>
 
           <nav aria-label="Hauptnavigation" className="hidden lg:block">
-            <ul className="flex items-center gap-7 text-[0.75rem] xl:gap-9">
+            <ul className="flex items-center gap-7 text-[0.75rem] xl:gap-6 2xl:gap-9">
               {audiences.map((a) => (
                 <li key={a.href}>
                   <NavLink href={a.href} label={a.label} active={isActive(a.href)} emphasis />

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { audiences, mapsUrl, secondaryNav, site } from "@/config/site";
+import { LogoMark } from "@/components/brand/LogoMark";
 import { HoursList } from "@/components/site/blocks";
 import { Container, Eyebrow } from "@/components/ui/primitives";
 
@@ -8,9 +9,17 @@ export function SiteFooter() {
     <footer className="border-t border-white/10 bg-ink text-white">
       <Container className="grid gap-14 py-20 md:grid-cols-12 md:py-28">
         <div className="md:col-span-4">
-          <Link href="/" className="inline-block font-display text-display-lg leading-none">
-            Perfectly Hair
-            <span className="mt-3 block font-sans text-eyebrow uppercase text-ash">by Gabriel</span>
+          <Link href="/" aria-label={`${site.name} – Startseite`} className="group inline-block">
+            <LogoMark
+              decorative
+              className="h-28 w-28 transition-opacity duration-700 group-hover:opacity-80 md:h-32 md:w-32"
+            />
+            <span aria-hidden="true" className="mt-8 block font-display text-display-lg leading-none">
+              Perfectly Hair
+            </span>
+            <span aria-hidden="true" className="mt-3 block text-eyebrow uppercase text-ash">
+              by Gabriel
+            </span>
           </Link>
           <p className="mt-8 max-w-xs leading-relaxed text-ash">
             Friseursalon für Damen, Herren und Kinder in Wiesbaden.
