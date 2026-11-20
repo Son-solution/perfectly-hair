@@ -1,8 +1,8 @@
-import Link from "next/link";
 import type { ReactNode } from "react";
 import { LogoMark } from "@/components/brand/LogoMark";
+import { BookingFinale } from "@/components/experience/BookingFinale";
 import { Reveal } from "@/components/motion";
-import { ButtonLink, Container, Eyebrow } from "@/components/ui/primitives";
+import { Eyebrow } from "@/components/ui/primitives";
 import { businessHours, flyerServices, site } from "@/config/site";
 import { formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -129,7 +129,7 @@ export function HoursList({ tone = "light" }: { tone?: "light" | "dark" }) {
 
 /* ----------------------------------------------------------------- */
 
-/** Closing call to action used at the bottom of most pages. */
+/** Closing call to action used at the bottom of most pages (compact cinematic finale). */
 export function CtaBand({
   title = "Ihr nächster Termin",
   italic = "beginnt mit einem Anruf.",
@@ -137,32 +137,7 @@ export function CtaBand({
   title?: string;
   italic?: string;
 }) {
-  return (
-    <section aria-labelledby="cta-title" className="grain overflow-hidden bg-ink text-white">
-      <Container className="relative py-24 md:py-40">
-        <div className="grid gap-12 md:grid-cols-12 md:items-end">
-          <Reveal className="md:col-span-8">
-            <Eyebrow className="text-ash">Termin vereinbaren</Eyebrow>
-            <h2 id="cta-title" className="mt-6 font-display text-display-xl font-normal">
-              {title}
-              <span className="block italic text-white/65">{italic}</span>
-            </h2>
-          </Reveal>
-          <Reveal delay={0.15} className="flex flex-col items-start gap-4 md:col-span-4 md:items-end">
-            <ButtonLink href={site.phone.href} tone="light">
-              {site.phone.display}
-            </ButtonLink>
-            <Link
-              href="/kontakt"
-              className="text-[0.75rem] uppercase tracking-[0.24em] text-ash underline-offset-8 transition-colors hover:text-white hover:underline"
-            >
-              Anfahrt &amp; Öffnungszeiten
-            </Link>
-          </Reveal>
-        </div>
-      </Container>
-    </section>
-  );
+  return <BookingFinale title={title} italic={italic} compact />;
 }
 
 /* ----------------------------------------------------------------- */

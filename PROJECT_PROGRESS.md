@@ -4,7 +4,7 @@ Resume point after any interruption: read this file, then `git log --oneline`.
 
 ## Current status
 
-**Phase 2 — Ultra-luxury public frontend + official logo (2.1) + editorial photography (2.2): complete, awaiting owner review / approval for Phase 3.**
+**Phase 2 — Public frontend + logo (2.1) + photography (2.2) + "Noir Atelier" redesign (2.3): complete, awaiting owner review / approval for Phase 3.**
 Last update: 2026-11-20
 
 Priority change (owner, Phase 2): finish and visually review the public website BEFORE
@@ -95,7 +95,33 @@ Supabase client factories (not connected). Details: `docs/`.
   trademarks, one image whose description advertises another salon. Salon/Team slots stay "Bild folgt".
 - Checks: typecheck ✅ · lint ✅ · build ✅ · 14 routes 200 ✅ · no dead links ✅ · screenshots 492 / 1440 ✅
 
+### Phase 2.3 — Major creative redesign "Noir Atelier" ✅ (2026-11-20)
+Checkpoint before redesign: git tag `pre-redesign-v1` (restore with `git checkout pre-redesign-v1`).
+Creative direction: `docs/CREATIVE_DIRECTION.md`.
+- **Hero** (`experience/HeroCinematic`): 3 chapters Damen/Herren/Kinder, auto-advance 6.5 s,
+  clip-path wipe + strong 1.2→1.04 zoom, layered inset frame (pointer depth + idle float),
+  masked rotating word "Für …", progress bars, CSS mask-up title (visible without JS)
+- **Category panels** (`experience/CategoryPanels`): full-height expanding panels, Ken Burns,
+  auto-cycle 5.2 s until interaction; touch: first tap expands, second opens
+- **Editorial story**: masked oversized statement, 3-layer floating collage + scroll parallax,
+  drifting outlined background words
+- **Cinematic gallery**: two counter-moving infinite rows, scroll-velocity boost + skew, hover captions
+- **Booking finale**: full-screen Ken Burns, giant masked type, rotating magnetic call badge;
+  honest note that online booking follows (used compact via `CtaBand` on all inner pages)
+- **Navigation**: hide-on-scroll-down header, rolling hover labels, full-screen menu (all breakpoints)
+  with curtain reveal, masked links and live image preview
+- **Footer**: moving Damen/Herren/Kinder band with logo, giant wordmark, back-to-top
+- **Inner pages**: new PageHero (giant masked title, outlined echo, zooming framed photo);
+  CSS page-enter transition via `(site)/template.tsx`
+- Performance: decorative loops pause off-screen / hidden tab (`useLiveSection` + `[data-paused]`),
+  transform/opacity/clip-path only, reduced motion respected. No GSAP added (Motion covers all effects).
+- Checks: typecheck ✅ · lint ✅ · build ✅ · 14 routes 200 ✅ · 0 dead links ✅ ·
+  visual checks via DevTools protocol at 1440×900 and real 390×844 mobile emulation, incl. menu open ✅
+
 ### Known limitations of testing
+- Reliable visual testing method: drive Edge via DevTools protocol (scratch script `cdp-shot.mjs`):
+  real mobile emulation, natural scrolling, clicks. The plain `--screenshot` CLI is unreliable
+  (min width 492 px, no anchors, lazy images in frames).
 - Headless Edge screenshots are timing-sensitive on this laptop (image generation on first request,
   slow decode): partially loaded or blank captures were traced to the tool, verified by fetching
   every image URL (all 200, ~1 s each) and by successful captures of the same pages.

@@ -45,6 +45,55 @@
   --animate-breathe: breathe 9s ease-in-out infinite;
   --animate-rise: rise 1.2s cubic-bezier(0.22, 1, 0.36, 1) both;
 
+  /* v2 "Noir Atelier" motion */
+  --animate-hero-zoom: hero-zoom 8s cubic-bezier(0.2, 0.6, 0.3, 1) both;
+  --animate-float-a: float-a 9s ease-in-out infinite;
+  --animate-float-b: float-b 12s ease-in-out infinite;
+  --animate-float-c: float-c 10.5s ease-in-out infinite;
+  --animate-progress: progress 1s linear both;
+  --animate-mask-up: mask-up 1.15s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-page-in: page-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-marquee: marquee 38s linear infinite;
+  --animate-marquee-rev: marquee 38s linear infinite reverse;
+  --animate-ken-strong: ken-strong 16s ease-in-out infinite alternate;
+
+  @keyframes hero-zoom {
+    from { transform: scale(1.2); }
+    to   { transform: scale(1.04); }
+  }
+  @keyframes float-a {
+    0%, 100% { transform: translate3d(0, 0, 0); }
+    50%      { transform: translate3d(0, -18px, 0); }
+  }
+  @keyframes float-b {
+    0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+    50%      { transform: translate3d(10px, 16px, 0) rotate(0.6deg); }
+  }
+  @keyframes float-c {
+    0%, 100% { transform: translate3d(0, 0, 0); }
+    50%      { transform: translate3d(-12px, -10px, 0); }
+  }
+  @keyframes progress {
+    from { transform: scaleX(0); }
+    to   { transform: scaleX(1); }
+  }
+  @keyframes mask-up {
+    from { transform: translate3d(0, 108%, 0); }
+    to   { transform: none; }
+  }
+  @keyframes page-in {
+    from { opacity: 0; transform: translate3d(0, 18px, 0); }
+    to   { opacity: 1; transform: none; }
+  }
+  @keyframes marquee {
+    from { transform: translate3d(0, 0, 0); }
+    to   { transform: translate3d(-50%, 0, 0); }
+  }
+  @keyframes ken-strong {
+    from { transform: scale(1.02) translate3d(0, 0, 0); }
+    to   { transform: scale(1.16) translate3d(-2.5%, -1.5%, 0); }
+  }
+
   @keyframes rise {
     from { opacity: 0; transform: translate3d(0, 24px, 0); }
     to   { opacity: 1; transform: none; }
@@ -115,6 +164,24 @@
       scroll-behavior: auto !important;
     }
   }
+}
+
+/* Pause every CSS loop inside a section that is off-screen or in a hidden tab. */
+[data-paused="true"],
+[data-paused="true"] *,
+[data-paused="true"] *::before,
+[data-paused="true"] *::after {
+  animation-play-state: paused !important;
+}
+
+/* Outlined display type (used sparingly for depth). */
+@utility text-outline-light {
+  color: transparent;
+  -webkit-text-stroke: 1px rgb(255 255 255 / 0.35);
+}
+@utility text-outline-dark {
+  color: transparent;
+  -webkit-text-stroke: 1px rgb(10 10 10 / 0.18);
 }
 
 /* Subtle animated film grain. Decorative only. */

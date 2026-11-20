@@ -42,7 +42,7 @@ const unsplash = (author: string, handle: string, photoId: string): ImageCredit 
 /* ------------------------------------------------ Editorial stock (Unsplash) */
 /* Licence verified on each photo page on 2026-11-20: "Free to use under the Unsplash License". */
 
-const stock = {
+export const stock = {
   damenPortraitHair: {
     seed: 101,
     src: "/images/editorial/damen-portrait-hair.jpg",

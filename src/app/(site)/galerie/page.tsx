@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Marquee, Reveal } from "@/components/motion";
+import { CinematicGallery } from "@/components/experience/CinematicGallery";
+import { Reveal } from "@/components/motion";
 import { SalonImage } from "@/components/media/SalonImage";
 import { CtaBand, Notice, SectionIntro } from "@/components/site/blocks";
 import { GalleryGrid } from "@/components/site/GalleryGrid";
@@ -25,24 +26,14 @@ export default function GaleriePage() {
         intro="Ideen für Damen, Herren und Kinder – und bald auch Arbeiten direkt aus unserem Salon."
       />
 
-      {/* Seamless, continuously moving strip */}
-      <div className="bg-ink pb-16 md:pb-24">
-        <Marquee label="Bildstreifen mit Inspirationsbildern, läuft automatisch" durationS={90}>
-          {inspirationItems.map((item) => (
-            <div
-              key={item.id}
-              className={cn(
-                "relative mr-3 h-48 shrink-0 overflow-hidden bg-ink-soft md:mr-5 md:h-72",
-                item.ratio === "landscape" ? "w-72 md:w-[27rem]" : item.ratio === "square" ? "w-48 md:w-72" : "w-36 md:w-52",
-              )}
-            >
-              <SalonImage image={item.image} sizes="(min-width: 768px) 27rem, 18rem" showLabel={false} />
-            </div>
-          ))}
-        </Marquee>
-        <p className="container-luxe mt-6 text-[0.625rem] uppercase tracking-[0.3em] text-ash">
-          Symbolbilder · Fotografie über Unsplash · <Link href="/bildnachweise" className="underline underline-offset-4 hover:text-white">Bildnachweise</Link>
-        </p>
+      {/* Two counter-moving infinite rows */}
+      <div className="-mt-px">
+        <CinematicGallery items={inspirationItems} showHeading={false} />
+        <div className="bg-ink pb-12">
+          <p className="container-luxe text-[0.625rem] uppercase tracking-[0.3em] text-ash">
+            Symbolbilder · Fotografie über Unsplash · <Link href="/bildnachweise" className="underline underline-offset-4 hover:text-white">Bildnachweise</Link>
+          </p>
+        </div>
       </div>
 
       {/* Inspiration (stock) */}

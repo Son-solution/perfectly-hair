@@ -1,38 +1,52 @@
 import Link from "next/link";
-import { audiences, mapsUrl, secondaryNav, site } from "@/config/site";
 import { LogoMark } from "@/components/brand/LogoMark";
-import { HoursList } from "@/components/site/blocks";
-import { Container, Eyebrow } from "@/components/ui/primitives";
+import { BackToTop, LiveBand } from "@/components/motion/LiveBand";
+import { audiences, businessHours, mapsUrl, secondaryNav, site } from "@/config/site";
+
+const bandWords = ["Damen", "Herren", "Kinder", "Wiesbaden"];
 
 export function SiteFooter() {
+  const band = (copy: number) => (
+    <span aria-hidden={copy === 1 ? true : undefined} className="flex shrink-0 items-center">
+      {bandWords.map((w, i) => (
+        <span key={w} className="flex items-center">
+          <span className={i % 2 === 1 ? "italic text-outline-light" : ""}>{w}</span>
+          <LogoMark decorative className="mx-[0.35em] h-[0.42em] w-[0.42em] text-white/40" />
+        </span>
+      ))}
+    </span>
+  );
+
+  const open = businessHours.filter((d) => d.opens);
+
   return (
-    <footer className="border-t border-white/10 bg-ink text-white">
-      <Container className="grid gap-14 py-20 md:grid-cols-12 md:py-28">
+    <footer className="relative overflow-hidden bg-ink text-white">
+      {/* Moving band */}
+      <LiveBand className="border-y border-white/10 py-6 md:py-10">
+        <div className="animate-marquee flex w-max whitespace-nowrap font-display text-[clamp(3.5rem,10vw,9rem)] leading-none">
+          {band(0)}
+          {band(1)}
+        </div>
+      </LiveBand>
+
+      <div className="container-luxe grid gap-14 py-20 md:grid-cols-12 md:py-28">
         <div className="md:col-span-4">
-          <Link href="/" aria-label={`${site.name} – Startseite`} className="group inline-block">
-            <LogoMark
-              decorative
-              className="h-28 w-28 transition-opacity duration-700 group-hover:opacity-80 md:h-32 md:w-32"
-            />
-            <span aria-hidden="true" className="mt-8 block font-display text-display-lg leading-none">
-              Perfectly Hair
-            </span>
-            <span aria-hidden="true" className="mt-3 block text-eyebrow uppercase text-ash">
-              by Gabriel
-            </span>
+          <Link href="/" aria-label={`${site.name} – Startseite`} className="group inline-flex items-center gap-5">
+            <LogoMark decorative className="h-24 w-24 transition-transform duration-700 group-hover:scale-105 md:h-28 md:w-28" />
           </Link>
-          <p className="mt-8 max-w-xs leading-relaxed text-ash">
-            Friseursalon für Damen, Herren und Kinder in Wiesbaden.
+          <p className="mt-8 max-w-xs font-display text-2xl leading-snug">
+            Friseursalon für <span className="italic">Damen, Herren</span> und{" "}
+            <span className="italic">Kinder</span> in Wiesbaden.
           </p>
         </div>
 
         <nav aria-label="Footer-Navigation" className="grid grid-cols-2 gap-8 md:col-span-4">
           <div>
-            <Eyebrow className="text-ash">Für</Eyebrow>
-            <ul className="mt-5 space-y-3">
+            <p className="text-[0.625rem] uppercase tracking-[0.3em] text-white/45">Für</p>
+            <ul className="mt-5 space-y-2">
               {audiences.map((a) => (
                 <li key={a.href}>
-                  <Link href={a.href} className="font-display text-2xl hover:italic">
+                  <Link href={a.href} className="font-display text-3xl transition-all duration-300 hover:pl-2 hover:italic">
                     {a.label}
                   </Link>
                 </li>
@@ -40,11 +54,11 @@ export function SiteFooter() {
             </ul>
           </div>
           <div>
-            <Eyebrow className="text-ash">Salon</Eyebrow>
+            <p className="text-[0.625rem] uppercase tracking-[0.3em] text-white/45">Salon</p>
             <ul className="mt-5 space-y-2.5 text-sm">
               {[...secondaryNav, { label: "Termin", href: "/termin" }].map((item) => (
                 <li key={item.href}>
-                  <Link href={item.href} className="text-white/75 transition-colors hover:text-white">
+                  <Link href={item.href} className="text-white/70 transition-colors hover:text-white">
                     {item.label}
                   </Link>
                 </li>
@@ -54,31 +68,48 @@ export function SiteFooter() {
         </nav>
 
         <div className="md:col-span-4">
-          <Eyebrow className="text-ash">Kontakt</Eyebrow>
-          <address className="mt-5 not-italic leading-loose">
-            <a href={mapsUrl} target="_blank" rel="noopener noreferrer" className="underline-offset-4 hover:underline">
-              {site.address.street}, {site.address.postalCode} {site.address.city}
+          <p className="text-[0.625rem] uppercase tracking-[0.3em] text-white/45">Besuch</p>
+          <address className="mt-5 not-italic">
+            <a href={mapsUrl} target="_blank" rel="noopener noreferrer" className="block font-display text-2xl leading-snug hover:italic">
+              {site.address.street}
+              <br />
+              {site.address.postalCode} {site.address.city}
               <span className="sr-only"> (Karte, öffnet in neuem Tab)</span>
             </a>
-            <br />
-            <a href={site.phone.href} className="underline-offset-4 hover:underline">
+            <a href={site.phone.href} className="mt-4 block font-display text-2xl hover:italic">
               {site.phone.display}
             </a>
           </address>
-          <div className="mt-8 text-sm">
-            <HoursList tone="dark" />
-          </div>
+          <dl className="mt-8 grid grid-cols-[auto_1fr] gap-x-6 gap-y-1.5 text-sm text-white/65">
+            <dt>Di – Fr</dt>
+            <dd className="tabular-nums text-white">{open[0]?.opens} – {open[0]?.closes} Uhr</dd>
+            <dt>Samstag</dt>
+            <dd className="tabular-nums text-white">{open.at(-1)?.opens} – {open.at(-1)?.closes} Uhr</dd>
+            <dt>So & Mo</dt>
+            <dd>Geschlossen</dd>
+          </dl>
         </div>
-      </Container>
+      </div>
 
-      <Container className="flex flex-col gap-4 border-t border-white/10 py-8 text-[0.6875rem] uppercase tracking-[0.2em] text-ash sm:flex-row sm:justify-between">
-        <p>{site.name}</p>
+      {/* Giant wordmark */}
+      <div className="container-luxe">
+        <div className="flex items-end justify-between gap-6 border-t border-white/10 pt-8">
+          <p aria-hidden="true" className="font-display text-[clamp(3rem,13.5vw,15rem)] leading-[0.8] tracking-[-0.02em]">
+            Perfectly <span className="italic text-white/35">Hair</span>
+          </p>
+          <BackToTop className="mb-3 hidden shrink-0 md:inline-flex" />
+        </div>
+      </div>
+
+      <div className="container-luxe flex flex-col gap-4 py-8 text-[0.625rem] uppercase tracking-[0.24em] text-white/45 sm:flex-row sm:items-center sm:justify-between">
+        <p>{site.name} · Wiesbaden</p>
         <ul className="flex flex-wrap gap-x-6 gap-y-2">
           <li><Link href="/impressum" className="hover:text-white">Impressum</Link></li>
           <li><Link href="/datenschutz" className="hover:text-white">Datenschutz</Link></li>
           <li><Link href="/bildnachweise" className="hover:text-white">Bildnachweise</Link></li>
+          <li className="md:hidden"><BackToTop className="text-[0.625rem]" /></li>
         </ul>
-      </Container>
+      </div>
     </footer>
   );
 }
