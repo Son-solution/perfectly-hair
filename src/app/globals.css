@@ -1,0 +1,99 @@
+@import "tailwindcss";
+
+/* ------------------------------------------------------------------
+   Perfectly Hair by Gabriel — design tokens (grayscale only)
+   See docs/DESIGN_SYSTEM.md
+------------------------------------------------------------------- */
+
+@theme {
+  /* Reset Tailwind's colour palette: only grayscale tokens exist. */
+  --color-*: initial;
+  --color-transparent: transparent;
+  --color-current: currentColor;
+  --color-ink: #0a0a0a;
+  --color-ink-soft: #1c1c1c;
+  --color-graphite: #3a3a3a;
+  --color-stone: #6b6b6b;
+  --color-ash: #a3a3a3;
+  --color-mist: #d9d9d9;
+  --color-bone: #f2f2f2;
+  --color-paper: #fafafa;
+  --color-white: #ffffff;
+  --color-black: #000000;
+
+  --font-display: var(--font-bodoni), "Didot", "Bodoni 72", Georgia, serif;
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+
+  --text-eyebrow: 0.75rem;
+  --text-eyebrow--letter-spacing: 0.3em;
+  --text-eyebrow--line-height: 1.4;
+
+  --text-display-lg: clamp(2.25rem, 1.4rem + 3.6vw, 4rem);
+  --text-display-lg--line-height: 1.05;
+  --text-display-xl: clamp(3rem, 1.6rem + 6vw, 6.5rem);
+  --text-display-xl--line-height: 0.98;
+  --text-display-2xl: clamp(3.5rem, 1rem + 10vw, 10rem);
+  --text-display-2xl--line-height: 0.92;
+
+  --ease-luxe: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --animate-ken-burns: ken-burns 24s ease-in-out infinite alternate;
+  --animate-grain: grain 8s steps(8) infinite;
+
+  @keyframes ken-burns {
+    from { transform: scale(1) translate3d(0, 0, 0); }
+    to   { transform: scale(1.08) translate3d(-1.5%, -1%, 0); }
+  }
+
+  @keyframes grain {
+    0%, 100% { transform: translate(0, 0); }
+    25% { transform: translate(-2%, 1%); }
+    50% { transform: translate(1%, -2%); }
+    75% { transform: translate(2%, 2%); }
+  }
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background: var(--color-ink);
+    color: var(--color-white);
+  }
+
+  :focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 4px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@utility container-luxe {
+  width: 100%;
+  max-width: 90rem;
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+  @media (width >= 48rem) { padding-inline: 2.5rem; }
+  @media (width >= 80rem) { padding-inline: 4rem; }
+}
