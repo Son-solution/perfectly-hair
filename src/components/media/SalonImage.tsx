@@ -5,8 +5,11 @@ import { ArtPlaceholder } from "./ArtPlaceholder";
 
 /**
  * Single replaceable image slot. Fills its (relatively positioned) parent.
- * Real photos render through next/image in grayscale; missing ones render
- * the abstract placeholder.
+ * - Photos render through next/image (responsive srcset, modern formats, lazy by default),
+ *   cropped with object-cover — never stretched — around the asset's focal point.
+ * - Stock photos (asset has `credit`) carry a small "Symbolbild" label so they are never
+ *   mistaken for the salon's own work.
+ * - Missing photos render the abstract placeholder ("Bild folgt").
  */
 export function SalonImage({
   image,
@@ -14,7 +17,7 @@ export function SalonImage({
   eager = false,
   tone = "dark",
   className,
-  showLabel,
+  showLabel = true,
 }: {
   image: ImageAsset;
   sizes?: string;
@@ -22,6 +25,7 @@ export function SalonImage({
   eager?: boolean;
   tone?: "dark" | "light";
   className?: string;
+  /** Show "Bild folgt" / "Symbolbild" label. Disable only where a caption is shown nearby. */
   showLabel?: boolean;
 }) {
   if (!image.src) {
@@ -37,14 +41,22 @@ export function SalonImage({
   }
 
   return (
-    <Image
-      src={image.src}
-      alt={image.alt}
-      fill
-      sizes={sizes}
-      loading={eager ? "eager" : "lazy"}
-      fetchPriority={eager ? "high" : "auto"}
-      className={cn("object-cover grayscale", className)}
-    />
+    <>
+      <Image
+        src={image.src}
+        alt={image.alt}
+        fill
+        sizes={sizes}
+        loading={eager ? "eager" : "lazy"}
+        fetchPriority={eager ? "high" : "auto"}
+        className={cn("object-cover grayscale", className)}
+        style={image.position ? { objectPosition: image.position } : undefined}
+      />
+      {showLabel && image.credit && (
+        <span className="pointer-events-none absolute bottom-3 left-3 bg-black/40 px-2 py-1 text-[0.5625rem] uppercase tracking-[0.28em] text-white/85 backdrop-blur-sm md:bottom-4 md:left-4">
+          Symbolbild
+        </span>
+      )}
+    </>
   );
 }

@@ -1,15 +1,17 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Marquee, Reveal } from "@/components/motion";
 import { SalonImage } from "@/components/media/SalonImage";
-import { CtaBand, Notice } from "@/components/site/blocks";
+import { CtaBand, Notice, SectionIntro } from "@/components/site/blocks";
 import { GalleryGrid } from "@/components/site/GalleryGrid";
 import { PageHero } from "@/components/site/PageHero";
 import { Container } from "@/components/ui/primitives";
-import { galleryItems } from "@/content/images";
+import { inspirationItems, portfolioItems } from "@/content/images";
+import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Galerie",
-  description: "Galerie von Perfectly Hair by Gabriel – Damen, Herren, Kinder und Salon.",
+  description: "Inspiration für Damen, Herren und Kinder – Perfectly Hair by Gabriel, Wiesbaden.",
   alternates: { canonical: "/galerie" },
 };
 
@@ -19,42 +21,77 @@ export default function GaleriePage() {
       <PageHero
         eyebrow="Galerie"
         title="Galerie"
-        italic="Momente aus dem Salon."
-        intro="Einblicke in unsere Arbeit für Damen, Herren und Kinder."
+        italic="Inspiration in Schwarzweiß."
+        intro="Ideen für Damen, Herren und Kinder – und bald auch Arbeiten direkt aus unserem Salon."
       />
 
-      <div aria-hidden="true" className="bg-ink pb-16 md:pb-24">
-        <Marquee label="Bildstreifen" durationS={90}>
-          {galleryItems.map((item) => (
-            <div key={item.id} className="relative mr-3 h-40 w-56 shrink-0 overflow-hidden md:mr-5 md:h-56 md:w-80">
-              <SalonImage image={item.image} sizes="20vw" showLabel={false} />
+      {/* Seamless, continuously moving strip */}
+      <div className="bg-ink pb-16 md:pb-24">
+        <Marquee label="Bildstreifen mit Inspirationsbildern, läuft automatisch" durationS={90}>
+          {inspirationItems.map((item) => (
+            <div
+              key={item.id}
+              className={cn(
+                "relative mr-3 h-48 shrink-0 overflow-hidden bg-ink-soft md:mr-5 md:h-72",
+                item.ratio === "landscape" ? "w-72 md:w-[27rem]" : item.ratio === "square" ? "w-48 md:w-72" : "w-36 md:w-52",
+              )}
+            >
+              <SalonImage image={item.image} sizes="(min-width: 768px) 27rem, 18rem" showLabel={false} />
             </div>
           ))}
         </Marquee>
+        <p className="container-luxe mt-6 text-[0.625rem] uppercase tracking-[0.3em] text-ash">
+          Symbolbilder · Fotografie über Unsplash · <Link href="/bildnachweise" className="underline underline-offset-4 hover:text-white">Bildnachweise</Link>
+        </p>
       </div>
 
-      <section aria-label="Bilder" className="py-24 md:py-36">
+      {/* Inspiration (stock) */}
+      <section aria-labelledby="inspiration" className="py-24 md:py-36">
         <Container>
-          <Reveal className="mb-12 max-w-2xl">
-            <Notice title="Bilder folgen">
-              Hier erscheinen in Kürze echte Aufnahmen aus dem Salon. Die Flächen unten
-              sind gestaltete Platzhalter und zeigen keine Arbeiten des Salons.
-            </Notice>
-          </Reveal>
+          <div className="mb-14 grid gap-10 md:grid-cols-12 md:items-end">
+            <div className="md:col-span-6">
+              <SectionIntro eyebrow="Inspiration" title="Ideen" italic="für Ihren nächsten Look." id="inspiration" />
+            </div>
+            <Reveal delay={0.1} className="md:col-span-5 md:col-start-8">
+              <Notice title="Symbolbilder">
+                Diese Fotos sind lizenzierte Symbolbilder (Unsplash) und dienen als
+                Inspiration. Sie zeigen <strong>keine Arbeiten, Mitarbeiter oder Kunden</strong>{" "}
+                des Salons.{" "}
+                <Link href="/bildnachweise" className="underline underline-offset-4">
+                  Bildnachweise
+                </Link>
+              </Notice>
+            </Reveal>
+          </div>
           <GalleryGrid
-            items={galleryItems.map((item) => ({
+            items={inspirationItems.map((item) => ({
               id: item.id,
               group: item.group,
               ratio: item.ratio,
-              node: (
-                <SalonImage
-                  image={item.image}
-                  tone={item.group === "salon" ? "dark" : "light"}
-                  sizes="(min-width: 768px) 33vw, 50vw"
-                />
-              ),
+              node: <SalonImage image={item.image} sizes="(min-width: 768px) 33vw, 50vw" />,
             }))}
           />
+        </Container>
+      </section>
+
+      {/* Genuine portfolio (empty until real work is supplied) */}
+      <section aria-labelledby="portfolio" className="bg-bone py-24 md:py-36">
+        <Container>
+          <SectionIntro eyebrow="Aus unserem Salon" title="Unsere Arbeiten" italic="folgen in Kürze." id="portfolio">
+            Hier zeigen wir bald echte Arbeiten aus dem Salon in der Rheinstraße.
+          </SectionIntro>
+          <ul className="mt-14 grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-5">
+            {portfolioItems.map((item, i) => (
+              <Reveal
+                as="li"
+                key={item.id}
+                delay={i * 0.08}
+                className={cn("relative overflow-hidden", i === 1 ? "col-span-2 aspect-[16/9] md:col-span-1 md:aspect-[4/5]" : "aspect-[4/5]")}
+              >
+                <SalonImage image={item.image} tone="light" />
+              </Reveal>
+            ))}
+          </ul>
         </Container>
       </section>
 

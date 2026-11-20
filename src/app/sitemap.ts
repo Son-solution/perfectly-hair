@@ -14,6 +14,7 @@ const routes = [
   "/salon",
   "/kontakt",
   "/termin",
+  "/bildnachweise",
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {

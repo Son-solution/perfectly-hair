@@ -1,9 +1,13 @@
 "use client";
 
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import { Children, useEffect, useState, type ReactNode } from "react";
 
-/** Cycles through its children with long, elegant dissolves. */
+/**
+ * Cycles through its children with long, elegant dissolves.
+ * All slides stay mounted and stacked, so images are already loaded before
+ * their turn (no pop-in); only opacity changes.
+ */
 export function Crossfade({
   children,
   holdMs = 7000,
@@ -33,19 +37,19 @@ export function Crossfade({
       className={className}
       style={{ display: "grid", gridTemplateColumns: "1fr", gridTemplateRows: "1fr" }}
     >
-      <AnimatePresence initial={false}>
+      {items.map((item, i) => (
         <motion.div
-          key={index}
+          key={i}
+          aria-hidden={i === index ? undefined : true}
           className="relative h-full min-h-0 w-full"
           style={{ gridArea: "1 / 1" }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
+          initial={false}
+          animate={{ opacity: i === index ? 1 : 0 }}
           transition={{ duration: reduce ? 0 : fadeS, ease: "easeInOut" }}
         >
-          {items[index]}
+          {item}
         </motion.div>
-      </AnimatePresence>
+      ))}
     </div>
   );
 }

@@ -30,11 +30,13 @@ export function GalleryGrid({
 }) {
   const [active, setActive] = useState<Group>("alle");
   const visible = items.filter((i) => active === "alle" || i.group === active);
+  // Only offer filters for groups that actually contain images.
+  const available = filters.filter((f) => f.id === "alle" || items.some((i) => i.group === f.id));
 
   return (
     <div>
       <div role="group" aria-label="Galerie filtern" className="flex flex-wrap gap-x-8 gap-y-3 border-b border-mist pb-5">
-        {filters.map((f) => (
+        {available.map((f) => (
           <button
             key={f.id}
             type="button"
@@ -62,8 +64,8 @@ export function GalleryGrid({
         {visible.length} Bilder angezeigt
       </p>
 
-      <motion.ul layout className="mt-12 grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-5">
-        <AnimatePresence mode="popLayout">
+      <motion.ul layout className="mt-12 grid grid-flow-row-dense grid-cols-2 gap-3 md:grid-cols-3 md:gap-5">
+        <AnimatePresence mode="popLayout" initial={false}>
           {visible.map((item) => (
             <motion.li
               key={item.id}
@@ -73,7 +75,7 @@ export function GalleryGrid({
               exit={{ opacity: 0, scale: 0.98 }}
               transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
               className={cn(
-                "group relative overflow-hidden",
+                "group relative overflow-hidden bg-mist",
                 item.ratio === "portrait" && "row-span-2 aspect-[3/4] md:aspect-auto",
                 item.ratio === "square" && "aspect-square",
                 item.ratio === "landscape" && "col-span-2 aspect-[16/9] md:col-span-1 md:aspect-[4/3]",

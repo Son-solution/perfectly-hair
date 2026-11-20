@@ -10,7 +10,7 @@ import {
 } from "@/components/site/blocks";
 import { ButtonLink, Container, Eyebrow } from "@/components/ui/primitives";
 import { audienceList } from "@/content/audiences";
-import { galleryItems, images } from "@/content/images";
+import { images, inspirationItems } from "@/content/images";
 import { site } from "@/config/site";
 import { cn } from "@/lib/utils";
 
@@ -25,14 +25,17 @@ export default function HomePage() {
         <Crossfade className="absolute inset-0 -z-20" holdMs={8000} fadeS={2.4}>
           {[images.heroOne, images.heroTwo, images.heroThree].map((img, i) => (
             <KenBurns key={img.seed} className="h-full w-full" delay={i * 8}>
-              <SalonImage image={img} eager={i === 0} showLabel={false} />
+              <SalonImage image={img} eager={i === 0} showLabel={false} sizes="100vw" />
             </KenBurns>
           ))}
         </Crossfade>
         <div
           aria-hidden="true"
-          className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(10,10,10,0.55)_0%,rgba(10,10,10,0.15)_40%,rgba(10,10,10,0.85)_100%)]"
+          className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(10,10,10,0.6)_0%,rgba(10,10,10,0.2)_38%,rgba(10,10,10,0.88)_100%)]"
         />
+        <p className="absolute right-5 top-22 text-[0.5625rem] uppercase tracking-[0.3em] text-white/55 md:right-10 md:top-28 lg:right-16">
+          Symbolbilder
+        </p>
 
         <Container className="flex flex-1 flex-col justify-end pb-10 pt-32 md:pb-14">
           <div className="flex items-end justify-between gap-8">
@@ -184,11 +187,11 @@ export default function HomePage() {
         </Container>
         <div className="mt-16 md:mt-20">
           <Marquee label="Bildergalerie, läuft automatisch" durationS={80}>
-            {galleryItems.map((item) => (
+            {inspirationItems.map((item) => (
               <div
                 key={item.id}
                 className={cn(
-                  "relative mr-4 h-72 shrink-0 overflow-hidden md:mr-6 md:h-[28rem]",
+                  "relative mr-4 h-72 shrink-0 overflow-hidden bg-ink-soft md:mr-6 md:h-[28rem]",
                   item.ratio === "portrait" && "w-52 md:w-80",
                   item.ratio === "square" && "w-72 md:w-[28rem]",
                   item.ratio === "landscape" && "w-[26rem] md:w-[40rem]",

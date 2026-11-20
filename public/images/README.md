@@ -29,4 +29,33 @@ All site imagery is registered in `src/content/images.ts`. To replace a placehol
 
 ## External imagery currently used
 
-None. All visuals are code-generated placeholders.
+Folder `editorial/` — 9 editorial **stock** photos from Unsplash, used as mood imagery
+("Symbolbild"). Licence verified on each photo page on 2026-11-20:
+"Free to use under the Unsplash License" (commercial use allowed, no attribution required;
+images may not be sold unmodified or compiled into a competing image service).
+
+| File | Photographer | Source |
+| --- | --- | --- |
+| damen-portrait-hair.jpg | Alexander Krivitskiy | https://unsplash.com/photos/GhPVQlqHLDE |
+| damen-portrait.jpg | Adil (@beingaheart) | https://unsplash.com/photos/-rEXYZx7fVk |
+| damen-curls.jpg | Atiyeh Fathi | https://unsplash.com/photos/EBqcZ3OyySs |
+| damen-hair-wash.jpg | Lindsay Cash | https://unsplash.com/photos/Md_DhaFsnCQ |
+| herren-profile.jpg | Megan Bagshaw | https://unsplash.com/photos/YmaaUNbHHtw |
+| herren-shears.jpg | Gulom Nazarov | https://unsplash.com/photos/DrG4V5skbMY |
+| herren-cut.jpg | Nate Johnston | https://unsplash.com/photos/tgPrIYnW3g4 |
+| kinder-portrait.jpg | Ibrahim Guetar | https://unsplash.com/photos/4brY7Bwss1I |
+| kinder-clipper.jpg | Jonathan Weiss | https://unsplash.com/photos/arxAZJT5k2A |
+
+Processing (sharp): auto-rotate → grayscale → mild contrast (linear 1.06, −6) → single-channel
+JPEG (mozjpeg q80), metadata stripped. Resized server-side and served as WebP by next/image.
+
+Usage rules:
+- Every stock photo has `credit` in `src/content/images.ts`, shows a "Symbolbild" label (or a
+  nearby "Symbolbilder" caption) and is listed on `/bildnachweise`.
+- Stock photos are NOT used in salon slots (interior, façade, portfolio, team) — those stay
+  "Bild folgt" until real photos exist.
+- Rejected during selection: images with visible trademarks/brand logos, an image whose
+  description advertises a specific other salon, and salon interiors that could be mistaken
+  for this salon.
+- Unsplash does not provide model releases. Identifiable people are shown only in neutral
+  editorial context, never as staff/customers or with endorsements.

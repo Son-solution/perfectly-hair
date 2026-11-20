@@ -73,9 +73,10 @@ export function SiteFooter() {
 
       <Container className="flex flex-col gap-4 border-t border-white/10 py-8 text-[0.6875rem] uppercase tracking-[0.2em] text-ash sm:flex-row sm:justify-between">
         <p>{site.name}</p>
-        <ul className="flex gap-6">
+        <ul className="flex flex-wrap gap-x-6 gap-y-2">
           <li><Link href="/impressum" className="hover:text-white">Impressum</Link></li>
           <li><Link href="/datenschutz" className="hover:text-white">Datenschutz</Link></li>
+          <li><Link href="/bildnachweise" className="hover:text-white">Bildnachweise</Link></li>
         </ul>
       </Container>
     </footer>

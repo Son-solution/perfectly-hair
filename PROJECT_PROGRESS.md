@@ -4,7 +4,7 @@ Resume point after any interruption: read this file, then `git log --oneline`.
 
 ## Current status
 
-**Phase 2 — Ultra-luxury public frontend + official logo (2.1): complete, awaiting owner review / approval for Phase 3.**
+**Phase 2 — Ultra-luxury public frontend + official logo (2.1) + editorial photography (2.2): complete, awaiting owner review / approval for Phase 3.**
 Last update: 2026-11-20
 
 Priority change (owner, Phase 2): finish and visually review the public website BEFORE
@@ -78,7 +78,27 @@ Supabase client factories (not connected). Details: `docs/`.
 - Header nav spacing tightened at 1280–1535 px so the logo + full navigation fit
 - Checks: typecheck ✅ · lint ✅ · build ✅ · routes incl. `/icon.svg` 200 ✅ · screenshots 492 / 1280 / 1440 ✅
 
+### Phase 2.2 — Monochrome editorial photography ✅ (2026-11-20)
+- 9 Unsplash photos (licence "Free to use under the Unsplash License" verified on EACH photo page);
+  full list with photographers in `public/images/README.md` and on the new page `/bildnachweise`
+- Distinct imagery: Damen (4), Herren (3), Kinder (2)
+- Processing with sharp: grayscale → mild contrast → true single-channel JPEG, metadata stripped;
+  served by next/image as responsive WebP (e.g. 42 KB at 640 px), lazy below the fold, eager hero
+- Registry `src/content/images.ts`: `credit`, intrinsic size, focal point (`position`) per photo;
+  object-cover only (no stretching)
+- Homepage hero: 3-image cinematic crossfade + Ken Burns (all slides preloaded, no pop-in), "Symbolbilder" caption
+- Category pages and cards use the photos; moving gallery strip on home + gallery
+- Gallery split into **Inspiration** (stock, "Symbolbild" label on every photo + notice) and
+  **Aus unserem Salon** (empty slots for genuine work)
+- Every stock photo shows a "Symbolbild" label (or nearby caption); footer link "Bildnachweise"
+- Deliberately NOT used: salon interiors (could be mistaken for this salon), images with visible
+  trademarks, one image whose description advertises another salon. Salon/Team slots stay "Bild folgt".
+- Checks: typecheck ✅ · lint ✅ · build ✅ · 14 routes 200 ✅ · no dead links ✅ · screenshots 492 / 1440 ✅
+
 ### Known limitations of testing
+- Headless Edge screenshots are timing-sensitive on this laptop (image generation on first request,
+  slow decode): partially loaded or blank captures were traced to the tool, verified by fetching
+  every image URL (all 200, ~1 s each) and by successful captures of the same pages.
 - Headless Edge cannot render viewports narrower than 492 px; 390 px phones were checked by
   calculation (hero title and audience row sized to fit 350 px content width), not by screenshot.
 - Screenshot method: use `--timeout=9000` (real time). With `--virtual-time-budget`, headless Edge
