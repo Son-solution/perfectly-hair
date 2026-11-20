@@ -4,8 +4,11 @@ Resume point after any interruption: read this file, then `git log --oneline`.
 
 ## Current status
 
-**Phase 1 — Foundation: complete, awaiting owner approval for Phase 2.**
+**Phase 2 — Ultra-luxury public frontend: complete, awaiting owner review / approval for Phase 3.**
 Last update: 2026-11-20
+
+Priority change (owner, Phase 2): finish and visually review the public website BEFORE
+connecting Supabase, Resend, GitHub or Vercel. None of these are connected.
 
 ## Environment (verified 2026-11-20)
 
@@ -17,22 +20,38 @@ Last update: 2026-11-20
 | Next.js | 16.4.6 (Turbopack, Cache Components + Partial Prefetching enabled) |
 | React | 19.3.0 |
 | Tailwind CSS | 4.3.3 |
+| Motion | 14.3.0 |
 
-## Phase 1 — completed
+## Phase 1 — Foundation ✅ (commit `2e92736`)
 
-- [x] Workspace inspected (was empty)
-- [x] Next.js App Router + TypeScript + Tailwind + ESLint scaffolded
-- [x] Dependencies: motion, @supabase/ssr, @supabase/supabase-js, zod, clsx, server-only
-- [x] Architecture → `docs/ARCHITECTURE.md`
-- [x] Database schema, RLS permission matrix, double-booking strategy → `docs/DATABASE.md` (design only)
-- [x] Booking workflow + notification architecture → `docs/ARCHITECTURE.md` §5–6
-- [x] Design system (grayscale tokens, Bodoni Moda + Manrope, motion rules) → `docs/DESIGN_SYSTEM.md`, `src/app/globals.css`
-- [x] Motion primitives: Reveal, KenBurns, Crossfade, Marquee, MotionProvider (reduced-motion aware)
-- [x] Foundation homepage with DAMEN / HERREN / KINDER, flyer prices, address, hours
-- [x] Impressum + Datenschutz drafts with missing information marked `[FEHLT: …]`
-- [x] Env handling (`.env.example`, validated accessors, server-only secrets)
-- [x] Supabase client factories (browser / server / admin) — **not connected**
-- [x] Secure `.gitignore` (all `.env*` except `.env.example`)
+Architecture, database/RLS design, design system, Next.js setup, env handling,
+Supabase client factories (not connected). Details: `docs/`.
+
+## Phase 2 — Public frontend ✅
+
+### Routes (all statically prerendered)
+`/` · `/damen` · `/herren` · `/kinder` · `/leistungen` · `/preise` · `/team` · `/galerie` ·
+`/salon` · `/kontakt` · `/termin` · `/impressum` · `/datenschutz` · `/sitemap.xml` · `/robots.txt` · custom 404
+
+### Built
+- [x] Homepage: cinematic crossfading hero, DAMEN/HERREN/KINDER visible on first screen (also mobile),
+      statement, asymmetric audience triptych, moving gallery strip, flyer prices, visit + hours, CTA
+- [x] Header: transparent → solid on scroll, active link state; audiences always visible on desktop
+- [x] Mobile menu: full-screen dialog, Escape/route-change close, focus trap, scroll lock
+- [x] Shared editorial `PageHero`, `SectionIntro`, `CtaBand`, `HoursList`, `FlyerPriceList`, `Notice`
+- [x] Damen / Herren / Kinder pages from one `AudiencePage` component + `src/content/audiences.ts`
+- [x] Prices: only the 6 verified flyer prices, with explicit note that the flyer does not distinguish audiences
+- [x] Team: no invented staff — elegant "in Vorbereitung" state
+- [x] Gallery: filterable grid (Alle/Damen/Herren/Kinder/Salon) + marquee; notice that images are placeholders
+- [x] Kontakt: address, phone, hours; map is a link (no embed → no third-party cookies)
+- [x] Termin: interactive 5-step booking **prototype**, clearly labelled unavailable; no submit,
+      no fake time slots, nothing stored; final step routes to the phone
+- [x] Image system: `src/content/images.ts` registry + `SalonImage` (next/image, grayscale) +
+      code-generated `ArtPlaceholder` ("Bild folgt"); `public/images/README.md` with rules. No external imagery used.
+- [x] Motion: `Rise` (CSS, above the fold), `Reveal` (in-view), `KenBurns`, `Crossfade`, `Marquee`,
+      drifting hairline art, rotating badge, grain; all reduced-motion aware
+- [x] SEO: per-page metadata + canonical, sitemap, robots, schema.org `HairSalon` JSON-LD (verified data only)
+- [x] Legal pages still marked as drafts (`[FEHLT: …]`, `noindex`)
 
 ### Checks (2026-11-20)
 
@@ -40,35 +59,36 @@ Last update: 2026-11-20
 | --- | --- |
 | `npm run typecheck` | ✅ passed |
 | `npm run lint` | ✅ passed, 0 warnings |
-| `npm run build` | ✅ passed — `/`, `/impressum`, `/datenschutz` prerendered static |
-| Production smoke test (`next start`) | ✅ `/`, `/impressum`, `/datenschutz` return 200 with expected German content |
+| `npm run build` | ✅ passed — 18 static pages |
+| All routes via `next start` | ✅ 200 (unknown route → 404) |
+| Internal link crawl | ✅ no dead links |
+| Built CSS colour scan | ✅ grayscale only (one Tailwind internal feature-test value, never rendered) |
+| Visual check (headless Edge) | ✅ desktop 1440 (home, Damen), tablet 1024, mobile 480–492 (home, Termin) |
 
-## Known gaps / not yet built (by design)
-
-- Nav links `/damen`, `/herren`, `/kinder`, `/leistungen`, `/team`, `/galerie`, `/salon`, `/kontakt`, `/termin` → 404 until Phase 4/3
-- No mobile navigation drawer yet (Phase 4)
-- No real photography — placeholders labelled "Bild folgt"
-- Supabase, Resend, push: **not configured, not tested**
-- No booking, auth, dashboards, notifications yet
-- `docs/DATABASE.md` SQL is untested design; real migrations come in Phase 2
-- Legal pages are incomplete drafts and must be legally reviewed
+### Known limitations of testing
+- Headless Edge cannot render viewports narrower than 492 px; 390 px phones were checked by
+  calculation (hero title and audience row sized to fit 350 px content width), not by screenshot.
+- Interactive behaviour (mobile menu open/close, gallery filter, booking steps) is implemented
+  and type-checked but was not click-tested automatically — please check manually in `npm run dev`.
+- Canonical URLs use `NEXT_PUBLIC_SITE_URL` (default `http://localhost:3000`) — set the real domain at deployment.
 
 ## Information needed from the owner
 
-1. Which flyer prices apply to Damen / Herren / Kinder, plus missing services and prices per category
+1. Which prices apply to Damen / Herren / Kinder, plus missing services and prices
 2. Duration of each service
-3. Team members (names, roles, photos, which services each performs) — only with their consent
-4. Real photos of the salon and work
+3. Team members (names, roles, portraits) — only with consent
+4. Real photos of salon and work (→ `public/images/`, register in `src/content/images.ts`)
 5. Impressum data: owner name, e-mail, USt-IdNr./Kleinunternehmer, Handwerkskammer, Betriebsnummer
-6. Approval mode preference (auto / manual / hybrid) and cancellation policy
-7. Supabase project (or approval to create one) and a sending domain for Resend
+6. Approval of the draft German texts (`src/content/audiences.ts`, homepage, Salon page)
+7. Approval mode preference (auto / manual / hybrid) and cancellation policy (for Phase 3+)
 
 ## Blockers
 
-- None technical. Network is very slow (npm install took ~15 min); allow time for installs.
-- Leftover folder `perfectly-hair/` (contains only a locked `node_modules` from the scaffold move). Ignored by Git; delete it manually after closing VS Code.
+- None technical. Network is slow; allow time for installs.
+- Leftover folder `perfectly-hair/` (only a locked `node_modules` from the Phase 1 move). Ignored by Git;
+  delete manually after closing VS Code.
 
-## Next step — Phase 2 (needs approval)
+## Next step — Phase 3 (needs approval)
 
-Supabase: migrations from `docs/DATABASE.md`, RLS policies + tests, Auth (sign-up, login, roles),
-`src/proxy.ts` session refresh, generated types, seed from flyer data.
+Backend foundation: Supabase project, migrations from `docs/DATABASE.md`, RLS + tests, Auth,
+`src/proxy.ts`, generated types, seed — then the real booking engine replaces the prototype.

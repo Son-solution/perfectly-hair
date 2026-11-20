@@ -7,6 +7,7 @@ import "./globals.css";
 
 const bodoni = Bodoni_Moda({
   subsets: ["latin"],
+  style: ["normal", "italic"],
   variable: "--font-bodoni",
   display: "swap",
 });

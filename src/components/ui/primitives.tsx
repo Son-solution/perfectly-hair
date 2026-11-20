@@ -79,30 +79,3 @@ export function ButtonLink({
     </Link>
   );
 }
-
-/** Honest image slot until the owner supplies real photography. */
-export function ImagePlaceholder({
-  label = "Bild folgt",
-  className,
-  tone = "dark",
-}: {
-  label?: string;
-  className?: string;
-  tone?: ButtonTone;
-}) {
-  return (
-    <div
-      role="img"
-      aria-label={label}
-      className={cn(
-        "flex h-full w-full items-end p-5",
-        tone === "dark"
-          ? "bg-[radial-gradient(ellipse_at_30%_20%,#3a3a3a_0%,#1c1c1c_45%,#0a0a0a_100%)] text-ash"
-          : "bg-[radial-gradient(ellipse_at_30%_20%,#ffffff_0%,#f2f2f2_50%,#d9d9d9_100%)] text-stone",
-        className,
-      )}
-    >
-      <span className="text-eyebrow uppercase">{label}</span>
-    </div>
-  );
-}

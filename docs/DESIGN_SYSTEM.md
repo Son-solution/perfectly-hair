@@ -45,11 +45,14 @@ All primitives use Motion for React and fall back to static rendering when
 
 | Primitive | Behaviour | Default timing |
 | --- | --- | --- |
-| `Reveal` | Fade + 24px rise when entering viewport, once | 1.1s, ease `[0.22, 1, 0.36, 1]` |
+| `Rise` | CSS-only entrance for above-the-fold content (heroes). Plays on first paint, no JS needed | 1.2s, staggered delays |
+| `Reveal` | Fade + 24px rise when entering viewport, once (below-the-fold only) | 1.1s, ease `[0.22, 1, 0.36, 1]` |
 | `KenBurns` | Slow continuous zoom/pan on images, independent of scroll | 24s alternate loop, scale 1 → 1.08 |
 | `Crossfade` | Cycles children with long dissolves | 7s hold, 1.8s fade |
 | `Marquee` | Seamless infinite horizontal drift (gallery strip, words) | 60s per loop, pauses on hover/focus |
-| `AmbientGrain` | Very subtle animated film grain overlay (CSS only) | 8 steps, opacity 0.05 |
+| `grain` utility | Very subtle animated film grain overlay (CSS only) | 8 steps, opacity 0.06 |
+| `ArtPlaceholder` | Code-generated flowing hairlines drifting slowly; stands in for missing photos | 38s alternate |
+| `RotatingBadge` | Circular "Damen · Herren · Kinder" text, slow rotation | 48s per turn |
 
 Rules: one ambient motion per viewport; no parallax on text; dashboards use only
 short state transitions (≤ 200ms), no continuous motion.
@@ -62,4 +65,5 @@ Focus style: 2px solid ink (or white on dark) outline with 4px offset on all int
 ## Imagery
 
 No stock photography is presented as the salon's own. Until the owner provides real
-photos, image slots render an explicit neutral placeholder labelled "Bild folgt".
+photos, image slots render an abstract artwork labelled "Bild folgt".
+All images are registered in `src/content/images.ts` — see `public/images/README.md`.

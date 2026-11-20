@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Crossfade, KenBurns, Marquee, Reveal } from "@/components/motion";
+import { Crossfade, KenBurns, Marquee, Reveal, Rise } from "@/components/motion";
 import { SalonImage } from "@/components/media/SalonImage";
 import {
   CtaBand,
@@ -37,26 +37,26 @@ export default function HomePage() {
         <Container className="flex flex-1 flex-col justify-end pb-10 pt-32 md:pb-14">
           <div className="flex items-end justify-between gap-8">
             <div>
-              <Reveal>
+              <Rise>
                 <Eyebrow className="flex items-center gap-4 text-ash">
                   <span aria-hidden="true" className="h-px w-10 bg-ash/60" />
                   Friseursalon in Wiesbaden
                 </Eyebrow>
-              </Reveal>
-              <Reveal delay={0.15}>
+              </Rise>
+              <Rise delay={0.15}>
                 <h1 id="hero-title" className="mt-8 font-display text-display-2xl font-normal">
                   Perfectly Hair
                   <span className="block pl-[0.6em] italic text-white/75">by Gabriel</span>
                 </h1>
-              </Reveal>
+              </Rise>
             </div>
-            <Reveal delay={0.6} className="hidden text-white/70 md:block">
+            <Rise delay={0.6} className="hidden text-white/70 md:block">
               <RotatingBadge />
-            </Reveal>
+            </Rise>
           </div>
 
           {/* The three audiences — visible immediately, also on mobile */}
-          <Reveal delay={0.35}>
+          <Rise delay={0.35}>
             <nav aria-label="Für wen" className="mt-14 border-t border-white/20 md:mt-20">
               <ul className="grid grid-cols-3">
                 {audienceList.map((a, i) => (
@@ -65,7 +65,7 @@ export default function HomePage() {
                       href={`/${a.slug}`}
                       className={cn("group flex flex-col gap-2 px-3 pt-5 sm:px-6 md:flex-row md:items-baseline md:justify-between md:pt-7", i === 0 && "pl-0 sm:pl-0")}
                     >
-                      <span className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl group-hover:italic">
+                      <span className="font-display text-[1.6rem] leading-tight sm:text-4xl md:text-5xl lg:text-6xl group-hover:italic">
                         {a.label}
                       </span>
                       <span className="flex items-center gap-3 text-[0.625rem] uppercase tracking-[0.3em] text-ash">
@@ -80,7 +80,7 @@ export default function HomePage() {
                 ))}
               </ul>
             </nav>
-          </Reveal>
+          </Rise>
         </Container>
 
         {/* Scroll cue */}

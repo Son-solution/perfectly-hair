@@ -66,8 +66,8 @@ export function ArtPlaceholder({
         <g
           fill="none"
           stroke={light ? "#0a0a0a" : "#ffffff"}
-          strokeWidth="0.12"
-          strokeOpacity={light ? 0.22 : 0.16}
+          strokeWidth="1"
+          strokeOpacity={light ? 0.14 : 0.1}
           vectorEffect="non-scaling-stroke"
         >
           {lines.map((d, i) => (
