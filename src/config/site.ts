@@ -73,13 +73,20 @@ export const flyerServices: ReadonlyArray<{
   { name: "Färben", priceCents: 2500, priceIsFrom: false, durationMin: null, audiences: [] },
 ];
 
-export const mainNav = [
-  { label: "Damen", href: "/damen" },
-  { label: "Herren", href: "/herren" },
-  { label: "Kinder", href: "/kinder" },
+export const secondaryNav = [
   { label: "Leistungen", href: "/leistungen" },
+  { label: "Preise", href: "/preise" },
   { label: "Team", href: "/team" },
   { label: "Galerie", href: "/galerie" },
   { label: "Salon", href: "/salon" },
   { label: "Kontakt", href: "/kontakt" },
 ] as const;
+
+export const mainNav = [
+  ...audiences.map(({ label, href }) => ({ label, href })),
+  ...secondaryNav,
+] as const;
+
+export const mapsUrl =
+  "https://www.google.com/maps/search/?api=1&query=" +
+  encodeURIComponent("Rheinstraße 33, 65185 Wiesbaden");

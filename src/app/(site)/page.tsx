@@ -1,94 +1,170 @@
 import Link from "next/link";
-import { KenBurns, Marquee, Reveal } from "@/components/motion";
+import { Crossfade, KenBurns, Marquee, Reveal } from "@/components/motion";
+import { SalonImage } from "@/components/media/SalonImage";
 import {
-  ButtonLink,
-  Container,
-  Eyebrow,
-  ImagePlaceholder,
-} from "@/components/ui/primitives";
-import { audiences, flyerServices, site } from "@/config/site";
-import { formatPrice } from "@/lib/format";
-
-/**
- * Phase 1 foundation homepage: demonstrates the design system and motion primitives
- * with real business data only. Photography and CMS-driven sections arrive in Phase 4.
- */
-
-const audienceCopy: Record<(typeof audiences)[number]["slug"], string> = {
-  damen: "Schnitt, Farbe und Styling für Damen.",
-  herren: "Haarschnitt, Bart und Pflege für Herren.",
-  kinder: "Entspannte Haarschnitte für Kinder.",
-};
+  CtaBand,
+  FlyerPriceList,
+  HoursList,
+  RotatingBadge,
+  SectionIntro,
+} from "@/components/site/blocks";
+import { ButtonLink, Container, Eyebrow } from "@/components/ui/primitives";
+import { audienceList } from "@/content/audiences";
+import { galleryItems, images } from "@/content/images";
+import { site } from "@/config/site";
+import { cn } from "@/lib/utils";
 
 export default function HomePage() {
   return (
     <>
-      {/* Hero */}
-      <section className="relative isolate flex min-h-[100svh] items-end overflow-hidden bg-ink text-white">
-        <KenBurns className="absolute inset-0 -z-10">
-          <ImagePlaceholder label="Hero-Bild folgt" />
-        </KenBurns>
-        <div aria-hidden="true" className="absolute inset-0 -z-10 bg-black/40" />
+      {/* ------------------------------------------------ Hero */}
+      <section
+        aria-labelledby="hero-title"
+        className="grain relative isolate flex min-h-[100svh] flex-col overflow-hidden bg-ink text-white"
+      >
+        <Crossfade className="absolute inset-0 -z-20" holdMs={8000} fadeS={2.4}>
+          {[images.heroOne, images.heroTwo, images.heroThree].map((img, i) => (
+            <KenBurns key={img.seed} className="h-full w-full" delay={i * 8}>
+              <SalonImage image={img} eager={i === 0} showLabel={false} />
+            </KenBurns>
+          ))}
+        </Crossfade>
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(10,10,10,0.55)_0%,rgba(10,10,10,0.15)_40%,rgba(10,10,10,0.85)_100%)]"
+        />
 
-        <Container className="pb-16 pt-40 md:pb-24">
-          <Reveal>
-            <Eyebrow className="text-ash">Friseursalon · Wiesbaden</Eyebrow>
+        <Container className="flex flex-1 flex-col justify-end pb-10 pt-32 md:pb-14">
+          <div className="flex items-end justify-between gap-8">
+            <div>
+              <Reveal>
+                <Eyebrow className="flex items-center gap-4 text-ash">
+                  <span aria-hidden="true" className="h-px w-10 bg-ash/60" />
+                  Friseursalon in Wiesbaden
+                </Eyebrow>
+              </Reveal>
+              <Reveal delay={0.15}>
+                <h1 id="hero-title" className="mt-8 font-display text-display-2xl font-normal">
+                  Perfectly Hair
+                  <span className="block pl-[0.6em] italic text-white/75">by Gabriel</span>
+                </h1>
+              </Reveal>
+            </div>
+            <Reveal delay={0.6} className="hidden text-white/70 md:block">
+              <RotatingBadge />
+            </Reveal>
+          </div>
+
+          {/* The three audiences — visible immediately, also on mobile */}
+          <Reveal delay={0.35}>
+            <nav aria-label="Für wen" className="mt-14 border-t border-white/20 md:mt-20">
+              <ul className="grid grid-cols-3">
+                {audienceList.map((a, i) => (
+                  <li key={a.slug} className={cn(i > 0 && "border-l border-white/20")}>
+                    <Link
+                      href={`/${a.slug}`}
+                      className={cn("group flex flex-col gap-2 px-3 pt-5 sm:px-6 md:flex-row md:items-baseline md:justify-between md:pt-7", i === 0 && "pl-0 sm:pl-0")}
+                    >
+                      <span className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl group-hover:italic">
+                        {a.label}
+                      </span>
+                      <span className="flex items-center gap-3 text-[0.625rem] uppercase tracking-[0.3em] text-ash">
+                        <span className="hidden sm:inline">{a.numeral}</span>
+                        <span
+                          aria-hidden="true"
+                          className="h-px w-6 bg-ash transition-[width] duration-700 ease-luxe group-hover:w-12"
+                        />
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
           </Reveal>
-          <Reveal delay={0.15}>
-            <h1 className="mt-6 max-w-5xl font-display text-display-2xl font-normal">
-              Perfectly Hair
-              <span className="block italic text-white/80">by Gabriel</span>
-            </h1>
+        </Container>
+
+        {/* Scroll cue */}
+        <div aria-hidden="true" className="absolute bottom-0 right-5 hidden h-16 w-px overflow-hidden bg-white/15 md:right-10 md:block lg:right-16">
+          <span className="block h-full w-full animate-scan bg-white" />
+        </div>
+      </section>
+
+      {/* ------------------------------------------------ Statement */}
+      <section aria-labelledby="statement" className="py-24 md:py-44">
+        <Container className="grid gap-14 md:grid-cols-12">
+          <Reveal className="md:col-span-3">
+            <Eyebrow className="flex items-center gap-4 text-stone">
+              <span aria-hidden="true" className="h-px w-10 bg-current opacity-60" />
+              Der Salon
+            </Eyebrow>
           </Reveal>
-          <Reveal delay={0.3}>
-            <p className="mt-10 flex flex-wrap gap-x-6 gap-y-2 text-eyebrow uppercase md:text-sm md:tracking-[0.3em]">
-              {audiences.map((a, i) => (
-                <span key={a.slug} className="flex items-center gap-6">
-                  {i > 0 && <span aria-hidden="true" className="h-px w-8 bg-white/40" />}
-                  {a.label}
+          <div className="md:col-span-9">
+            <Reveal>
+              <h2 id="statement" className="font-display text-display-lg font-normal leading-[1.12]">
+                Ein Salon für die ganze Familie –{" "}
+                <span className="italic text-graphite">
+                  für Damen, Herren und Kinder, mitten in Wiesbaden.
                 </span>
-              ))}
-            </p>
-          </Reveal>
-          <Reveal delay={0.45} className="mt-12 flex flex-wrap gap-4">
-            <ButtonLink href="/termin" tone="light">
-              Termin buchen
-            </ButtonLink>
-            <ButtonLink href="/leistungen" tone="light" variant="outline">
-              Leistungen
-            </ButtonLink>
-          </Reveal>
+              </h2>
+            </Reveal>
+            <Reveal delay={0.15} className="mt-12 grid gap-8 text-graphite sm:grid-cols-2 md:mt-16">
+              <p className="leading-relaxed">
+                Bei Perfectly Hair by Gabriel steht der Mensch im Mittelpunkt. Wir nehmen
+                uns Zeit für Ihre Wünsche und arbeiten mit Ruhe und Sorgfalt.
+              </p>
+              <p className="leading-relaxed">
+                Sie finden uns in der {site.address.street}. Rufen Sie uns an – wir
+                beraten Sie gern und finden einen passenden Termin.
+              </p>
+            </Reveal>
+            <Reveal delay={0.25} className="mt-12">
+              <ButtonLink href="/salon" variant="ghost">
+                Mehr über den Salon
+              </ButtonLink>
+            </Reveal>
+          </div>
         </Container>
       </section>
 
-      {/* Audience categories */}
-      <section aria-labelledby="fuer-wen" className="py-24 md:py-44">
+      {/* ------------------------------------------------ Audiences */}
+      <section aria-labelledby="fuer-wen" className="bg-bone py-24 md:py-44">
         <Container>
-          <Reveal className="max-w-3xl">
-            <Eyebrow className="text-stone">Für die ganze Familie</Eyebrow>
-            <h2 id="fuer-wen" className="mt-6 font-display text-display-xl font-normal">
-              Damen. Herren. Kinder.
-            </h2>
-          </Reveal>
+          <div className="flex flex-col justify-between gap-8 md:flex-row md:items-end">
+            <SectionIntro eyebrow="Für wen" title="Damen. Herren." italic="Kinder." id="fuer-wen" />
+            <Reveal delay={0.1}>
+              <ButtonLink href="/leistungen" variant="outline">
+                Alle Leistungen
+              </ButtonLink>
+            </Reveal>
+          </div>
 
-          <ul className="mt-16 grid gap-6 md:mt-24 md:grid-cols-3 md:gap-8">
-            {audiences.map((a, i) => (
-              <Reveal as="li" key={a.slug} delay={i * 0.12}>
-                <Link href={a.href} className="group block">
-                  <KenBurns className="aspect-[3/4]" delay={i * 6}>
-                    <ImagePlaceholder
-                      label={`${a.label} – Bild folgt`}
-                      className="transition-transform duration-[1400ms] ease-luxe group-hover:scale-[1.03]"
-                    />
+          <ul className="mt-16 grid gap-14 md:mt-24 md:grid-cols-3 md:gap-8">
+            {audienceList.map((a, i) => (
+              <Reveal
+                as="li"
+                key={a.slug}
+                delay={i * 0.12}
+                className={cn(i === 1 && "md:mt-24", i === 2 && "md:mt-12")}
+              >
+                <Link href={`/${a.slug}`} className="group block">
+                  <KenBurns className="aspect-[3/4]" delay={i * 7}>
+                    <div className="absolute inset-0 transition-transform duration-[1600ms] ease-luxe group-hover:scale-[1.04]">
+                      <SalonImage image={a.hero} sizes="(min-width: 768px) 33vw, 100vw" />
+                    </div>
                   </KenBurns>
-                  <div className="mt-6 flex items-baseline justify-between border-b border-mist pb-5">
-                    <h3 className="font-display text-4xl md:text-5xl">{a.label}</h3>
+                  <div className="mt-7 flex items-baseline justify-between border-b border-ink/15 pb-5">
+                    <h3 className="font-display text-4xl md:text-5xl">
+                      <span className="mr-4 align-top font-sans text-[0.625rem] tracking-[0.3em] text-stone">
+                        {a.numeral}
+                      </span>
+                      <span className="transition-[font-style] group-hover:italic">{a.label}</span>
+                    </h3>
                     <span
                       aria-hidden="true"
-                      className="h-px w-8 bg-ink transition-[width] duration-500 ease-luxe group-hover:w-16"
+                      className="h-px w-8 bg-ink transition-[width] duration-700 ease-luxe group-hover:w-16"
                     />
                   </div>
-                  <p className="mt-4 text-graphite">{audienceCopy[a.slug]}</p>
+                  <p className="mt-4 text-graphite">{a.teaser}</p>
                 </Link>
               </Reveal>
             ))}
@@ -96,74 +172,76 @@ export default function HomePage() {
         </Container>
       </section>
 
-      {/* Ambient marquee */}
-      <section className="border-y border-mist bg-bone py-10">
-        <Marquee label="Leistungen im Überblick" durationS={70}>
-          {flyerServices.map((s) => (
-            <span
-              key={s.name}
-              className="flex items-center gap-10 px-5 font-display text-4xl italic text-graphite md:text-6xl"
-            >
-              {s.name}
-              <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-ash" />
-            </span>
-          ))}
-        </Marquee>
+      {/* ------------------------------------------------ Moving gallery */}
+      <section aria-labelledby="galerie-teaser" className="overflow-hidden bg-ink py-24 text-white md:py-36">
+        <Container className="flex flex-col justify-between gap-8 md:flex-row md:items-end">
+          <SectionIntro eyebrow="Galerie" title="Handwerk" italic="in Bewegung." tone="dark" id="galerie-teaser" />
+          <Reveal delay={0.1}>
+            <ButtonLink href="/galerie" tone="light" variant="outline">
+              Zur Galerie
+            </ButtonLink>
+          </Reveal>
+        </Container>
+        <div className="mt-16 md:mt-20">
+          <Marquee label="Bildergalerie, läuft automatisch" durationS={80}>
+            {galleryItems.map((item) => (
+              <div
+                key={item.id}
+                className={cn(
+                  "relative mr-4 h-72 shrink-0 overflow-hidden md:mr-6 md:h-[28rem]",
+                  item.ratio === "portrait" && "w-52 md:w-80",
+                  item.ratio === "square" && "w-72 md:w-[28rem]",
+                  item.ratio === "landscape" && "w-[26rem] md:w-[40rem]",
+                )}
+              >
+                <SalonImage image={item.image} sizes="40vw" />
+              </div>
+            ))}
+          </Marquee>
+        </div>
       </section>
 
-      {/* Price preview (flyer) */}
+      {/* ------------------------------------------------ Prices */}
       <section aria-labelledby="preise" className="py-24 md:py-44">
         <Container className="grid gap-16 md:grid-cols-12">
-          <Reveal className="md:col-span-5">
-            <Eyebrow className="text-stone">Preise</Eyebrow>
-            <h2 id="preise" className="mt-6 font-display text-display-lg font-normal">
-              Auszug aus unserer Preisliste
-            </h2>
-            <p className="mt-8 max-w-md leading-relaxed text-graphite">
-              Preise für Damen, Herren und Kinder können abweichen. Die vollständige,
-              aktuelle Preisliste folgt in Kürze.
-            </p>
-          </Reveal>
-          <Reveal delay={0.15} className="md:col-span-6 md:col-start-7">
-            <dl>
-              {flyerServices.map((s) => (
-                <div
-                  key={s.name}
-                  className="flex items-baseline justify-between gap-6 border-b border-mist py-5"
-                >
-                  <dt className="text-lg">{s.name}</dt>
-                  <dd className="font-display text-2xl tabular-nums">
-                    {formatPrice(s.priceCents, s.priceIsFrom)}
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          </Reveal>
+          <div className="md:col-span-5">
+            <SectionIntro eyebrow="Preise" title="Auszug aus" italic="unserer Preisliste" id="preise" />
+            <Reveal delay={0.15} className="mt-10">
+              <ButtonLink href="/preise" variant="outline">
+                Alle Preise
+              </ButtonLink>
+            </Reveal>
+          </div>
+          <div className="md:col-span-6 md:col-start-7">
+            <FlyerPriceList />
+          </div>
         </Container>
       </section>
 
-      {/* Visit */}
-      <section aria-labelledby="besuch" className="bg-ink py-24 text-white md:py-36">
-        <Container className="flex flex-col items-start gap-10 md:flex-row md:items-end md:justify-between">
-          <Reveal>
-            <Eyebrow className="text-ash">Besuchen Sie uns</Eyebrow>
-            <h2 id="besuch" className="mt-6 font-display text-display-lg font-normal">
-              {site.address.street}
-              <span className="block text-ash">
-                {site.address.postalCode} {site.address.city}
-              </span>
-            </h2>
+      {/* ------------------------------------------------ Visit */}
+      <section aria-labelledby="besuch" className="bg-bone py-24 md:py-44">
+        <Container className="grid gap-16 md:grid-cols-12 md:items-center">
+          <Reveal className="md:col-span-6">
+            <KenBurns className="aspect-[4/5] md:aspect-[5/6]" delay={4}>
+              <SalonImage image={images.salonFacade} sizes="(min-width: 768px) 50vw, 100vw" />
+            </KenBurns>
           </Reveal>
-          <Reveal delay={0.15} className="flex flex-wrap gap-4">
-            <ButtonLink href={site.phone.href} tone="light">
-              {site.phone.display}
-            </ButtonLink>
-            <ButtonLink href="/kontakt" tone="light" variant="outline">
-              Anfahrt
-            </ButtonLink>
-          </Reveal>
+          <div className="md:col-span-5 md:col-start-8">
+            <SectionIntro eyebrow="Besuchen Sie uns" title={site.address.street} italic={`${site.address.postalCode} ${site.address.city}`} id="besuch" />
+            <Reveal delay={0.15} className="mt-12">
+              <HoursList />
+            </Reveal>
+            <Reveal delay={0.2} className="mt-10 flex flex-wrap gap-4">
+              <ButtonLink href={site.phone.href}>{site.phone.display}</ButtonLink>
+              <ButtonLink href="/kontakt" variant="outline">
+                Anfahrt
+              </ButtonLink>
+            </Reveal>
+          </div>
         </Container>
       </section>
+
+      <CtaBand />
     </>
   );
 }

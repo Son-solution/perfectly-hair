@@ -29,10 +29,14 @@ export function Crossfade({
   }, [reduce, items.length, holdMs]);
 
   return (
-    <div className={className} style={{ display: "grid" }}>
+    <div
+      className={className}
+      style={{ display: "grid", gridTemplateColumns: "1fr", gridTemplateRows: "1fr" }}
+    >
       <AnimatePresence initial={false}>
         <motion.div
           key={index}
+          className="relative h-full min-h-0 w-full"
           style={{ gridArea: "1 / 1" }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

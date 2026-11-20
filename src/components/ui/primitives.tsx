@@ -47,13 +47,35 @@ export function ButtonLink({
   tone?: ButtonTone;
   className?: string;
 }) {
-  return (
-    <Link href={href} className={cn(base, variants[tone][variant], className)}>
+  const classes = cn(base, variants[tone][variant], className);
+  const content = (
+    <>
       <span>{children}</span>
       <span
         aria-hidden="true"
         className="inline-block h-px w-6 bg-current transition-[width] duration-500 ease-luxe group-hover:w-10"
       />
+    </>
+  );
+
+  if (/^https?:\/\//.test(href)) {
+    return (
+      <a href={href} target="_blank" rel="noopener noreferrer" className={classes}>
+        {content}
+        <span className="sr-only"> (öffnet in neuem Tab)</span>
+      </a>
+    );
+  }
+  if (/^(tel|mailto):/.test(href)) {
+    return (
+      <a href={href} className={classes}>
+        {content}
+      </a>
+    );
+  }
+  return (
+    <Link href={href} className={classes}>
+      {content}
     </Link>
   );
 }
