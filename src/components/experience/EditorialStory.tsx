@@ -25,17 +25,17 @@ export function EditorialStory() {
   const { ref: liveRef } = useLiveSection<HTMLElement>();
   const scrollRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: scrollRef, offset: ["start end", "end start"] });
-  const yA = useTransform(scrollYProgress, [0, 1], [80, -80]);
-  const yB = useTransform(scrollYProgress, [0, 1], [-40, 60]);
-  const yC = useTransform(scrollYProgress, [0, 1], [120, -120]);
+  const yA = useTransform(scrollYProgress, [0, 1], [50, -60]);
+  const yB = useTransform(scrollYProgress, [0, 1], [-30, 40]);
+  const yC = useTransform(scrollYProgress, [0, 1], [40, -80]);
 
   const open = businessHours.filter((d) => d.opens);
 
   return (
-    <section ref={liveRef} aria-labelledby="atelier" className="relative overflow-hidden bg-paper py-24 text-ink md:py-40">
-      {/* Drifting outlined word */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-10 select-none md:top-16">
-        <div className="animate-marquee flex w-max whitespace-nowrap font-display text-[24vw] leading-none text-outline-dark italic">
+    <section ref={liveRef} aria-labelledby="atelier" className="relative overflow-hidden bg-paper pb-24 pt-10 text-ink md:pb-40 md:pt-16">
+      {/* Drifting outlined words — an in-flow band ABOVE the content, so it never crosses text */}
+      <div aria-hidden="true" className="pointer-events-none mb-[clamp(2rem,5vw,5rem)] select-none overflow-hidden">
+        <div className="animate-marquee flex w-max whitespace-nowrap font-display text-[clamp(4.5rem,15vw,15rem)] italic leading-[1.05] text-outline-dark">
           <span className="pr-[0.3em]">Atelier · Familie · Handwerk ·</span>
           <span className="pr-[0.3em]">Atelier · Familie · Handwerk ·</span>
         </div>
@@ -43,7 +43,7 @@ export function EditorialStory() {
 
       <div className="container-luxe relative grid gap-16 lg:grid-cols-12 lg:gap-10">
         {/* Text */}
-        <div className="lg:col-span-6 lg:pt-24">
+        <div className="lg:col-span-6 lg:pt-8">
           <Reveal>
             <p className="flex items-center gap-4 text-eyebrow uppercase text-stone">
               <span aria-hidden="true" className="h-px w-10 bg-current" />
@@ -71,9 +71,14 @@ export function EditorialStory() {
             </p>
           </Reveal>
 
-          <ol className="mt-14 grid gap-px bg-mist sm:grid-cols-3">
+          <ol className="mt-14 grid border-t border-mist sm:grid-cols-3">
             {values.map((v, i) => (
-              <Reveal as="li" key={v.n} delay={0.1 + i * 0.1} className="bg-paper py-6 sm:pr-6">
+              <Reveal
+                as="li"
+                key={v.n}
+                delay={0.1 + i * 0.1}
+                className="border-b border-mist py-7 sm:border-b-0 sm:py-8 sm:pr-6 sm:[&:not(:first-child)]:border-l sm:[&:not(:first-child)]:pl-6"
+              >
                 <p className="text-[0.625rem] tracking-[0.3em] text-stone">{v.n}</p>
                 <p className="mt-3 font-display text-3xl italic">{v.title}</p>
                 <p className="mt-2 text-sm leading-relaxed text-graphite">{v.text}</p>
@@ -94,7 +99,7 @@ export function EditorialStory() {
             <div className="animate-float-a">
               <div className="relative aspect-[3/4] overflow-hidden shadow-[0_50px_90px_-30px_rgba(0,0,0,0.45)]">
                 <div className="absolute inset-0 animate-ken-strong">
-                  <SalonImage image={images.damenDetail} sizes="(min-width: 1024px) 30vw, 60vw" />
+                  <SalonImage image={images.damenDetail} sizes="(min-width: 1024px) 30vw, 60vw" showLabel={false} />
                 </div>
               </div>
             </div>

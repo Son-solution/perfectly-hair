@@ -43,8 +43,9 @@ function CallBadge() {
         <defs>
           <path id="call-circle" d="M100,100 m-80,0 a80,80 0 1,1 160,0 a80,80 0 1,1 -160,0" />
         </defs>
-        <text fill="currentColor" fontSize="12.5" letterSpacing="4.6" style={{ textTransform: "uppercase" }}>
-          <textPath href="#call-circle">Jetzt anrufen · {site.phone.display} · Termin vereinbaren ·</textPath>
+        {/* textLength = circumference (2πr, r=80) so the ring closes exactly without overlap */}
+        <text fill="currentColor" fontSize="12" style={{ textTransform: "uppercase" }}>
+          <textPath href="#call-circle" textLength="500" lengthAdjust="spacing">Jetzt anrufen · {site.phone.display} · </textPath>
         </text>
       </svg>
       <span className="relative flex flex-col items-center gap-2 text-center">

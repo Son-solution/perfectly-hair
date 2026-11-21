@@ -91,23 +91,25 @@ export function SiteFooter() {
         </div>
       </div>
 
-      {/* Giant wordmark */}
+      {/* Giant wordmark — own row, one line, sized to always fit the container width */}
       <div className="container-luxe">
-        <div className="flex items-end justify-between gap-6 border-t border-white/10 pt-8">
-          <p aria-hidden="true" className="font-display text-[clamp(3rem,13.5vw,15rem)] leading-[0.8] tracking-[-0.02em]">
+        <div className="border-t border-white/10 pt-[clamp(1.5rem,3vw,3rem)]">
+          <p
+            aria-hidden="true"
+            className="whitespace-nowrap pb-[0.26em] font-display text-[clamp(2.4rem,12vw,14.5rem)] leading-[0.95] tracking-[-0.02em]"
+          >
             Perfectly <span className="italic text-white/35">Hair</span>
           </p>
-          <BackToTop className="mb-3 hidden shrink-0 md:inline-flex" />
         </div>
       </div>
 
-      <div className="container-luxe flex flex-col gap-4 py-8 text-[0.625rem] uppercase tracking-[0.24em] text-white/45 sm:flex-row sm:items-center sm:justify-between">
+      <div className="container-luxe flex flex-col gap-5 border-t border-white/10 py-8 text-[0.625rem] uppercase tracking-[0.24em] text-white/45 md:flex-row md:items-center md:justify-between">
         <p>{site.name} · Wiesbaden</p>
-        <ul className="flex flex-wrap gap-x-6 gap-y-2">
+        <ul className="flex flex-wrap items-center gap-x-6 gap-y-3">
           <li><Link href="/impressum" className="hover:text-white">Impressum</Link></li>
           <li><Link href="/datenschutz" className="hover:text-white">Datenschutz</Link></li>
           <li><Link href="/bildnachweise" className="hover:text-white">Bildnachweise</Link></li>
-          <li className="md:hidden"><BackToTop className="text-[0.625rem]" /></li>
+          <li><BackToTop className="text-[0.625rem]" /></li>
         </ul>
       </div>
     </footer>

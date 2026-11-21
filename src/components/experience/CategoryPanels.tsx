@@ -95,13 +95,11 @@ export function CategoryPanels() {
               )}
             </span>
 
-            {/* Numeral */}
-            <span className="absolute left-5 top-5 text-[0.625rem] uppercase tracking-[0.34em] text-white/70 md:left-7 md:top-7">
-              {a.numeral} / 03
-            </span>
-            <span className="absolute right-5 top-5 text-[0.5625rem] uppercase tracking-[0.3em] text-white/45 md:right-7 md:top-7">
-              Symbolbild
-            </span>
+            {/* Top row: numeral + label share one wrapping row, so they can never collide in narrow panels */}
+            <div className="absolute inset-x-5 top-5 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-[var(--space-label)] leading-none md:inset-x-7 md:top-7">
+              <span className="text-[0.625rem] uppercase tracking-[0.34em] text-white/70">{a.numeral} / 03</span>
+              <span className="text-[0.5625rem] uppercase tracking-[0.3em] text-white/45">Symbolbild</span>
+            </div>
 
             {/* Collapsed label (vertical on desktop) */}
             <span
@@ -133,14 +131,14 @@ export function CategoryPanels() {
                     {a.titleItalic}
                   </p>
                   <div className="mt-6 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-                    <ul className="hidden gap-6 text-sm text-white/70 lg:flex">
+                    <ul className="hidden gap-6 text-sm text-white/70 xl:flex">
                       {a.principles.map((p) => (
                         <li key={p.title} className="border-t border-white/25 pt-3">
                           {p.title}
                         </li>
                       ))}
                     </ul>
-                    <span className="inline-flex items-center gap-4 self-start border border-white/50 px-6 py-3.5 text-[0.6875rem] uppercase tracking-[0.26em] transition-colors duration-500 group-hover:bg-white group-hover:text-ink md:self-auto">
+                    <span className="inline-flex shrink-0 items-center gap-4 self-start whitespace-nowrap border border-white/50 px-6 py-3.5 text-[0.6875rem] uppercase tracking-[0.26em] transition-colors duration-500 group-hover:bg-white group-hover:text-ink md:self-auto">
                       {a.label} entdecken
                       <span aria-hidden="true" className="h-px w-8 bg-current" />
                     </span>

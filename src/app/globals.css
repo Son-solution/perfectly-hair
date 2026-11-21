@@ -129,6 +129,23 @@
   }
 }
 
+/* ------------------------------------------------------------------
+   Spacing tokens (layout safety)
+   --header-h      : height of the fixed header (matches h-18 / md:h-22)
+   --safe-top      : header + minimum breathing room; hero content never goes above it
+   --space-label   : minimum gap between small labels and divider lines / image edges
+------------------------------------------------------------------- */
+:root {
+  --header-h: 4.5rem;
+  --safe-top: calc(var(--header-h) + clamp(1.25rem, 4svh, 3rem));
+  --space-label: 0.875rem;
+}
+@media (width >= 48rem) {
+  :root {
+    --header-h: 5.5rem;
+  }
+}
+
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;

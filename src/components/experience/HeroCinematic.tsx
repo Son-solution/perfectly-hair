@@ -85,7 +85,7 @@ export function HeroCinematic() {
         px.set(0);
         py.set(0);
       }}
-      className="grain relative isolate h-[100svh] min-h-[640px] overflow-hidden bg-ink text-white"
+      className="grain relative isolate flex min-h-[100svh] flex-col overflow-hidden bg-ink text-white"
     >
       {/* ---------- Background chapters (wipe + zoom) */}
       <motion.div aria-hidden="true" className="absolute -inset-6 -z-20" style={{ x: bgX, y: bgY }}>
@@ -129,7 +129,7 @@ export function HeroCinematic() {
       {/* ---------- Inset frame (layered depth) */}
       <motion.div
         aria-hidden="true"
-        className="absolute right-[6vw] top-[16vh] hidden w-[19vw] max-w-[300px] md:block"
+        className="absolute right-[6vw] top-[calc(var(--safe-top)+1.75rem)] hidden w-[min(19vw,300px,24svh)] md:block"
         style={{ x: insetX, y: insetY }}
       >
         <div className="animate-float-a">
@@ -167,24 +167,25 @@ export function HeroCinematic() {
       >
         {site.address.street} · {site.address.city}
       </p>
-      <p className="absolute right-5 top-[5.5rem] text-[0.5625rem] uppercase tracking-[0.3em] text-white/50 md:right-10 md:top-auto md:bottom-[13.5rem] lg:right-16">
+      <p className="absolute right-5 top-[var(--safe-top)] text-[0.5625rem] uppercase leading-none tracking-[0.3em] text-white/50 md:right-[6vw]">
         Symbolbilder
       </p>
 
       {/* ---------- Type */}
-      <div className="container-luxe relative flex h-full flex-col justify-end pb-[11.5rem] md:pb-[13rem]">
+      {/* Safe area: content starts below the fixed header and grows the section instead of overlapping it */}
+      <div className="container-luxe relative flex flex-1 flex-col justify-end pb-10 pt-[calc(var(--safe-top)+1.5rem)] md:pb-14">
         <motion.div style={{ x: typeX }}>
           <p className="animate-rise flex items-center gap-4 text-[0.6875rem] uppercase tracking-[0.34em] text-white/70">
             <LogoMark decorative className="h-7 w-7" />
             Friseursalon · Wiesbaden
           </p>
-          <h1 id="hero-title" className="mt-6 font-display font-normal leading-[0.86] tracking-[-0.01em]">
-            <span className="block overflow-hidden pb-[0.06em]">
-              <span className="animate-mask-up block text-[clamp(3.4rem,13.5vw,13rem)]">Perfectly</span>
+          <h1 id="hero-title" className="mt-6 font-display font-normal leading-[0.9] tracking-[-0.01em]">
+            <span className="-mb-[0.06em] block overflow-hidden pb-[0.12em]">
+              <span className="animate-mask-up block text-[clamp(3rem,min(13.5vw,19svh),13rem)]">Perfectly</span>
             </span>
-            <span className="block overflow-hidden pb-[0.08em]">
+            <span className="-mb-[0.06em] block overflow-hidden pb-[0.14em]">
               <span
-                className="animate-mask-up block pl-[0.9em] text-[clamp(3.4rem,13.5vw,13rem)] italic text-white/80"
+                className="animate-mask-up block pl-[0.9em] text-[clamp(3rem,min(13.5vw,19svh),13rem)] italic text-white/80"
                 style={{ animationDelay: "0.12s" }}
               >
                 Hair <span className="align-middle font-sans text-[0.11em] not-italic tracking-[0.5em] text-white/70">BY GABRIEL</span>
@@ -217,7 +218,7 @@ export function HeroCinematic() {
       {/* ---------- Chapter bar: Damen / Herren / Kinder */}
       <nav
         aria-label="Für wen"
-        className="absolute inset-x-0 bottom-0"
+        className="relative"
         onMouseEnter={() => setHold(true)}
         onMouseLeave={() => setHold(false)}
       >
@@ -257,7 +258,7 @@ export function HeroCinematic() {
                     </span>
                     <span
                       className={cn(
-                        "font-display text-[1.65rem] leading-none transition-all duration-700 sm:text-4xl lg:text-6xl",
+                        "font-display text-[1.65rem] leading-none transition-all duration-700 sm:text-4xl lg:text-[min(3.75rem,7svh)]",
                         isActive ? "italic text-white" : "text-white/55 group-hover:text-white",
                       )}
                     >

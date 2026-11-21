@@ -26,19 +26,11 @@ export function PageHero({
 }) {
   return (
     <section className="grain relative overflow-hidden bg-ink text-white">
-      {/* Outlined echo of the title */}
-      <p
-        aria-hidden="true"
-        className="pointer-events-none absolute -right-[0.05em] bottom-[-0.18em] select-none font-display text-[28vw] italic leading-none text-outline-light opacity-60"
-      >
-        {title}
-      </p>
-
       <div
         className={
           image
-            ? "container-luxe relative grid gap-12 pb-16 pt-32 md:grid-cols-12 md:items-end md:pb-24 md:pt-40"
-            : "container-luxe relative pb-20 pt-36 md:pb-32 md:pt-52"
+            ? "container-luxe relative grid gap-12 pb-4 pt-[calc(var(--safe-top)+1.5rem)] md:grid-cols-12 md:items-end md:pb-8"
+            : "container-luxe relative pb-4 pt-[calc(var(--safe-top)+3rem)] md:pb-8 md:pt-[calc(var(--safe-top)+6rem)]"
         }
       >
         <div className={image ? "md:col-span-7" : "max-w-6xl"}>
@@ -49,11 +41,11 @@ export function PageHero({
             </p>
           </Rise>
           <h1 className="mt-8 font-display font-normal leading-[0.9]">
-            <span className="block overflow-hidden pb-[0.06em]">
+            <span className="-mb-[0.08em] block overflow-hidden pb-[0.14em]">
               <span className="animate-mask-up block text-[clamp(3.2rem,9vw,9rem)]">{title}</span>
             </span>
             {italic && (
-              <span className="block overflow-hidden pb-[0.1em]">
+              <span className="-mb-[0.2em] block overflow-hidden pb-[0.32em]">
                 <span
                   className="animate-mask-up block text-[clamp(2rem,5vw,5rem)] italic text-white/70"
                   style={{ animationDelay: "0.12s" }}
@@ -89,6 +81,15 @@ export function PageHero({
           </Rise>
         )}
       </div>
+
+      {/* Outlined echo of the title: in-flow band below the content, cropped by the section edge
+          (intended decorative clipping) — it never sits behind text or buttons. */}
+      <p
+        aria-hidden="true"
+        className="pointer-events-none -mb-[0.24em] select-none whitespace-nowrap pl-[clamp(1rem,4vw,4rem)] font-display text-[clamp(5rem,19vw,19rem)] italic leading-[0.9] text-outline-light opacity-70"
+      >
+        {title}
+      </p>
     </section>
   );
 }

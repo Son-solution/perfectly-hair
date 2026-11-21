@@ -118,6 +118,25 @@ Creative direction: `docs/CREATIVE_DIRECTION.md`.
 - Checks: typecheck ✅ · lint ✅ · build ✅ · 14 routes 200 ✅ · 0 dead links ✅ ·
   visual checks via DevTools protocol at 1440×900 and real 390×844 mobile emulation, incl. menu open ✅
 
+### Phase 2.4 — Precision layout & typography refinement ✅ (2026-11-21)
+Measured with DevTools-protocol audits (header/title positions, horizontal overflow, screenshots)
+at 1920×1080, 1440×900, 1366×657, 1280×720, 1280×600, 1024×768, 768×1024, 390×844, 375×667.
+
+| Problem (observed) | Root cause | Fix |
+| --- | --- | --- |
+| Hero title under the header on laptop screens (1366×657: title top 50 px, header bottom 89 px) | Hero had a fixed `h-[100svh]` with content pushed down by `justify-end`, no reserved header area; title size depended only on width (13.5vw) | `min-h-[100svh]` flex column, `--safe-top` padding (header + breathing room), height-aware type `min(13.5vw,19svh)`, chapter bar in normal flow, inset frame sized by `svh` |
+| Finale second line ("beginnt mit einem Anruf.") never appeared | `MaskLines` observed the masked inner span, which starts translated below its `overflow:hidden` mask → 0 px visible → long lines never revealed (short lines worked only by a 1 px accident) | Observe the visible heading element with `useInView`, animate lines from that state |
+| Circular call badge text overlapped itself ("VEREINBARJETZT") | Text longer than the circle circumference | `textLength` = 2πr with `lengthAdjust="spacing"` (finale + hero badge) |
+| Footer "Hair" collided with "Perfectly"; "Nach oben" shown twice on mobile | Wordmark shared a flex row with the button → wrapped to 2 lines at leading 0.8; `hidden` vs component `inline-flex` class conflict | Own row, `whitespace-nowrap`, fit-to-width size, descender padding; single back-to-top in bottom row |
+| Panel labels "II / 03SYMBOLBILD" in narrow panels | Two absolutely positioned labels | One wrapping flex row with `--space-label` gap |
+| Decorative giant words behind real text (story "Atelier…", "Preise" behind "Klar.", inner-page title echo behind buttons) | Absolute decorative layers over content areas | Converted to in-flow bands above/below content; only cropped at section edges |
+| Grey block while value items fade in | `gap-px` on `bg-mist` background trick | Real border dividers with text padding |
+| Clipped italic descenders (f, g, y) | Mask padding too small at tight display line-heights | Larger mask padding with compensating negative margin |
+
+- New spacing tokens in `globals.css`: `--header-h`, `--safe-top`, `--space-label`
+- Results: no horizontal overflow on any page/viewport; hero eyebrow ≥ 47 px below the header at all
+  sizes; all 14 routes checked; typecheck ✅ · lint ✅ · build ✅
+
 ### Known limitations of testing
 - Reliable visual testing method: drive Edge via DevTools protocol (scratch script `cdp-shot.mjs`):
   real mobile emulation, natural scrolling, clicks. The plain `--screenshot` CLI is unreliable

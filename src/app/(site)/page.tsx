@@ -44,15 +44,16 @@ export default function HomePage() {
       <CinematicGallery items={inspirationItems} />
 
       {/* ---------------- Prices */}
-      <section aria-labelledby="preise" className="relative overflow-hidden bg-paper py-24 text-ink md:py-40">
+      <section aria-labelledby="preise" className="relative overflow-hidden bg-paper pb-24 pt-6 text-ink md:pb-40 md:pt-10">
+        {/* Outlined word as an in-flow band above the content — never behind text */}
         <p
           aria-hidden="true"
-          className="pointer-events-none absolute -left-[0.06em] top-6 select-none font-display text-[30vw] italic leading-none text-outline-dark md:top-10"
+          className="pointer-events-none mb-[clamp(1.5rem,4vw,4rem)] select-none whitespace-nowrap pl-[clamp(1rem,3vw,3rem)] font-display text-[clamp(5rem,22vw,22rem)] italic leading-[0.95] text-outline-dark"
         >
           Preise
         </p>
         <div className="container-luxe relative grid gap-14 lg:grid-cols-12">
-          <div className="lg:col-span-5 lg:pt-[12vw]">
+          <div className="lg:col-span-5">
             <MaskLines
               id="preise"
               className="font-display text-[clamp(2.8rem,6vw,6rem)] font-normal leading-[0.92]"
@@ -64,7 +65,7 @@ export default function HomePage() {
               </ButtonLink>
             </Reveal>
           </div>
-          <div className="lg:col-span-6 lg:col-start-7 lg:pt-[12vw]">
+          <div className="lg:col-span-6 lg:col-start-7">
             <FlyerPriceList />
           </div>
         </div>

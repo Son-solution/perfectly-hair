@@ -156,8 +156,9 @@ export function RotatingBadge({
         <defs>
           <path id="badge-circle" d="M100,100 m-78,0 a78,78 0 1,1 156,0 a78,78 0 1,1 -156,0" />
         </defs>
-        <text fill="currentColor" fontSize="14.5" letterSpacing="5.2" style={{ textTransform: "uppercase" }}>
-          <textPath href="#badge-circle">{text}</textPath>
+        {/* textLength = circumference (2πr, r=78) so the ring closes exactly without overlap */}
+        <text fill="currentColor" fontSize="14" style={{ textTransform: "uppercase" }}>
+          <textPath href="#badge-circle" textLength="488" lengthAdjust="spacing">{text}</textPath>
         </text>
       </svg>
       <span className="absolute inset-0 flex items-center justify-center">
