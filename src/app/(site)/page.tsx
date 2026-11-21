@@ -1,4 +1,5 @@
 import { Reveal } from "@/components/motion";
+import { LiveBand } from "@/components/motion/LiveBand";
 import { MaskLines } from "@/components/motion/MaskLines";
 import { BookingFinale } from "@/components/experience/BookingFinale";
 import { CategoryPanels } from "@/components/experience/CategoryPanels";
@@ -45,13 +46,24 @@ export default function HomePage() {
 
       {/* ---------------- Prices */}
       <section aria-labelledby="preise" className="relative overflow-hidden bg-paper pb-24 pt-6 text-ink md:pb-40 md:pt-10">
-        {/* Outlined word as an in-flow band above the content — never behind text */}
-        <p
-          aria-hidden="true"
-          className="pointer-events-none mb-[clamp(1.5rem,4vw,4rem)] select-none whitespace-nowrap pl-[clamp(1rem,3vw,3rem)] font-display text-[clamp(5rem,22vw,22rem)] italic leading-[0.95] text-outline-dark"
-        >
-          Preise
-        </p>
+        {/* Continuously drifting outlined word — in-flow band above the content, never behind text.
+            LiveBand pauses the loop while off-screen or in a hidden tab. */}
+        <LiveBand className="pointer-events-none mb-[clamp(1.5rem,4vw,4rem)] select-none overflow-hidden">
+          <div
+            aria-hidden="true"
+            className="animate-marquee flex w-max whitespace-nowrap font-display text-[clamp(5rem,22vw,22rem)] italic leading-[0.95] text-outline-dark [animation-duration:46s]"
+          >
+            {[0, 1].map((copy) => (
+              <span key={copy} className="flex shrink-0">
+                {["Preise", "Preise", "Preise"].map((w, i) => (
+                  <span key={i} className="pr-[0.35em]">
+                    {w} <span className="text-[0.4em] align-middle">·</span>
+                  </span>
+                ))}
+              </span>
+            ))}
+          </div>
+        </LiveBand>
         <div className="container-luxe relative grid gap-14 lg:grid-cols-12">
           <div className="lg:col-span-5">
             <MaskLines
