@@ -56,6 +56,7 @@
   --animate-marquee: marquee 38s linear infinite;
   --animate-marquee-rev: marquee 38s linear infinite reverse;
   --animate-ken-strong: ken-strong 16s ease-in-out infinite alternate;
+  --animate-ping-slow: ping 2.6s cubic-bezier(0, 0, 0.2, 1) infinite;
 
   @keyframes hero-zoom {
     from { transform: scale(1.2); }

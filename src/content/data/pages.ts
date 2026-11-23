@@ -299,4 +299,35 @@ export const pages: Page[] = [
       },
     ],
   },
+  /* ---------------------------------------------------------------- 3D prototype (isolated) */
+  // noindex → excluded from sitemap; not linked in navigation. Owner approval needed before use elsewhere.
+  {
+    slug: "3d-preview", status: "published", visible: true,
+    seo: { title: "3D-Vorschau (Prototyp)", description: "Interaktiver 3D-Prototyp – nicht öffentlich verlinkt.", noindex: true },
+    sections: [
+      {
+        id: "preview-3d", type: "hair-3d", visible: true,
+        modelId: "head-scan",
+        eyebrow: "Herren · 3D-Prototyp",
+        title: "Schnitt",
+        italic: "aus jedem Blickwinkel.",
+        intro: "Drehen Sie den Kopf, wählen Sie eine Ansicht und entdecken Sie unsere Leistungen für Haar und Bart.",
+        category: "herren",
+        defaultView: "front",
+        autoRotate: { enabled: true, degreesPerSecond: 9, resumeAfterMs: 3500 },
+        hotspots: [
+          { id: "oberkopf", label: "Haarschnitt", serviceId: "haarschnitt", text: "Schnitt und Form am Oberkopf – präzise auf Ihr Haar abgestimmt.", position: [0, 3.95, -0.1], normal: [0, 1, 0.1] },
+          { id: "seiten", label: "Konturen & Seiten", serviceId: "haarschnitt", text: "Saubere Übergänge an den Seiten, wie bei einem modernen Fade.", position: [1.65, 2.45, -0.35], normal: [1, 0.2, -0.1] },
+          { id: "bart", label: "Bartrasur", serviceId: "bartrasur", text: "Rasur und Kontur des Bartes mit Ruhe und Sorgfalt.", position: [0, 0.15, 2], normal: [0, -0.35, 1] },
+          { id: "augenbrauen", label: "Augenbrauen", serviceId: "augenbrauen-zupfen", text: "Augenbrauen in Form gebracht – dezent und gepflegt.", position: [0.55, 2.05, 2.05], normal: [0.15, 0.15, 1] },
+          { id: "ohr", label: "Ohren & Nase", serviceId: "ohren-nase-wax", text: "Ohren oder Nase mit Wax – für ein gepflegtes Gesamtbild.", position: [-1.85, 1.5, -0.15], normal: [-1, 0, 0] },
+          { id: "nacken", label: "Waschen & Styling", serviceId: "waschen-styling", text: "Waschen und Styling als Abschluss Ihres Besuchs.", position: [0, 2.4, -1.95], normal: [0, 0.15, -1] },
+        ],
+        ctaLabel: "Termin für diese Leistung",
+        fallbackImageId: "herren-profile",
+        assetNotice: "Prototyp: Das 3D-Modell ist ein lizenzierter Kopfscan ohne Haare (Platzhalter). Das finale Modell mit modernem Fade-Haarschnitt fehlt noch.",
+      },
+    ],
+  },
+
 ];

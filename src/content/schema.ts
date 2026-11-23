@@ -53,6 +53,43 @@ export type MediaAsset = z.infer<typeof mediaAsset>;
 /** @deprecated alias kept for readability in components */
 export type ImageAsset = MediaAsset;
 
+/* ------------------------------------------------------------------ 3D models */
+
+const vec3 = z.tuple([z.number(), z.number(), z.number()]);
+
+export const model3d = z.object({
+  id,
+  /** Path under /public today; Supabase Storage URL later. Must be .glb/.gltf. */
+  src: z.string().regex(/\.(glb|gltf)$/i),
+  title: z.string(),
+  description: z.string(),
+  /** true = temporary asset, must not be presented as the final photorealistic model. */
+  isPlaceholder: z.boolean(),
+  hasHair: z.boolean(),
+  /** Camera framing in the model's native units (model faces +Z, Y up). */
+  focus: z.object({ center: vec3, radius: z.number().positive() }),
+  credit: z.object({
+    author: z.string(),
+    sourceUrl: z.url(),
+    license: z.string(),
+    licenseUrl: z.url(),
+    notes: z.string().nullable(),
+  }),
+});
+export type Model3D = z.infer<typeof model3d>;
+
+export const hotspot = z.object({
+  id,
+  label: z.string(),
+  serviceId: id,
+  text: z.string(),
+  /** Approximate position in the model's native units; snapped to the surface at runtime (raycast along -normal). */
+  position: vec3,
+  /** Surface direction; the hotspot fades out when it faces away from the camera. */
+  normal: vec3,
+});
+export type Hotspot = z.infer<typeof hotspot>;
+
 /* ------------------------------------------------------------------ business */
 
 export const businessHour = z.object({
@@ -294,6 +331,25 @@ export const section = z.discriminatedUnion("type", [
     ),
   }),
   sectionBase.extend({ type: z.literal("credits"), intro: z.string() }),
+  sectionBase.extend({
+    type: z.literal("hair-3d"),
+    modelId: id,
+    eyebrow: z.string(),
+    title: z.string(),
+    italic: z.string(),
+    intro: z.string(),
+    category: audienceSlug,
+    defaultView: z.enum(["front", "left", "right", "back"]),
+    autoRotate: z.object({
+      enabled: z.boolean(),
+      degreesPerSecond: z.number().min(0).max(90),
+      resumeAfterMs: z.number().int().min(0),
+    }),
+    hotspots: z.array(hotspot).min(1),
+    ctaLabel: z.string(),
+    fallbackImageId: id,
+    assetNotice: z.string(),
+  }),
 ]);
 export type Section = z.infer<typeof section>;
 export type SectionOf<T extends Section["type"]> = Extract<Section, { type: T }>;

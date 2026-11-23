@@ -4,14 +4,16 @@ import { CategoryPanels } from "@/components/experience/CategoryPanels";
 import { CinematicGallery } from "@/components/experience/CinematicGallery";
 import { EditorialStory } from "@/components/experience/EditorialStory";
 import { HeroCinematic } from "@/components/experience/HeroCinematic";
+import { HairExperience } from "@/components/experience3d/HairExperience";
 import { MaskLines } from "@/components/motion/MaskLines";
 import { PageHero } from "@/components/site/PageHero";
 import {
-  getBusiness, getCategories, getEmployees, getGallery, getMediaResolver, getServices,
+  getBusiness, getCategories, getEmployees, getGallery, getMediaResolver, getModel3D, getServices,
   getSiteChrome, getStockMedia,
 } from "@/content/repository";
 import type { Page, Section } from "@/content/schema";
 import { emphasis } from "@/lib/emphasis";
+import { formatPrice } from "@/lib/format";
 import { BookingFlowSection } from "./BookingFlowSection";
 import { ContactDetailsSection, LocationSection } from "./contact";
 import {
@@ -219,6 +221,36 @@ export async function SectionRenderer({ page }: { page: Page }) {
 
       case "legal-text":
         return <LegalTextSection section={section} business={business} />;
+
+      case "hair-3d": {
+        const model = (await getModel3D(section.modelId))!;
+        const byId = new Map(allServices.map((sv) => [sv.id, sv]));
+        return (
+          <HairExperience
+            eyebrow={section.eyebrow}
+            title={section.title}
+            italic={section.italic}
+            intro={section.intro}
+            model={{ src: model.src, title: model.title, isPlaceholder: model.isPlaceholder, focus: model.focus, credit: model.credit }}
+            defaultView={section.defaultView}
+            autoRotate={section.autoRotate}
+            ctaLabel={section.ctaLabel}
+            fallbackImage={media(section.fallbackImageId)}
+            assetNotice={section.assetNotice}
+            hotspots={section.hotspots.map((h) => {
+              const sv = byId.get(h.serviceId)!;
+              return {
+                id: h.id, label: h.label, text: h.text, position: h.position, normal: h.normal,
+                service: {
+                  name: sv.name,
+                  price: sv.priceCents !== null ? formatPrice(sv.priceCents, sv.priceIsFrom) : null,
+                  href: `/termin?kategorie=${section.category}&leistung=${sv.id}`,
+                },
+              };
+            })}
+          />
+        );
+      }
 
       case "credits":
         return <CreditsSection section={section} stock={stock} />;

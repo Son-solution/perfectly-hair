@@ -5,10 +5,11 @@ import type { SiteChrome } from "./view";
 import { business as businessData, navigation as navigationData, siteSettings as settingsData } from "./data/business";
 import { categories as categoryData, employees as employeeData, gallery as galleryData, services as serviceData } from "./data/catalogue";
 import { media as mediaData } from "./data/media";
+import { models as modelData } from "./data/models";
 import { pages as pageData } from "./data/pages";
 import {
-  business, category, employee, galleryItem, mediaAsset, navigation, page, service, siteSettings,
-  type AudienceSlug, type Business, type Category, type Employee, type GalleryItem, type MediaAsset,
+  business, category, employee, galleryItem, mediaAsset, model3d, navigation, page, service, siteSettings,
+  type AudienceSlug, type Business, type Category, type Employee, type GalleryItem, type MediaAsset, type Model3D,
   type Navigation, type Page, type Service, type SiteSettings,
 } from "./schema";
 
@@ -31,6 +32,7 @@ type ContentStore = {
   employees: Employee[];
   gallery: GalleryItem[];
   media: Map<string, MediaAsset>;
+  models: Map<string, Model3D>;
   pages: Page[];
 };
 
@@ -48,6 +50,7 @@ function load(): ContentStore {
     employees: z.array(employee).parse(employeeData),
     gallery: z.array(galleryItem).parse(galleryData),
     media: new Map(mediaList.map((m) => [m.id, m])),
+    models: new Map(z.array(model3d).parse(modelData).map((m) => [m.id, m])),
     pages: z.array(page).parse(pageData),
   };
   assertReferences(s);
@@ -72,6 +75,12 @@ function assertReferences(s: ContentStore) {
       const where = `page "${p.slug}" section ${sec.id}`;
       if ("imageId" in sec) img(sec.imageId as string | null, where);
       if ("imageIds" in sec) (sec.imageIds as string[]).forEach((i) => img(i, where));
+      if (sec.type === "hair-3d") {
+        if (!s.models.has(sec.modelId)) missing.push(`${where} → model "${sec.modelId}"`);
+        img(sec.fallbackImageId, where);
+        const ids = new Set(s.services.map((x) => x.id));
+        sec.hotspots.forEach((h) => { if (!ids.has(h.serviceId)) missing.push(`${where} hotspot ${h.id} → service "${h.serviceId}"`); });
+      }
       if (sec.type === "hero-cinematic") sec.slides.forEach((sl) => { img(sl.imageId, where); img(sl.insetImageId, where); });
     }
   }
@@ -133,6 +142,10 @@ export async function getMediaResolver(): Promise<(id: string) => MediaAsset> {
     if (!asset) throw new Error(`Unknown media id "${id}"`);
     return asset;
   };
+}
+
+export async function getModel3D(id: string): Promise<Model3D | null> {
+  return load().models.get(id) ?? null;
 }
 
 export async function getStockMedia(): Promise<MediaAsset[]> {

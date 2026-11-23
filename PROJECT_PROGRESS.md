@@ -4,7 +4,7 @@ Resume point after any interruption: read this file, then `git log --oneline`.
 
 ## Current status
 
-**Phase 3 — Complete public website + CMS-ready architecture: complete, awaiting owner approval for the next phase (backend).**
+**Phase 4 — Isolated 3D prototype (/3d-preview): complete, awaiting owner approval. NOT integrated into the homepage.**
 Last update: 2026-11-23
 Last update: 2026-11-20
 
@@ -186,6 +186,27 @@ Checkpoint before: git tag `pre-phase3`. Architecture: `docs/CMS_ARCHITECTURE.md
 - Known content limitation: flyer services are not assigned to Damen/Herren/Kinder, so every category
   lists all six (e.g. Bartrasur under Kinder) until the salon assigns them (`service.audiences`).
 
+## Phase 4 — Isolated interactive 3D prototype ✅ (2026-11-23)
+Checkpoint before: git tag `pre-phase4`. Details: `docs/3D_EXPERIENCE.md`.
+
+- Route `/3d-preview` (CMS page, `noindex`, not in navigation or sitemap). The homepage is unchanged.
+- Three.js 0.187 + @react-three/fiber 9 + @react-three/drei 10. The 3D engine is lazy-loaded
+  (client-only chunk, only on this route).
+- **Model (placeholder):** real photogrammetry head scan "Infinite, 3D Head Scan" by Lee Perry-Smith,
+  CC BY 3.0, from the official three.js repo. **No hair.** It is labelled on the page as
+  "Prototyp · Platzhalter".
+- CMS: `model3d` schema + `data/models.ts` (src, credit, `isPlaceholder`, `hasHair`, focus framing);
+  section `hair-3d` (texts, default view, auto-rotate, hotspots → service references, CTA,
+  fallback image). References are validated in the repository.
+- Interactions: auto-rotation (pauses on interaction, resumes), mouse/touch drag, views
+  Vorne/Links/Rechts/Hinten, six hotspots snapped to the surface by raycasting, accessible list
+  + panel + CTA to `/termin?kategorie=herren&leistung=…`, keyboard (← → Escape), reduced motion,
+  WebGL fallback.
+- Fixed during testing: endless stage growth (layout loop), wrong hotspot framing (bust vs head),
+  mobile stage below the fold.
+- Missing for final quality: a licensed head model WITH a modern fade haircut (see
+  `docs/3D_EXPERIENCE.md` §C), plus testing on real GPU devices (headless runs at ~3 fps).
+
 ### Known limitations of testing
 - Reliable visual testing method: drive Edge via DevTools protocol (scratch script `cdp-shot.mjs`):
   real mobile emulation, natural scrolling, clicks. The plain `--screenshot` CLI is unreliable
@@ -218,7 +239,7 @@ Checkpoint before: git tag `pre-phase3`. Architecture: `docs/CMS_ARCHITECTURE.md
 - Leftover folder `perfectly-hair/` (only a locked `node_modules` from the Phase 1 move). Ignored by Git;
   delete manually after closing VS Code.
 
-## Next step — Phase 4 (needs approval)
+## Next step (needs approval)
 
 Backend: Supabase project, migrations (docs/DATABASE.md), RLS, Auth + roles, repository → Supabase,
 Storage uploads, publish/revalidate, real booking engine behind `BookingGateway`; then Admin, Staff and
