@@ -191,6 +191,13 @@
   animation-play-state: paused !important;
 }
 
+/* Readable small labels over moving photography: soft, tight shadow (no visible halo). */
+@utility label-shadow {
+  text-shadow:
+    0 1px 2px rgb(0 0 0 / 0.55),
+    0 0 14px rgb(0 0 0 / 0.45);
+}
+
 /* Outlined display type (used sparingly for depth). */
 @utility text-outline-light {
   color: transparent;

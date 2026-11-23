@@ -21,10 +21,15 @@ import { cn } from "@/lib/utils";
 const CHAPTER_MS = 6500;
 const ease = [0.76, 0, 0.24, 1] as const; // cinematic in-out for wipes
 
+/**
+ * Chapter order is fixed: HERREN first (index 0 = server-rendered first frame, so there is
+ * never a flash of another chapter during loading/hydration), then DAMEN, then KINDER,
+ * looping back to HERREN.
+ */
 const chapters = [
-  { ...audienceContent.damen, bg: images.heroOne, inset: images.damenDetail },
-  { ...audienceContent.herren, bg: images.heroTwo, inset: images.herren },
-  { ...audienceContent.kinder, bg: images.heroThree, inset: images.kinder },
+  { ...audienceContent.herren, chapter: "01", bg: images.heroHerren, inset: images.herren },
+  { ...audienceContent.damen, chapter: "02", bg: images.heroDamen, inset: images.damenDetail },
+  { ...audienceContent.kinder, chapter: "03", bg: images.heroKinder, inset: images.kinder },
 ];
 
 /**
@@ -113,7 +118,7 @@ export function HeroCinematic() {
                     : { duration: 0, delay: 1.6 }
                 }
               >
-                <SalonImage image={c.bg} eager={i === 0} showLabel={false} sizes="100vw" />
+                <SalonImage image={c.bg} eager={i === 0} preload={i !== 0} showLabel={false} sizes="100vw" />
               </motion.div>
             </motion.div>
           );
@@ -123,7 +128,7 @@ export function HeroCinematic() {
       {/* ---------- Light & shade */}
       <div
         aria-hidden="true"
-        className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_70%_35%,transparent_0%,rgba(10,10,10,0.35)_55%,rgba(10,10,10,0.85)_100%),linear-gradient(180deg,rgba(10,10,10,0.55)_0%,rgba(10,10,10,0.05)_35%,rgba(10,10,10,0.9)_100%)]"
+        className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_70%_35%,transparent_0%,rgba(10,10,10,0.35)_55%,rgba(10,10,10,0.85)_100%),linear-gradient(180deg,rgba(10,10,10,0.72)_0%,rgba(10,10,10,0.18)_30%,rgba(10,10,10,0.1)_48%,rgba(10,10,10,0.92)_100%)]"
       />
 
       {/* ---------- Inset frame (layered depth) */}
@@ -148,13 +153,13 @@ export function HeroCinematic() {
                   animate={{ scale: i === index ? 1 : 1.25 }}
                   transition={{ duration: 2.2, ease: [0.22, 1, 0.36, 1] }}
                 >
-                  <SalonImage image={c.inset} showLabel={false} sizes="20vw" />
+                  <SalonImage image={c.inset} preload showLabel={false} sizes="20vw" />
                 </motion.div>
               </motion.div>
             ))}
           </div>
-          <p className="mt-3 flex justify-between text-[0.5625rem] uppercase tracking-[0.3em] text-white/60">
-            <span>Kapitel {active.numeral}</span>
+          <p className="label-shadow mt-[var(--space-label)] flex justify-between text-[0.5625rem] uppercase leading-none tracking-[0.3em] text-white/80">
+            <span>Kapitel {active.chapter}</span>
             <span>{active.label}</span>
           </p>
         </div>
@@ -163,11 +168,11 @@ export function HeroCinematic() {
       {/* ---------- Edge details */}
       <p
         aria-hidden="true"
-        className="absolute left-5 top-1/2 hidden origin-left -translate-y-1/2 -rotate-90 text-[0.5625rem] uppercase tracking-[0.4em] text-white/45 lg:left-8 lg:block"
+        className="label-shadow absolute left-5 top-1/2 hidden origin-left -translate-y-1/2 -rotate-90 text-[0.5625rem] uppercase tracking-[0.4em] text-white/60 lg:left-8 lg:block"
       >
         {site.address.street} · {site.address.city}
       </p>
-      <p className="absolute right-5 top-[var(--safe-top)] text-[0.5625rem] uppercase leading-none tracking-[0.3em] text-white/50 md:right-[6vw]">
+      <p className="absolute right-5 top-[var(--safe-top)] label-shadow text-[0.5625rem] uppercase leading-none tracking-[0.3em] text-white/75 md:right-[6vw]">
         Symbolbilder
       </p>
 
@@ -175,7 +180,7 @@ export function HeroCinematic() {
       {/* Safe area: content starts below the fixed header and grows the section instead of overlapping it */}
       <div className="container-luxe relative flex flex-1 flex-col justify-end pb-10 pt-[calc(var(--safe-top)+1.5rem)] md:pb-14">
         <motion.div style={{ x: typeX }}>
-          <p className="animate-rise flex items-center gap-4 text-[0.6875rem] uppercase tracking-[0.34em] text-white/70">
+          <p className="label-shadow animate-rise flex items-center gap-4 text-[0.6875rem] uppercase tracking-[0.34em] text-white/85">
             <LogoMark decorative className="h-7 w-7" />
             Friseursalon · Wiesbaden
           </p>
@@ -251,15 +256,15 @@ export function HeroCinematic() {
                     <span
                       className={cn(
                         "hidden text-[0.625rem] tracking-[0.3em] transition-colors duration-500 sm:inline",
-                        isActive ? "text-white" : "text-white/40",
+                        isActive ? "text-white" : "text-white/60",
                       )}
                     >
-                      {c.numeral}
+                      {c.chapter}
                     </span>
                     <span
                       className={cn(
                         "font-display text-[1.65rem] leading-none transition-all duration-700 sm:text-4xl lg:text-[min(3.75rem,7svh)]",
-                        isActive ? "italic text-white" : "text-white/55 group-hover:text-white",
+                        isActive ? "italic text-white" : "text-white/65 group-hover:text-white",
                       )}
                     >
                       {c.label}
@@ -268,7 +273,7 @@ export function HeroCinematic() {
                   <span
                     className={cn(
                       "flex items-center gap-3 text-[0.625rem] uppercase tracking-[0.3em] transition-all duration-700",
-                      isActive ? "text-white opacity-100" : "text-white/40 opacity-0 md:group-hover:opacity-100",
+                      isActive ? "text-white opacity-100" : "text-white/60 opacity-0 md:group-hover:opacity-100",
                     )}
                   >
                     <span className="hidden md:inline">Entdecken</span>

@@ -66,7 +66,7 @@ export function SiteHeader() {
 
           <nav aria-label="Für wen" className="hidden lg:block">
             <ul className="flex items-center gap-10">
-              {audiences.map((a, i) => {
+              {audiences.map((a) => {
                 const active = isActive(a.href);
                 return (
                   <li key={a.href}>
@@ -75,7 +75,6 @@ export function SiteHeader() {
                       aria-current={active ? "page" : undefined}
                       className="group relative flex items-start gap-1.5 py-2"
                     >
-                      <span className="text-[0.5rem] tracking-[0.2em] text-white/40">0{i + 1}</span>
                       <span className="relative block overflow-hidden text-[0.75rem] uppercase tracking-[0.28em]">
                         {/* rolling label */}
                         <span

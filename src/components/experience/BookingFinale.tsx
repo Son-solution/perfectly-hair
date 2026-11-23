@@ -88,9 +88,9 @@ export function BookingFinale({
       </div>
       <div
         aria-hidden="true"
-        className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(10,10,10,0.92)_0%,rgba(10,10,10,0.6)_55%,rgba(10,10,10,0.35)_100%),linear-gradient(0deg,rgba(10,10,10,0.9)_0%,transparent_60%)]"
+        className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(10,10,10,0.94)_0%,rgba(10,10,10,0.78)_45%,rgba(10,10,10,0.45)_100%),linear-gradient(0deg,rgba(10,10,10,0.92)_0%,rgba(10,10,10,0.25)_55%,rgba(10,10,10,0.5)_100%)]"
       />
-      <p className="absolute right-5 top-6 text-[0.5625rem] uppercase tracking-[0.3em] text-white/45 md:right-10 lg:right-16">
+      <p className="label-shadow absolute right-5 top-6 text-[0.5625rem] uppercase leading-none tracking-[0.3em] text-white/70 md:right-10 lg:right-16">
         Symbolbild
       </p>
 
@@ -105,38 +105,38 @@ export function BookingFinale({
             </Reveal>
             <MaskLines
               id="finale-title"
-              className="mt-8 font-display text-[clamp(3.4rem,10vw,10.5rem)] font-normal leading-[0.86]"
-              lines={[title, <span key="i" className="italic text-outline-light">{italic}</span>]}
+              className="mt-8 font-display text-[clamp(3.2rem,9vw,9.5rem)] font-normal leading-[0.98]"
+              lines={[title, <span key="i" className="italic text-white/75">{italic}</span>]}
             />
           </div>
-          <div className="flex lg:col-span-4 lg:justify-end">
+          <div className="mt-4 flex lg:col-span-4 lg:mt-0 lg:justify-end">
             <CallBadge />
           </div>
         </div>
 
         <Reveal delay={0.2}>
-          <div className="mt-16 grid gap-8 border-t border-white/15 pt-8 text-sm sm:grid-cols-3">
+          <div className="mt-16 grid gap-10 border-t border-white/20 pt-10 text-sm sm:grid-cols-3 sm:gap-8">
             <div>
-              <p className="text-[0.625rem] uppercase tracking-[0.3em] text-white/50">Telefon</p>
-              <a href={site.phone.href} className="mt-3 block font-display text-3xl hover:italic">
+              <p className="text-[0.625rem] uppercase leading-none tracking-[0.3em] text-white/60">Telefon</p>
+              <a href={site.phone.href} className="mt-[var(--space-label)] block font-display text-3xl hover:italic">
                 {site.phone.display}
               </a>
             </div>
             <div>
-              <p className="text-[0.625rem] uppercase tracking-[0.3em] text-white/50">Öffnungszeiten</p>
-              <p className="mt-3 leading-relaxed text-white/80">
+              <p className="text-[0.625rem] uppercase leading-none tracking-[0.3em] text-white/60">Öffnungszeiten</p>
+              <p className="mt-[var(--space-label)] leading-relaxed text-white/85">
                 Di – Fr {open[0]?.opens} – {open[0]?.closes} Uhr
                 <br />
                 Sa {open.at(-1)?.opens} – {open.at(-1)?.closes} Uhr · So & Mo geschlossen
               </p>
             </div>
             <div>
-              <p className="text-[0.625rem] uppercase tracking-[0.3em] text-white/50">Salon</p>
+              <p className="text-[0.625rem] uppercase leading-none tracking-[0.3em] text-white/60">Salon</p>
               <a
                 href={mapsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-3 block leading-relaxed text-white/80 underline-offset-4 hover:underline"
+                className="mt-[var(--space-label)] block leading-relaxed text-white/80 underline-offset-4 hover:underline"
               >
                 {site.address.street}
                 <br />
@@ -145,7 +145,7 @@ export function BookingFinale({
               </a>
             </div>
           </div>
-          <p className="mt-10 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-white/55">
+          <p className="mt-12 flex flex-wrap items-center gap-x-5 gap-y-3 text-xs text-white/70">
             <span className="flex items-center gap-2">
               <span aria-hidden="true" className="h-1.5 w-1.5 animate-breathe rounded-full bg-white" />
               Online-Buchung folgt – aktuell vereinbaren Sie Termine telefonisch.

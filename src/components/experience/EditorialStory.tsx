@@ -94,7 +94,7 @@ export function EditorialStory() {
         </div>
 
         {/* Layered collage */}
-        <div ref={scrollRef} className="relative h-[110vw] sm:h-[90vw] lg:col-span-6 lg:h-[clamp(620px,62vw,900px)]">
+        <div ref={scrollRef} className="relative h-[150vw] sm:h-[112vw] lg:col-span-6 lg:h-[clamp(660px,64vw,920px)]">
           <motion.div style={{ y: yA }} className="absolute right-0 top-0 w-[62%]">
             <div className="animate-float-a">
               <div className="relative aspect-[3/4] overflow-hidden shadow-[0_50px_90px_-30px_rgba(0,0,0,0.45)]">
@@ -105,7 +105,7 @@ export function EditorialStory() {
             </div>
           </motion.div>
 
-          <motion.div style={{ y: yB }} className="absolute left-0 top-[30%] z-10 w-[44%]">
+          <motion.div style={{ y: yB }} className="absolute left-0 top-[28%] z-10 w-[44%]">
             <div className="animate-float-b">
               <div className="relative aspect-[3/4] overflow-hidden border-[10px] border-paper shadow-[0_40px_80px_-30px_rgba(0,0,0,0.5)]">
                 <SalonImage image={stock.herrenProfile} sizes="(min-width: 1024px) 22vw, 44vw" />
@@ -113,7 +113,7 @@ export function EditorialStory() {
             </div>
           </motion.div>
 
-          <motion.div style={{ y: yC }} className="absolute bottom-0 right-[6%] z-20 w-[52%]">
+          <motion.div style={{ y: yC }} className="absolute bottom-0 right-0 z-20 w-[54%]">
             <div className="animate-float-c">
               <div className="relative aspect-[4/3] overflow-hidden border-[10px] border-paper shadow-[0_40px_80px_-30px_rgba(0,0,0,0.5)]">
                 <SalonImage image={stock.kinderClipper} sizes="(min-width: 1024px) 26vw, 52vw" />
@@ -123,9 +123,11 @@ export function EditorialStory() {
 
           <p
             aria-hidden="true"
-            className="absolute bottom-[38%] left-[2%] z-30 font-display text-[clamp(1.4rem,2.4vw,2.2rem)] italic text-ink"
+            className="absolute left-0 top-0 z-30 font-display text-[clamp(1.35rem,2.3vw,2.2rem)] italic leading-[1.15] text-ink"
           >
-            <span className="bg-paper px-3 py-1">Damen · Herren · Kinder</span>
+            <span className="block">Damen</span>
+            <span className="block pl-[0.6em] text-graphite">Herren</span>
+            <span className="block pl-[1.2em]">Kinder</span>
           </p>
           <p className="absolute -bottom-8 left-0 text-[0.5625rem] uppercase tracking-[0.3em] text-stone">
             Symbolbilder · Unsplash

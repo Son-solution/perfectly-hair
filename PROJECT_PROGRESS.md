@@ -137,6 +137,28 @@ at 1920×1080, 1440×900, 1366×657, 1280×720, 1280×600, 1024×768, 768×1024,
 - Results: no horizontal overflow on any page/viewport; hero eyebrow ≥ 47 px below the header at all
   sizes; all 14 routes checked; typecheck ✅ · lint ✅ · build ✅
 
+### Phase 2.5 — Final luxury refinement + Herren-first hero ✅ (2026-11-23)
+Checkpoint before: git tag `pre-refine-v2`.
+- **Hero order** Herren (01) → Damen (02) → Kinder (03) → loop. Herren is index 0, so it is the
+  server-rendered first frame (verified in production HTML) — no flash of another chapter.
+  Image, "Für …" word, chapter tab, "Kapitel 0X" caption all driven by one index (verified in sync).
+  Next slides preload (`SalonImage preload`) so wipes never reveal a half-loaded image.
+- Hero readability: stronger top shade under the header, `label-shadow` utility for small labels
+  over photos, higher label contrast. Removed small header numbers that conflicted with the new order.
+- Atelier: taller collage, photos no longer cover each other's faces, caption "Damen / Herren / Kinder"
+  moved into free space (no longer across a photo).
+- Appointment: solid (not outlined) italic second line, stronger photo overlay, more space between
+  labels and divider, consistent CTA spacing; still states booking is by phone.
+- Footer marquee: line-height 1.2 + vertical padding (no ascender/descender clipping), horizontal clip only.
+- "N" circle identified as Next.js Dev Tools (`<nextjs-portal>`, button "Open Next.js Dev Tools") —
+  dev only; production HTML contains none.
+- Tests (production build, DevTools protocol): Herren first + timed cycle at 1440 and 390;
+  reduced motion → stays on Herren (no auto-advance); keyboard focus on chapter links switches chapter;
+  menu Escape closes; 7 widths 1920–375 no horizontal overflow, eyebrow ≥ 82 px below header;
+  14 routes 200, 0 dead links, tel link correct. typecheck ✅ lint ✅ build ✅
+- Incident: a power cut corrupted generated `.next/types` (null bytes) → deleted `.next`
+  (git-ignored build output) and regenerated with `next typegen` + build.
+
 ### Known limitations of testing
 - Reliable visual testing method: drive Edge via DevTools protocol (scratch script `cdp-shot.mjs`):
   real mobile emulation, natural scrolling, clicks. The plain `--screenshot` CLI is unreliable

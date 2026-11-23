@@ -113,9 +113,10 @@ export const stockImages: ReadonlyArray<ImageAsset> = Object.values(stock);
 /* ------------------------------------------------ Page slots */
 
 export const images = {
-  heroOne: stock.damenPortraitHair,
-  heroTwo: stock.herrenShears,
-  heroThree: stock.kinderClipper,
+  // Hero chapter order: Herren (first frame on every load) → Damen → Kinder
+  heroHerren: stock.herrenShears,
+  heroDamen: stock.damenPortraitHair,
+  heroKinder: stock.kinderClipper,
 
   damen: stock.damenPortrait,
   herren: stock.herrenProfile,

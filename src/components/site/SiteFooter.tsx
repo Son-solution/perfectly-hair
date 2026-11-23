@@ -22,8 +22,10 @@ export function SiteFooter() {
   return (
     <footer className="relative overflow-hidden bg-ink text-white">
       {/* Moving band */}
-      <LiveBand className="border-y border-white/10 py-6 md:py-10">
-        <div className="animate-marquee flex w-max whitespace-nowrap font-display text-[clamp(3.5rem,10vw,9rem)] leading-none">
+      {/* Line height leaves room for Bodoni ascenders/descenders (no vertical clipping);
+          only the horizontal track is clipped, which is the intended marquee effect. */}
+      <LiveBand className="overflow-x-clip border-y border-white/10 py-[clamp(1rem,2.5vw,2.25rem)]">
+        <div className="animate-marquee flex w-max items-center whitespace-nowrap font-display text-[clamp(3.25rem,9.5vw,8.5rem)] leading-[1.2]">
           {band(0)}
           {band(1)}
         </div>

@@ -15,6 +15,7 @@ export function SalonImage({
   image,
   sizes = "100vw",
   eager = false,
+  preload = false,
   tone = "dark",
   className,
   showLabel = true,
@@ -23,6 +24,8 @@ export function SalonImage({
   sizes?: string;
   /** Above-the-fold image: load eagerly with high fetch priority. */
   eager?: boolean;
+  /** Load now at normal priority (e.g. upcoming slider slides), so it is ready before it shows. */
+  preload?: boolean;
   tone?: "dark" | "light";
   className?: string;
   /** Show "Bild folgt" / "Symbolbild" label. Disable only where a caption is shown nearby. */
@@ -47,7 +50,7 @@ export function SalonImage({
         alt={image.alt}
         fill
         sizes={sizes}
-        loading={eager ? "eager" : "lazy"}
+        loading={eager || preload ? "eager" : "lazy"}
         fetchPriority={eager ? "high" : "auto"}
         className={cn("object-cover grayscale", className)}
         style={image.position ? { objectPosition: image.position } : undefined}
