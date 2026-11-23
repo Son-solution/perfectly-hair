@@ -1,26 +1,13 @@
 import type { MetadataRoute } from "next";
+import { getPublishedSlugs } from "@/content/repository";
 import { siteUrl } from "@/lib/env";
 
-// Legal pages are excluded (noindex) until their content is complete.
-const routes = [
-  "",
-  "/damen",
-  "/herren",
-  "/kinder",
-  "/leistungen",
-  "/preise",
-  "/team",
-  "/galerie",
-  "/salon",
-  "/kontakt",
-  "/termin",
-  "/bildnachweise",
-];
-
-export default function sitemap(): MetadataRoute.Sitemap {
-  return routes.map((path) => ({
-    url: `${siteUrl}${path}`,
+/** Built from published, indexable CMS pages (legal drafts are noindex and excluded). */
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const slugs = await getPublishedSlugs();
+  return slugs.map((slug) => ({
+    url: `${siteUrl}${slug ? `/${slug}` : ""}`,
     changeFrequency: "monthly",
-    priority: path === "" ? 1 : ["/damen", "/herren", "/kinder"].includes(path) ? 0.9 : 0.7,
+    priority: slug === "" ? 1 : ["herren", "damen", "kinder"].includes(slug) ? 0.9 : 0.7,
   }));
 }

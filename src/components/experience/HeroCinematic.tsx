@@ -13,24 +13,20 @@ import { useCallback, useEffect, useState, type PointerEvent } from "react";
 import { LogoMark } from "@/components/brand/LogoMark";
 import { SalonImage } from "@/components/media/SalonImage";
 import { useLiveSection } from "@/components/motion/useLiveSection";
-import { audienceContent } from "@/content/audiences";
-import { images } from "@/content/images";
-import { site } from "@/config/site";
+import type { MediaAsset } from "@/content/schema";
 import { cn } from "@/lib/utils";
 
 const CHAPTER_MS = 6500;
 const ease = [0.76, 0, 0.24, 1] as const; // cinematic in-out for wipes
 
-/**
- * Chapter order is fixed: HERREN first (index 0 = server-rendered first frame, so there is
- * never a flash of another chapter during loading/hydration), then DAMEN, then KINDER,
- * looping back to HERREN.
- */
-const chapters = [
-  { ...audienceContent.herren, chapter: "01", bg: images.heroHerren, inset: images.herren },
-  { ...audienceContent.damen, chapter: "02", bg: images.heroDamen, inset: images.damenDetail },
-  { ...audienceContent.kinder, chapter: "03", bg: images.heroKinder, inset: images.kinder },
-];
+export type HeroSlide = {
+  slug: string;
+  label: string;
+  titleItalic: string;
+  chapter: string;
+  bg: MediaAsset;
+  inset: MediaAsset;
+};
 
 /**
  * Full-viewport cinematic hero with three chapters (Damen / Herren / Kinder).
@@ -38,8 +34,28 @@ const chapters = [
  * a masked word change and progress bars. Depth: background, inset frame and type move
  * at different rates with the pointer and drift on their own when idle.
  * The first chapter is fully visible in the server HTML (no wait for JS).
+ *
+ * Content comes from the CMS section "hero-cinematic"; slide order = chapter order
+ * (owner requirement: HERREN first). Index 0 is the server-rendered first frame, so there is
+ * never a flash of another chapter during loading/hydration.
  */
-export function HeroCinematic() {
+export function HeroCinematic({
+  slides: chapters,
+  brandFirst,
+  brandSecond,
+  brandSuffix,
+  eyebrow,
+  edgeLabel,
+  stockLabel,
+}: {
+  slides: HeroSlide[];
+  brandFirst: string;
+  brandSecond: string;
+  brandSuffix: string;
+  eyebrow: string;
+  edgeLabel: string;
+  stockLabel: string;
+}) {
   const reduce = useReducedMotion();
   const { ref, live } = useLiveSection<HTMLElement>();
   const [index, setIndex] = useState(0);
@@ -59,7 +75,7 @@ export function HeroCinematic() {
     if (reduce || !live || hold) return;
     const id = window.setTimeout(() => go((index + 1) % chapters.length), CHAPTER_MS);
     return () => window.clearTimeout(id);
-  }, [index, reduce, live, hold, go]);
+  }, [index, reduce, live, hold, go, chapters.length]);
 
   // Pointer depth (fine pointers only); springs keep it silky.
   const px = useMotionValue(0);
@@ -170,10 +186,10 @@ export function HeroCinematic() {
         aria-hidden="true"
         className="label-shadow absolute left-5 top-1/2 hidden origin-left -translate-y-1/2 -rotate-90 text-[0.5625rem] uppercase tracking-[0.4em] text-white/60 lg:left-8 lg:block"
       >
-        {site.address.street} · {site.address.city}
+        {edgeLabel}
       </p>
       <p className="absolute right-5 top-[var(--safe-top)] label-shadow text-[0.5625rem] uppercase leading-none tracking-[0.3em] text-white/75 md:right-[6vw]">
-        Symbolbilder
+        {stockLabel}
       </p>
 
       {/* ---------- Type */}
@@ -182,18 +198,18 @@ export function HeroCinematic() {
         <motion.div style={{ x: typeX }}>
           <p className="label-shadow animate-rise flex items-center gap-4 text-[0.6875rem] uppercase tracking-[0.34em] text-white/85">
             <LogoMark decorative className="h-7 w-7" />
-            Friseursalon · Wiesbaden
+            {eyebrow}
           </p>
           <h1 id="hero-title" className="mt-6 font-display font-normal leading-[0.9] tracking-[-0.01em]">
-            <span className="-mb-[0.06em] block overflow-hidden pb-[0.12em]">
-              <span className="animate-mask-up block text-[clamp(3rem,min(13.5vw,19svh),13rem)]">Perfectly</span>
+            <span className="-mb-[0.06em] -mt-[0.2em] block overflow-hidden pb-[0.12em] pt-[0.2em]">
+              <span className="animate-mask-up block text-[clamp(3rem,min(13.5vw,19svh),13rem)]">{brandFirst}</span>
             </span>
-            <span className="-mb-[0.06em] block overflow-hidden pb-[0.14em]">
+            <span className="-mb-[0.06em] -mt-[0.2em] block overflow-hidden pb-[0.14em] pt-[0.2em]">
               <span
                 className="animate-mask-up block pl-[0.9em] text-[clamp(3rem,min(13.5vw,19svh),13rem)] italic text-white/80"
                 style={{ animationDelay: "0.12s" }}
               >
-                Hair <span className="align-middle font-sans text-[0.11em] not-italic tracking-[0.5em] text-white/70">BY GABRIEL</span>
+                {brandSecond} <span className="align-middle font-sans text-[0.11em] uppercase not-italic tracking-[0.5em] text-white/70">{brandSuffix}</span>
               </span>
             </span>
           </h1>

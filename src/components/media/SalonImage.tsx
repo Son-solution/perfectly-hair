@@ -1,5 +1,5 @@
 import Image from "next/image";
-import type { ImageAsset } from "@/content/images";
+import type { ImageAsset } from "@/content/schema";
 import { cn } from "@/lib/utils";
 import { ArtPlaceholder } from "./ArtPlaceholder";
 

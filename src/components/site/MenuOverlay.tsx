@@ -5,25 +5,12 @@ import Link from "next/link";
 import { useEffect, useRef, useState, type RefObject } from "react";
 import { LogoMark } from "@/components/brand/LogoMark";
 import { SalonImage } from "@/components/media/SalonImage";
-import { businessHours, mapsUrl, site } from "@/config/site";
-import { images, stock, type ImageAsset } from "@/content/images";
+import type { SiteChrome } from "@/content/view";
 import { cn } from "@/lib/utils";
 
 const ease = [0.76, 0, 0.24, 1] as const;
 const soft = [0.22, 1, 0.36, 1] as const;
 
-const entries: ReadonlyArray<{ label: string; href: string; image: ImageAsset; primary?: boolean }> = [
-  { label: "Damen", href: "/damen", image: images.damen, primary: true },
-  { label: "Herren", href: "/herren", image: images.herren, primary: true },
-  { label: "Kinder", href: "/kinder", image: images.kinder, primary: true },
-  { label: "Leistungen", href: "/leistungen", image: stock.herrenShears },
-  { label: "Preise", href: "/preise", image: stock.herrenCut },
-  { label: "Galerie", href: "/galerie", image: stock.damenCurls },
-  { label: "Team", href: "/team", image: { seed: 31, alt: "Team" } },
-  { label: "Salon", href: "/salon", image: images.salonInterior },
-  { label: "Kontakt", href: "/kontakt", image: stock.kinderClipper },
-  { label: "Termin", href: "/termin", image: stock.damenHairWash },
-];
 
 /**
  * Full-screen navigation (all breakpoints). Curtain reveal, masked staggered links,
@@ -34,10 +21,12 @@ export function MenuOverlay({
   open,
   onClose,
   pathname,
+  chrome,
 }: {
   open: boolean;
   onClose: () => void;
   pathname: string;
+  chrome: SiteChrome;
 }) {
   const panelRef = useRef<HTMLDivElement>(null);
   const lastPath = useRef(pathname);
@@ -81,7 +70,7 @@ export function MenuOverlay({
 
   return (
     <AnimatePresence>
-      {open && <MenuPanel key="menu" panelRef={panelRef} pathname={pathname} />}
+      {open && <MenuPanel key="menu" panelRef={panelRef} pathname={pathname} chrome={chrome} />}
     </AnimatePresence>
   );
 }
@@ -90,12 +79,14 @@ export function MenuOverlay({
 function MenuPanel({
   panelRef,
   pathname,
+  chrome,
 }: {
   panelRef: RefObject<HTMLDivElement | null>;
   pathname: string;
+  chrome: SiteChrome;
 }) {
-  const [preview, setPreview] = useState(() => Math.max(0, entries.findIndex((e) => e.href === pathname)));
-  const openDays = businessHours.filter((d) => d.opens);
+  const [preview, setPreview] = useState(() => Math.max(0, chrome.menu.findIndex((e) => e.href === pathname)));
+  const entries = chrome.menu;
 
   return (
       <motion.div
@@ -188,23 +179,23 @@ function MenuPanel({
             <div className="flex items-center gap-4">
               <LogoMark decorative className="h-12 w-12 text-white" />
               <span className="leading-tight">
-                <span className="block font-display text-xl text-white">Perfectly Hair</span>
-                <span className="text-[0.625rem] uppercase tracking-[0.3em]">by Gabriel</span>
+                <span className="block font-display text-xl text-white">{chrome.shortName}</span>
+                <span className="text-[0.625rem] uppercase tracking-[0.3em]">{chrome.byline}</span>
               </span>
             </div>
             <p>
-              <a href={mapsUrl} target="_blank" rel="noopener noreferrer" className="hover:text-white">
-                {site.address.street}, {site.address.postalCode} {site.address.city}
+              <a href={chrome.mapsUrl} target="_blank" rel="noopener noreferrer" className="hover:text-white">
+                {chrome.addressLine}
               </a>
               <br />
-              <a href={site.phone.href} className="text-white hover:underline">
-                {site.phone.display}
+              <a href={chrome.phone.href} className="text-white hover:underline">
+                {chrome.phone.display}
               </a>
             </p>
             <p>
-              Di – Fr {openDays[0]?.opens} – {openDays[0]?.closes}
-              <br />
-              Sa {openDays.at(-1)?.opens} – {openDays.at(-1)?.closes}
+              {chrome.hoursLines.map((l) => (
+                <span key={l} className="block">{l}</span>
+              ))}
             </p>
           </motion.div>
         </div>

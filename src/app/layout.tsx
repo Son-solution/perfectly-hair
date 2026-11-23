@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Bodoni_Moda, Manrope } from "next/font/google";
 import { MotionProvider } from "@/components/motion";
-import { site } from "@/config/site";
+import { getBusiness } from "@/content/repository";
 import { siteUrl } from "@/lib/env";
 import "./globals.css";
 
@@ -18,19 +18,18 @@ const manrope = Manrope({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
-  title: {
-    default: `${site.name} – Friseur für Damen, Herren & Kinder in Wiesbaden`,
-    template: `%s – ${site.name}`,
-  },
-  description: site.description,
-  openGraph: {
-    type: "website",
-    locale: "de_DE",
-    siteName: site.name,
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const b = await getBusiness();
+  return {
+    metadataBase: new URL(siteUrl),
+    title: {
+      default: `${b.name} – Friseur für Damen, Herren & Kinder in ${b.address.city}`,
+      template: `%s – ${b.name}`,
+    },
+    description: b.description,
+    openGraph: { type: "website", locale: "de_DE", siteName: b.name },
+  };
+}
 
 export const viewport: Viewport = {
   themeColor: "#0a0a0a",

@@ -1,15 +1,8 @@
-import type { Metadata } from "next";
-import { AudiencePage } from "@/components/site/AudiencePage";
-import { audienceContent } from "@/content/audiences";
+import { PageView, pageMetadata } from "@/components/sections/PageView";
 
-const content = audienceContent.kinder;
-
-export const metadata: Metadata = {
-  title: `Friseur für Kinder in Wiesbaden`,
-  description: content.intro,
-  alternates: { canonical: "/kinder" },
-};
+// Content: CMS page "kinder" (src/content/data/pages.ts → later Supabase "site_pages").
+export const generateMetadata = () => pageMetadata("kinder");
 
 export default function KinderPage() {
-  return <AudiencePage content={content} />;
+  return <PageView slug="kinder" />;
 }

@@ -6,13 +6,7 @@ import { cn } from "@/lib/utils";
 
 type Group = "alle" | "damen" | "herren" | "kinder" | "salon";
 
-const filters: ReadonlyArray<{ id: Group; label: string }> = [
-  { id: "alle", label: "Alle" },
-  { id: "damen", label: "Damen" },
-  { id: "herren", label: "Herren" },
-  { id: "kinder", label: "Kinder" },
-  { id: "salon", label: "Salon" },
-];
+
 
 /**
  * Filterable gallery. Images are rendered on the server and passed in as
@@ -20,7 +14,10 @@ const filters: ReadonlyArray<{ id: Group; label: string }> = [
  */
 export function GalleryGrid({
   items,
+  filterLabels,
 }: {
+  /** Labels from the CMS categories, e.g. { herren: "Herren" }. */
+  filterLabels: Record<string, string>;
   items: ReadonlyArray<{
     id: string;
     group: Exclude<Group, "alle">;
@@ -31,7 +28,11 @@ export function GalleryGrid({
   const [active, setActive] = useState<Group>("alle");
   const visible = items.filter((i) => active === "alle" || i.group === active);
   // Only offer filters for groups that actually contain images.
-  const available = filters.filter((f) => f.id === "alle" || items.some((i) => i.group === f.id));
+  const groups = [...new Set(items.map((i) => i.group))];
+  const available: { id: Group; label: string }[] = [
+    { id: "alle", label: "Alle" },
+    ...groups.map((g) => ({ id: g, label: filterLabels[g] ?? "Salon" })),
+  ];
 
   return (
     <div>

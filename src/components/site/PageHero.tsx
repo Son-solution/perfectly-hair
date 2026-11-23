@@ -1,7 +1,8 @@
 import type { ReactNode } from "react";
 import { Rise } from "@/components/motion";
 import { SalonImage } from "@/components/media/SalonImage";
-import type { ImageAsset } from "@/content/images";
+import { ButtonLink } from "@/components/ui/primitives";
+import type { Cta, MediaAsset } from "@/content/schema";
 
 /**
  * Dark editorial hero shared by all inner pages ("Noir Atelier").
@@ -15,13 +16,19 @@ export function PageHero({
   italic,
   intro,
   image,
+  ctas = [],
+  stockLabel = "Symbolbild",
+  placeholderLabel = "Bild folgt",
   children,
 }: {
   eyebrow: string;
   title: string;
   italic?: string;
   intro?: ReactNode;
-  image?: ImageAsset;
+  image?: MediaAsset;
+  ctas?: Cta[];
+  stockLabel?: string;
+  placeholderLabel?: string;
   children?: ReactNode;
 }) {
   return (
@@ -41,11 +48,11 @@ export function PageHero({
             </p>
           </Rise>
           <h1 className="mt-8 font-display font-normal leading-[0.9]">
-            <span className="-mb-[0.08em] block overflow-hidden pb-[0.14em]">
+            <span className="-mb-[0.18em] -mt-[0.2em] block overflow-hidden pb-[0.26em] pt-[0.2em]">
               <span className="animate-mask-up block text-[clamp(3.2rem,9vw,9rem)]">{title}</span>
             </span>
             {italic && (
-              <span className="-mb-[0.2em] block overflow-hidden pb-[0.32em]">
+              <span className="-mb-[0.2em] -mt-[0.2em] block overflow-hidden pb-[0.32em] pt-[0.2em]">
                 <span
                   className="animate-mask-up block text-[clamp(2rem,5vw,5rem)] italic text-white/70"
                   style={{ animationDelay: "0.12s" }}
@@ -60,8 +67,13 @@ export function PageHero({
               <div className="mt-10 max-w-xl text-lg leading-relaxed text-white/65">{intro}</div>
             </Rise>
           )}
-          {children && (
-            <Rise delay={0.35} className="mt-10">
+          {(ctas.length > 0 || children) && (
+            <Rise delay={0.35} className="mt-10 flex flex-wrap gap-4">
+              {ctas.map((c) => (
+                <ButtonLink key={c.href + c.label} href={c.href} tone="light" variant={c.variant}>
+                  {c.label}
+                </ButtonLink>
+              ))}
               {children}
             </Rise>
           )}
@@ -75,7 +87,7 @@ export function PageHero({
               </div>
               {/* Label outside the zooming layer so it always stays in frame */}
               <span className="absolute bottom-4 left-4 bg-black/40 px-2 py-1 text-[0.5625rem] uppercase tracking-[0.28em] text-white/85 backdrop-blur-sm">
-                {image.credit ? "Symbolbild" : "Bild folgt"}
+                {image.credit ? stockLabel : placeholderLabel}
               </span>
             </div>
           </Rise>

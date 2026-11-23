@@ -8,12 +8,13 @@ import { SalonImage } from "@/components/media/SalonImage";
 import { MaskLines } from "@/components/motion/MaskLines";
 import { Reveal } from "@/components/motion";
 import { useLiveSection } from "@/components/motion/useLiveSection";
-import { businessHours, mapsUrl, site } from "@/config/site";
-import { stock, type ImageAsset } from "@/content/images";
+import type { MediaAsset } from "@/content/schema";
 import { cn } from "@/lib/utils";
 
 /** Rotating circular call button that leans toward the pointer (magnetic). */
-function CallBadge() {
+type Phone = { display: string; href: string };
+
+function CallBadge({ phone }: { phone: Phone }) {
   const reduce = useReducedMotion();
   const mx = useMotionValue(0);
   const my = useMotionValue(0);
@@ -29,7 +30,7 @@ function CallBadge() {
 
   return (
     <motion.a
-      href={site.phone.href}
+      href={phone.href}
       onPointerMove={onMove}
       onPointerLeave={() => {
         mx.set(0);
@@ -37,7 +38,7 @@ function CallBadge() {
       }}
       style={{ x, y }}
       className="group relative flex h-44 w-44 shrink-0 items-center justify-center rounded-full border border-white/30 bg-white/5 backdrop-blur-sm transition-colors duration-700 hover:bg-white hover:text-ink md:h-56 md:w-56"
-      aria-label={`Jetzt anrufen: ${site.phone.display}`}
+      aria-label={`Jetzt anrufen: ${phone.display}`}
     >
       <svg aria-hidden="true" viewBox="0 0 200 200" className="absolute inset-0 h-full w-full animate-spin-slow">
         <defs>
@@ -45,7 +46,7 @@ function CallBadge() {
         </defs>
         {/* textLength = circumference (2πr, r=80) so the ring closes exactly without overlap */}
         <text fill="currentColor" fontSize="12" style={{ textTransform: "uppercase" }}>
-          <textPath href="#call-circle" textLength="500" lengthAdjust="spacing">Jetzt anrufen · {site.phone.display} · </textPath>
+          <textPath href="#call-circle" textLength="500" lengthAdjust="spacing">Jetzt anrufen · {phone.display} · </textPath>
         </text>
       </svg>
       <span className="relative flex flex-col items-center gap-2 text-center">
@@ -60,19 +61,31 @@ function CallBadge() {
  * Full-screen appointment finale. Honest: booking happens by phone until the backend
  * exists; the online flow is linked only as a labelled preview.
  */
+export type FinaleContact = {
+  phone: Phone;
+  hoursLines: string[];
+  street: string;
+  cityLine: string;
+  mapsUrl: string;
+  onlineBookingActive: boolean;
+};
+
 export function BookingFinale({
-  title = "Ihr Termin",
-  italic = "beginnt mit einem Anruf.",
-  image = stock.damenPortrait,
-  compact = false,
+  title,
+  italic,
+  image,
+  compact,
+  contact,
+  stockLabel,
 }: {
-  title?: string;
-  italic?: string;
-  image?: ImageAsset;
-  compact?: boolean;
+  title: string;
+  italic: string;
+  image: MediaAsset;
+  compact: boolean;
+  contact: FinaleContact;
+  stockLabel: string;
 }) {
   const { ref } = useLiveSection<HTMLElement>();
-  const open = businessHours.filter((d) => d.opens);
 
   return (
     <section
@@ -91,7 +104,7 @@ export function BookingFinale({
         className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(10,10,10,0.94)_0%,rgba(10,10,10,0.78)_45%,rgba(10,10,10,0.45)_100%),linear-gradient(0deg,rgba(10,10,10,0.92)_0%,rgba(10,10,10,0.25)_55%,rgba(10,10,10,0.5)_100%)]"
       />
       <p className="label-shadow absolute right-5 top-6 text-[0.5625rem] uppercase leading-none tracking-[0.3em] text-white/70 md:right-10 lg:right-16">
-        Symbolbild
+        {image.credit ? stockLabel : ""}
       </p>
 
       <div className="container-luxe w-full py-20 md:py-28">
@@ -110,7 +123,7 @@ export function BookingFinale({
             />
           </div>
           <div className="mt-4 flex lg:col-span-4 lg:mt-0 lg:justify-end">
-            <CallBadge />
+            <CallBadge phone={contact.phone} />
           </div>
         </div>
 
@@ -118,33 +131,34 @@ export function BookingFinale({
           <div className="mt-16 grid gap-10 border-t border-white/20 pt-10 text-sm sm:grid-cols-3 sm:gap-8">
             <div>
               <p className="text-[0.625rem] uppercase leading-none tracking-[0.3em] text-white/60">Telefon</p>
-              <a href={site.phone.href} className="mt-[var(--space-label)] block font-display text-3xl hover:italic">
-                {site.phone.display}
+              <a href={contact.phone.href} className="mt-[var(--space-label)] block font-display text-3xl hover:italic">
+                {contact.phone.display}
               </a>
             </div>
             <div>
               <p className="text-[0.625rem] uppercase leading-none tracking-[0.3em] text-white/60">Öffnungszeiten</p>
               <p className="mt-[var(--space-label)] leading-relaxed text-white/85">
-                Di – Fr {open[0]?.opens} – {open[0]?.closes} Uhr
-                <br />
-                Sa {open.at(-1)?.opens} – {open.at(-1)?.closes} Uhr · So & Mo geschlossen
+                {contact.hoursLines.map((l) => (
+                  <span key={l} className="block">{l}</span>
+                ))}
               </p>
             </div>
             <div>
               <p className="text-[0.625rem] uppercase leading-none tracking-[0.3em] text-white/60">Salon</p>
               <a
-                href={mapsUrl}
+                href={contact.mapsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="mt-[var(--space-label)] block leading-relaxed text-white/80 underline-offset-4 hover:underline"
               >
-                {site.address.street}
+                {contact.street}
                 <br />
-                {site.address.postalCode} {site.address.city}
+                {contact.cityLine}
                 <span className="sr-only"> (Karte, öffnet in neuem Tab)</span>
               </a>
             </div>
           </div>
+          {!contact.onlineBookingActive && (
           <p className="mt-12 flex flex-wrap items-center gap-x-5 gap-y-3 text-xs text-white/70">
             <span className="flex items-center gap-2">
               <span aria-hidden="true" className="h-1.5 w-1.5 animate-breathe rounded-full bg-white" />
@@ -154,6 +168,7 @@ export function BookingFinale({
               Vorschau ansehen
             </Link>
           </p>
+          )}
         </Reveal>
       </div>
     </section>

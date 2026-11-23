@@ -153,3 +153,29 @@ Allowed transitions (enforced in `set_booking_status`):
 | pending | cancelled | customer (own), admin |
 | accepted | cancelled | customer before cutoff, staff, admin |
 | accepted | completed, no_show | assigned staff, admin (only after `starts_at`) |
+
+## 6. CMS and content tables (added in Phase 3)
+
+Mirrors the Zod schemas in `src/content/schema.ts` (see `docs/CMS_ARCHITECTURE.md`).
+
+| Table | Key columns | Notes |
+| --- | --- | --- |
+| `site_settings` | singleton: `footer_tagline`, `footer_band_words text[]`, `appearance` (enum preset), `stock_label`, `placeholder_label` | Appearance limited to monochrome presets |
+| `business_settings` | singleton: name, short_name, tagline, description, address fields, `phone_e164`, `phone_display`, `email`, `social jsonb`, booking policy fields, legal fields (`owner_name`, `vat_id`, `chamber`, `registration_number`) | `null` = not provided yet |
+| `opening_hours` | `weekday 1–7`, `opens`, `closes` | Same as `business_hours` in §2 |
+| `opening_exceptions` | `date`, `label`, `opens`, `closes` (null = closed) | Holidays / special hours |
+| `navigation_items` | `id`, `group` (primary/secondary/cta/menu/legal), `label`, `href`, `media_id`, `is_primary`, `sort_order` | `href` restricted to existing routes (check constraint / app validation) |
+| `media_assets` | `id`, `storage_path`, `alt`, `width`, `height`, `focal_point`, `credit jsonb`, `uploaded_by`, `created_at` | Storage bucket `media`; images normalised to grayscale on upload |
+| `site_pages` | `slug` pk, `status` (draft/published), `is_visible`, `seo_title`, `seo_description`, `noindex`, `published_at` | Core page slugs protected from deletion |
+| `page_sections` | `id`, `page_slug`, `type`, `sort_order`, `is_visible`, `payload jsonb`, `status` | `payload` validated by Zod `section` schema |
+| `page_revisions` | `id`, `page_slug`, `snapshot jsonb`, `published_by`, `published_at` | Publication history and rollback |
+| `gallery_images` | `id`, `media_id`, `group`, `ratio`, `caption`, `collection` (inspiration/portfolio), `sort_order`, `is_visible` | Portfolio = genuine salon work only |
+| `notifications` / `notification_preferences` / `email_outbox` | see §2 | In-app events + optional e-mail |
+| `audit_log` | see §2 | Every admin write (content, prices, staff, settings) |
+
+RLS
+- **Read:** public read is limited to `status = 'published' AND is_visible`.
+- **Write:** writes go only through admin Server Actions (`is_admin()`).
+- **Protected settings:** `site_settings.appearance` and the logo media can be changed only
+  by a Super Admin.
+- **Cache:** publishing triggers `revalidateTag('content:<entity>')` from the Server Action.

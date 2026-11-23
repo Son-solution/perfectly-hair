@@ -4,7 +4,8 @@ Resume point after any interruption: read this file, then `git log --oneline`.
 
 ## Current status
 
-**Phase 2 — Public frontend + logo (2.1) + photography (2.2) + "Noir Atelier" redesign (2.3): complete, awaiting owner review / approval for Phase 3.**
+**Phase 3 — Complete public website + CMS-ready architecture: complete, awaiting owner approval for the next phase (backend).**
+Last update: 2026-11-23
 Last update: 2026-11-20
 
 Priority change (owner, Phase 2): finish and visually review the public website BEFORE
@@ -159,6 +160,32 @@ Checkpoint before: git tag `pre-refine-v2`.
 - Incident: a power cut corrupted generated `.next/types` (null bytes) → deleted `.next`
   (git-ignored build output) and regenerated with `next typegen` + build.
 
+## Phase 3 — Complete website + CMS-ready architecture ✅ (2026-11-23)
+Checkpoint before: git tag `pre-phase3`. Architecture: `docs/CMS_ARCHITECTURE.md`; DB plan: `docs/DATABASE.md` §6.
+
+- **Content layer:** `src/content/schema.ts` (Zod), `src/content/data/*` (mock: business, navigation, settings,
+  categories, services, employees, gallery, media, pages), `src/content/repository.ts` (async, server-only,
+  validates + checks references at build). Old `config/site.ts`, `content/images.ts`, `content/audiences.ts` removed.
+- **Pages = ordered typed sections** rendered by `components/sections/SectionRenderer.tsx` (22 section types).
+  All 14 routes are thin `<PageView slug>` wrappers; SEO from CMS; hidden/draft pages → 404.
+- **Components props-only:** hero, panels, story, gallery, finale, header, menu, footer, JSON-LD, sitemap,
+  root metadata all read CMS data (no business content hardcoded in components).
+- **Single sources:** phone/address/hours (`summarizeHours`), category texts/images, service prices.
+- **Booking (frontend only):** 6 steps (Bereich, Leistung, Mitarbeiter, Termin, Ihre Daten, Übersicht);
+  deep links `/termin?kategorie=&leistung=&mitarbeiter=` from every service row and category page;
+  closed weekdays disabled; no invented slots; Zod validation (German messages); booking button disabled;
+  `BookingGateway` contract with `unavailableGateway` (`features/booking/types.ts`).
+- Editor conventions: `*text*` = italic accent; CTA `tel:` = salon phone; legal tokens → [FEHLT] when null.
+- Fixes found while testing: German umlauts (Ü) clipped by text masks → top padding in all masks;
+  descender clipping in page hero; JSON-LD `<` escape corrected.
+- **Tests (production build, DevTools protocol):** 14 routes 200, 404 for unknown; 44 internal links, 0 dead;
+  27 booking deep links valid; tel link correct; maps link present; hero Herren first; booking walk-through
+  (deep link → step 3, date selection, validation blocks empty form, summary, submit disabled);
+  14 pages × 375/390/768/1024/1440 → no horizontal overflow, page titles ≥ 98 px below header.
+  typecheck ✅ lint ✅ build ✅ (18 static routes).
+- Known content limitation: flyer services are not assigned to Damen/Herren/Kinder, so every category
+  lists all six (e.g. Bartrasur under Kinder) until the salon assigns them (`service.audiences`).
+
 ### Known limitations of testing
 - Reliable visual testing method: drive Edge via DevTools protocol (scratch script `cdp-shot.mjs`):
   real mobile emulation, natural scrolling, clicks. The plain `--screenshot` CLI is unreliable
@@ -191,7 +218,8 @@ Checkpoint before: git tag `pre-refine-v2`.
 - Leftover folder `perfectly-hair/` (only a locked `node_modules` from the Phase 1 move). Ignored by Git;
   delete manually after closing VS Code.
 
-## Next step — Phase 3 (needs approval)
+## Next step — Phase 4 (needs approval)
 
-Backend foundation: Supabase project, migrations from `docs/DATABASE.md`, RLS + tests, Auth,
-`src/proxy.ts`, generated types, seed — then the real booking engine replaces the prototype.
+Backend: Supabase project, migrations (docs/DATABASE.md), RLS, Auth + roles, repository → Supabase,
+Storage uploads, publish/revalidate, real booking engine behind `BookingGateway`; then Admin, Staff and
+Customer dashboards and notifications.

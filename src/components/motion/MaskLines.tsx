@@ -39,11 +39,11 @@ export function MaskLines({
   return (
     <Tag ref={ref} id={id} className={className}>
       {lines.map((line, i) => (
-        <span key={i} className="-mb-[0.16em] block overflow-hidden pb-[0.28em]">
+        <span key={i} className="-mb-[0.16em] -mt-[0.2em] block overflow-hidden pb-[0.28em] pt-[0.2em]">
           <motion.span
             className={cn("block", lineClassName)}
-            initial={{ y: "108%" }}
-            animate={{ y: inView ? "0%" : "108%" }}
+            initial={{ y: "135%" }}
+            animate={{ y: inView ? "0%" : "135%" }}
             transition={{ duration: 1.15, ease, delay: delay + i * 0.11 }}
           >
             {line}

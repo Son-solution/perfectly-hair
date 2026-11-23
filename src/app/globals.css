@@ -78,7 +78,7 @@
     to   { transform: scaleX(1); }
   }
   @keyframes mask-up {
-    from { transform: translate3d(0, 108%, 0); }
+    from { transform: translate3d(0, 135%, 0); }
     to   { transform: none; }
   }
   @keyframes page-in {

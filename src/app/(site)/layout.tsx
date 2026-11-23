@@ -1,8 +1,11 @@
+import { SalonJsonLd } from "@/components/site/SalonJsonLd";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { SiteHeader } from "@/components/site/SiteHeader";
-import { SalonJsonLd } from "@/components/site/SalonJsonLd";
+import { getBusiness, getSiteChrome } from "@/content/repository";
 
-export default function SiteLayout({ children }: { children: React.ReactNode }) {
+/** Global chrome is CMS content too: loaded once here and passed down as props. */
+export default async function SiteLayout({ children }: { children: React.ReactNode }) {
+  const [chrome, business] = await Promise.all([getSiteChrome(), getBusiness()]);
   return (
     <>
       <a
@@ -11,10 +14,10 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
       >
         Zum Inhalt springen
       </a>
-      <SiteHeader />
+      <SiteHeader chrome={chrome} />
       <main id="inhalt">{children}</main>
-      <SiteFooter />
-      <SalonJsonLd />
+      <SiteFooter chrome={chrome} />
+      <SalonJsonLd business={business} />
     </>
   );
 }

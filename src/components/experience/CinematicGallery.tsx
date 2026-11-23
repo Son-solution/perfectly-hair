@@ -14,12 +14,12 @@ import Link from "next/link";
 import { useRef, useState } from "react";
 import { SalonImage } from "@/components/media/SalonImage";
 import { useLiveSection } from "@/components/motion/useLiveSection";
-import type { ImageAsset } from "@/content/images";
+import type { MediaAsset } from "@/content/schema";
 import { cn } from "@/lib/utils";
 
-type Item = { id: string; image: ImageAsset; group: string; ratio: "portrait" | "landscape" | "square" };
+export type GalleryCard = { id: string; image: MediaAsset; label: string; ratio: "portrait" | "landscape" | "square" };
+type Item = GalleryCard;
 
-const groupLabel: Record<string, string> = { damen: "Damen", herren: "Herren", kinder: "Kinder", salon: "Salon" };
 
 /**
  * One endlessly moving row. Moves continuously on its own; scroll velocity adds a
@@ -32,12 +32,14 @@ function Row({
   speed,
   live,
   tall,
+  stockLabel,
 }: {
   items: ReadonlyArray<Item>;
   direction: 1 | -1;
   speed: number; // px per second
   live: boolean;
   tall: boolean;
+  stockLabel: string;
 }) {
   const reduce = useReducedMotion();
   const trackRef = useRef<HTMLDivElement>(null);
@@ -79,8 +81,8 @@ function Row({
           <SalonImage image={item.image} sizes="(min-width: 768px) 30vw, 60vw" showLabel={false} />
         </div>
         <figcaption className="absolute inset-x-0 bottom-0 flex translate-y-full items-end justify-between bg-[linear-gradient(0deg,rgba(10,10,10,0.85),transparent)] p-4 pt-12 text-white transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/card:translate-y-0">
-          <span className="font-display text-2xl italic">{groupLabel[item.group]}</span>
-          <span className="text-[0.5625rem] uppercase tracking-[0.3em] text-white/70">Symbolbild</span>
+          <span className="font-display text-2xl italic">{item.label}</span>
+          <span className="text-[0.5625rem] uppercase tracking-[0.3em] text-white/70">{item.image.credit ? stockLabel : ""}</span>
         </figcaption>
       </figure>
     ));
@@ -101,10 +103,14 @@ function Row({
 
 export function CinematicGallery({
   items,
-  showHeading = true,
+  heading,
+  stockLabel,
+  creditsLink,
 }: {
   items: ReadonlyArray<Item>;
-  showHeading?: boolean;
+  heading: { eyebrow: string; title: string; italic: string; cta: { label: string; href: string } | null } | null;
+  stockLabel: string;
+  creditsLink: { label: string; href: string } | null;
 }) {
   const { ref, live } = useLiveSection<HTMLElement>("200px");
   const half = Math.ceil(items.length / 2);
@@ -113,39 +119,43 @@ export function CinematicGallery({
 
   return (
     <section ref={ref} aria-label="Galerie in Bewegung" className="relative overflow-hidden bg-ink py-24 text-white md:py-36">
-      {showHeading && (
+      {heading && (
         <div className="container-luxe relative mb-14 flex flex-col gap-8 md:mb-20 md:flex-row md:items-end md:justify-between">
           <div>
             <p className="flex items-center gap-4 text-eyebrow uppercase text-ash">
               <span aria-hidden="true" className="h-px w-10 bg-current" />
-              Galerie
+              {heading.eyebrow}
             </p>
             <h2 className="mt-6 font-display text-[clamp(3.2rem,9vw,9rem)] font-normal leading-[0.88]">
-              Handwerk
-              <span className="block italic text-outline-light">in Bewegung.</span>
+              {heading.title}
+              <span className="block italic text-outline-light">{heading.italic}</span>
             </h2>
           </div>
           <div className="flex flex-col items-start gap-4 md:items-end">
+            {heading.cta && (
             <Link
-              href="/galerie"
+              href={heading.cta.href}
               className="group inline-flex items-center gap-4 border border-white/40 px-7 py-4 text-[0.6875rem] uppercase tracking-[0.26em] transition-colors duration-500 hover:bg-white hover:text-ink"
             >
-              Zur Galerie
+              {heading.cta.label}
               <span aria-hidden="true" className="h-px w-8 bg-current transition-[width] duration-500 group-hover:w-12" />
             </Link>
-            <p className="text-[0.5625rem] uppercase tracking-[0.3em] text-white/45">
-              Symbolbilder ·{" "}
-              <Link href="/bildnachweise" className="underline underline-offset-4 hover:text-white">
-                Bildnachweise
-              </Link>
-            </p>
+            )}
+            {creditsLink && (
+              <p className="text-[0.5625rem] uppercase tracking-[0.3em] text-white/45">
+                {stockLabel} ·{" "}
+                <Link href={creditsLink.href} className="underline underline-offset-4 hover:text-white">
+                  {creditsLink.label}
+                </Link>
+              </p>
+            )}
           </div>
         </div>
       )}
 
       <div className="flex flex-col gap-3 md:gap-5">
-        <Row items={rowA} direction={1} speed={42} live={live} tall />
-        <Row items={rowB} direction={-1} speed={30} live={live} tall={false} />
+        <Row items={rowA} direction={1} speed={42} live={live} tall stockLabel={stockLabel} />
+        <Row items={rowB} direction={-1} speed={30} live={live} tall={false} stockLabel={stockLabel} />
       </div>
     </section>
   );

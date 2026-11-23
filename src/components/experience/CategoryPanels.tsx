@@ -5,7 +5,9 @@ import Link from "next/link";
 import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { SalonImage } from "@/components/media/SalonImage";
 import { useLiveSection } from "@/components/motion/useLiveSection";
-import { audienceList } from "@/content/audiences";
+import type { Category, MediaAsset } from "@/content/schema";
+
+export type Panel = Category & { hero: MediaAsset };
 import { cn } from "@/lib/utils";
 
 const CYCLE_MS = 5200;
@@ -18,7 +20,7 @@ const ease = [0.22, 1, 0.36, 1] as const;
  * Touch:   vertically stacked; first tap expands a panel, a tap on the expanded
  *          panel (or its "Entdecken" link) opens the category.
  */
-export function CategoryPanels() {
+export function CategoryPanels({ panels: audienceList, stockLabel }: { panels: Panel[]; stockLabel: string }) {
   const reduce = useReducedMotion();
   const { ref, live } = useLiveSection<HTMLDivElement>();
   const [active, setActive] = useState(0);
@@ -33,7 +35,7 @@ export function CategoryPanels() {
     if (reduce || !live || interacting) return;
     const id = window.setTimeout(() => setActive((a) => (a + 1) % audienceList.length), CYCLE_MS);
     return () => window.clearTimeout(id);
-  }, [active, reduce, live, interacting]);
+  }, [active, reduce, live, interacting, audienceList.length]);
 
   const onPanelClick = (i: number) => (e: MouseEvent<HTMLAnchorElement>) => {
     // On touch devices the first tap only expands the panel.
@@ -97,8 +99,8 @@ export function CategoryPanels() {
 
             {/* Top row: numeral + label share one wrapping row, so they can never collide in narrow panels */}
             <div className="absolute inset-x-5 top-5 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-[var(--space-label)] leading-none md:inset-x-7 md:top-7">
-              <span className="text-[0.625rem] uppercase tracking-[0.34em] text-white/70">{a.numeral} / 03</span>
-              <span className="text-[0.5625rem] uppercase tracking-[0.3em] text-white/45">Symbolbild</span>
+              <span className="text-[0.625rem] uppercase tracking-[0.34em] text-white/70">{a.numeral} / {String(audienceList.length).padStart(2, "0")}</span>
+              <span className="text-[0.5625rem] uppercase tracking-[0.3em] text-white/45">{stockLabel}</span>
             </div>
 
             {/* Collapsed label (vertical on desktop) */}

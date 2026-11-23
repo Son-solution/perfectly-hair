@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { LogoMark } from "@/components/brand/LogoMark";
-import { audiences, site } from "@/config/site";
+import type { SiteChrome } from "@/content/view";
 import { cn } from "@/lib/utils";
 import { MenuOverlay } from "./MenuOverlay";
 
@@ -13,7 +13,7 @@ import { MenuOverlay } from "./MenuOverlay";
  * and returns on scroll up. Audiences always one click away; everything else lives in
  * the full-screen menu (all breakpoints).
  */
-export function SiteHeader() {
+export function SiteHeader({ chrome }: { chrome: SiteChrome }) {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [hidden, setHidden] = useState(false);
@@ -50,7 +50,7 @@ export function SiteHeader() {
           <Link
             href="/"
             className="group relative z-10 flex shrink-0 items-center gap-3.5 md:gap-4"
-            aria-label={`${site.name} – Startseite`}
+            aria-label={`${chrome.name} – Startseite`}
             onClick={closeMenu}
           >
             <LogoMark
@@ -59,14 +59,14 @@ export function SiteHeader() {
             />
             <span aria-hidden="true" className="h-8 w-px bg-white/25 md:h-9" />
             <span aria-hidden="true" className="flex flex-col leading-none">
-              <span className="font-display text-lg tracking-wide md:text-xl">Perfectly Hair</span>
-              <span className="mt-1.5 text-[0.5625rem] uppercase tracking-[0.34em] text-white/60">by Gabriel</span>
+              <span className="font-display text-lg tracking-wide md:text-xl">{chrome.shortName}</span>
+              <span className="mt-1.5 text-[0.5625rem] uppercase tracking-[0.34em] text-white/60">{chrome.byline}</span>
             </span>
           </Link>
 
           <nav aria-label="Für wen" className="hidden lg:block">
             <ul className="flex items-center gap-10">
-              {audiences.map((a) => {
+              {chrome.primaryNav.map((a) => {
                 const active = isActive(a.href);
                 return (
                   <li key={a.href}>
@@ -108,12 +108,12 @@ export function SiteHeader() {
 
           <div className="flex items-center gap-2 md:gap-4">
             <Link
-              href="/termin"
-              aria-current={isActive("/termin") ? "page" : undefined}
+              href={chrome.cta.href}
+              aria-current={isActive(chrome.cta.href) ? "page" : undefined}
               className="group relative hidden overflow-hidden border border-white/45 px-5 py-2.5 text-[0.6875rem] uppercase tracking-[0.24em] sm:inline-flex"
             >
               <span aria-hidden="true" className="absolute inset-0 origin-bottom scale-y-0 bg-white transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-y-100" />
-              <span className="relative transition-colors duration-500 group-hover:text-ink">Termin</span>
+              <span className="relative transition-colors duration-500 group-hover:text-ink">{chrome.cta.label}</span>
             </Link>
             <button
               type="button"
@@ -145,7 +145,7 @@ export function SiteHeader() {
         </div>
       </header>
 
-      <MenuOverlay open={menuOpen} onClose={closeMenu} pathname={pathname} />
+      <MenuOverlay open={menuOpen} onClose={closeMenu} pathname={pathname} chrome={chrome} />
     </>
   );
 }

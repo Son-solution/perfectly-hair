@@ -1,10 +1,7 @@
 import type { ReactNode } from "react";
 import { LogoMark } from "@/components/brand/LogoMark";
-import { BookingFinale } from "@/components/experience/BookingFinale";
 import { Reveal } from "@/components/motion";
 import { Eyebrow } from "@/components/ui/primitives";
-import { businessHours, flyerServices, site } from "@/config/site";
-import { formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 /* ----------------------------------------------------------------- */
@@ -47,97 +44,6 @@ export function SectionIntro({
       )}
     </Reveal>
   );
-}
-
-/* ----------------------------------------------------------------- */
-
-/** Prices exactly as printed on the flyer, with the honest audience caveat. */
-export function FlyerPriceList({
-  tone = "light",
-  showNote = true,
-}: {
-  tone?: "light" | "dark";
-  showNote?: boolean;
-}) {
-  const dark = tone === "dark";
-  return (
-    <div>
-      <dl>
-        {flyerServices.map((s, i) => (
-          <Reveal
-            key={s.name}
-            delay={i * 0.05}
-            className={cn(
-              "group flex items-baseline gap-4 border-b py-5 md:py-6",
-              dark ? "border-white/12" : "border-mist",
-            )}
-          >
-            <dt className="flex flex-1 items-baseline gap-4 text-lg md:text-xl">
-              {s.name}
-              <span
-                aria-hidden="true"
-                className={cn(
-                  "h-px flex-1 origin-left scale-x-50 transition-transform duration-700 ease-luxe group-hover:scale-x-100",
-                  dark ? "bg-white/20" : "bg-mist",
-                )}
-              />
-            </dt>
-            <dd className="font-display text-2xl tabular-nums md:text-3xl">
-              {formatPrice(s.priceCents, s.priceIsFrom)}
-            </dd>
-          </Reveal>
-        ))}
-      </dl>
-      {showNote && (
-        <p className={cn("mt-8 max-w-xl text-sm leading-relaxed", dark ? "text-ash" : "text-stone")}>
-          Preise laut aktuellem Flyer des Salons. Der Flyer unterscheidet nicht zwischen
-          Damen, Herren und Kindern – je nach Haarlänge und Aufwand kann der Preis
-          abweichen. Bitte fragen Sie uns nach dem Preis für Ihre Wunschleistung:{" "}
-          <a href={site.phone.href} className="underline underline-offset-4">
-            {site.phone.display}
-          </a>
-          .
-        </p>
-      )}
-    </div>
-  );
-}
-
-/* ----------------------------------------------------------------- */
-
-export function HoursList({ tone = "light" }: { tone?: "light" | "dark" }) {
-  const dark = tone === "dark";
-  return (
-    <dl className="text-base">
-      {businessHours.map((d) => (
-        <div
-          key={d.weekday}
-          className={cn(
-            "flex justify-between gap-6 border-b py-3.5",
-            dark ? "border-white/12" : "border-mist",
-          )}
-        >
-          <dt className={dark ? "text-ash" : "text-graphite"}>{d.label}</dt>
-          <dd className={cn("tabular-nums", !d.opens && (dark ? "text-ash" : "text-stone"))}>
-            {d.opens ? `${d.opens} – ${d.closes} Uhr` : "Geschlossen"}
-          </dd>
-        </div>
-      ))}
-    </dl>
-  );
-}
-
-/* ----------------------------------------------------------------- */
-
-/** Closing call to action used at the bottom of most pages (compact cinematic finale). */
-export function CtaBand({
-  title = "Ihr nächster Termin",
-  italic = "beginnt mit einem Anruf.",
-}: {
-  title?: string;
-  italic?: string;
-}) {
-  return <BookingFinale title={title} italic={italic} compact />;
 }
 
 /* ----------------------------------------------------------------- */
