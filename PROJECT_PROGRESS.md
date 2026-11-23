@@ -4,7 +4,9 @@ Resume point after any interruption: read this file, then `git log --oneline`.
 
 ## Current status
 
-**Phase 4 — Isolated 3D prototype (/3d-preview): complete, awaiting owner approval. NOT integrated into the homepage.**
+**Phase 4 — 3D prototype (/3d-preview): built, then POSTPONED by the owner (2026-11-23). Not integrated into the homepage.**
+
+3D on hold. Phase 4.1 (free Sketchfab hair/beard upgrade) was investigated but not started. Blocked on: Sketchfab download needs the owner's login (API 401); Blender not installed. "Bearded Man" (CC BY 4.0, ~30k tris, 18 textures) looks usable; "Male Fashion Hair Collection 02" (CC BY 4.0) has only 1 texture for 27 materials on Sketchfab (alpha maps likely missing), and no confirmed fade style. Project pushed to GitHub: https://github.com/Son-solution/Perfectly-hair (branch main).
 Last update: 2026-11-23
 Last update: 2026-11-20
 
