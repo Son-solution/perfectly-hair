@@ -1,11 +1,17 @@
+import { demoReady } from "@/features/demo/config";
+
 /**
- * Local-only preview gate for the Phase 5A dashboards.
+ * Preview gate for the dashboards (demo data, no real auth yet).
  *
- * Dashboards are visible in development (`npm run dev`) and in a local production build
- * started with DASHBOARD_PREVIEW=local. On Vercel neither condition is true, so every
- * dashboard route renders 404. NEVER set DASHBOARD_PREVIEW on Vercel.
+ * Visible in:
+ *  - development (`npm run dev`)
+ *  - a local production build started with DASHBOARD_PREVIEW=local
+ *  - the PASSWORD-PROTECTED client demo (DEMO_ENVIRONMENT=client-demo + credentials; see
+ *    src/proxy.ts). Without valid credentials the demo fails closed.
+ * Production never sets these variables → every dashboard route renders 404.
+ * NEVER set DASHBOARD_PREVIEW or DEMO_ENVIRONMENT for the Production environment on Vercel.
  *
- * This is not authentication — it only keeps the unprotected design preview off production.
+ * This is not authentication for real data — Phase 5B replaces it with Supabase Auth.
  */
 export const dashboardPreviewEnabled =
-  process.env.NODE_ENV !== "production" || process.env.DASHBOARD_PREVIEW === "local";
+  process.env.NODE_ENV !== "production" || process.env.DASHBOARD_PREVIEW === "local" || demoReady;

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Bodoni_Moda, Manrope } from "next/font/google";
 import { MotionProvider } from "@/components/motion";
 import { getBusiness } from "@/content/repository";
+import { demoMode } from "@/features/demo/config";
 import { siteUrl } from "@/lib/env";
 import "./globals.css";
 
@@ -28,6 +29,8 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     description: b.description,
     openGraph: { type: "website", locale: "de_DE", siteName: b.name },
+    // Protected client demo: never indexed (plus X-Robots-Tag header from src/proxy.ts).
+    ...(demoMode ? { robots: { index: false, follow: false, nocache: true } } : {}),
   };
 }
 

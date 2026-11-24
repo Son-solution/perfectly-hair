@@ -111,6 +111,9 @@ export const business = z.object({
   holidays: z.array(z.object({ date: z.string(), label: z.string() })),
   social: z.array(link),
   booking: z.object({
+    /** Which booking channels the website offers (owner setting). Default REQUEST_ONLY. */
+    mode: z.enum(["REQUEST_ONLY", "ONLINE_ONLY", "BOTH", "DISABLED"]),
+    /** Technical readiness of the booking engine (backend + availability + double-booking guard). Until true, online booking is shown as a non-operational preview only. */
     onlineBookingActive: z.boolean(),
     cancellationPolicy: z.string().nullable(),
     approvalMode: z.enum(["auto", "manual", "hybrid"]).nullable(),
@@ -224,7 +227,6 @@ export const siteSettings = z.object({
   features: z.object({
     teamPageVisible: z.boolean(),
     careersPageVisible: z.boolean(),
-    callbackFormVisible: z.boolean(),
     applicationFormVisible: z.boolean(),
   }),
   /** Internal recipient for callback/application notifications. null = not configured yet. */

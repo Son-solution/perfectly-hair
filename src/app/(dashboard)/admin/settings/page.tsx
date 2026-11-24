@@ -19,6 +19,8 @@ export default async function AdminSettingsPage() {
         site={{
           walkIn: business.walkIn,
           features: settings.features,
+          bookingMode: business.booking.mode,
+          onlineBookingEngineReady: business.booking.onlineBookingActive,
           notificationEmail: settings.notificationEmail,
           application: form?.type === "application-form" ? { positions: form.positions, employmentOptions: form.employmentOptions, cvMaxMb: form.cvMaxMb } : null,
         }}

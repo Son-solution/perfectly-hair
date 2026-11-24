@@ -5,12 +5,15 @@ import { Tabs, useToast } from "@/components/dashboard/interactive";
 import { Avatar, Badge, Card, Field, Table, Td, Th, btn, inputCls, textareaCls } from "@/components/dashboard/ui";
 import { ROLE_LABEL, type Employee, type Role } from "@/features/dashboard/domain";
 import { PERMISSIONS, PERMISSION_LABEL, ROLE_PERMISSIONS } from "@/features/dashboard/permissions";
-import type { WalkInPolicy } from "@/lib/booking-rules";
+import type { BookingMode, WalkInPolicy } from "@/lib/booking-rules";
+import { BookingModeSettings } from "./BookingModeSettings";
 import { cn } from "@/lib/utils";
 
 export type SiteConfig = {
   walkIn: WalkInPolicy;
-  features: { teamPageVisible: boolean; careersPageVisible: boolean; callbackFormVisible: boolean; applicationFormVisible: boolean };
+  features: { teamPageVisible: boolean; careersPageVisible: boolean; applicationFormVisible: boolean };
+  bookingMode: BookingMode;
+  onlineBookingEngineReady: boolean;
   notificationEmail: string | null;
   application: { positions: string[]; employmentOptions: string[]; cvMaxMb: number } | null;
 };
@@ -51,7 +54,7 @@ export function SettingsPanel({ hours, employees, salonName, phone, address, sit
   return (
     <>
       <Tabs label="Einstellungsbereiche" value={tab} onChange={setTab} tabs={[
-        { id: "salon", label: "Salon" }, { id: "buchung", label: "Buchungsregeln" }, { id: "zeiten", label: "Arbeitszeiten & Pausen" },
+        { id: "salon", label: "Salon" }, { id: "buchung", label: "Buchungseinstellungen" }, { id: "zeiten", label: "Arbeitszeiten & Pausen" },
         { id: "rechte", label: "Berechtigungen" }, { id: "benutzer", label: "Benutzer & Rollen" }, { id: "benachrichtigungen", label: "Benachrichtigungen" },
         { id: "website", label: "Website & Formulare" },
       ]} />
@@ -67,7 +70,8 @@ export function SettingsPanel({ hours, employees, salonName, phone, address, sit
           </Card>
         )}
 
-        {tab === "buchung" && (
+        {tab === "buchung" && (<>
+          <BookingModeSettings savedMode={site.bookingMode} engineReady={site.onlineBookingEngineReady} notificationEmail={site.notificationEmail} />
           <Card title="Buchungsregeln" description="Wirksam ab Anbindung der Buchungs-Engine (serverseitig geprüft)" action={save}>
             <Field label="Freigabemodus" htmlFor="b-mode" hint="Hybrid: automatisch bestätigen, wenn alle Regeln erfüllt sind – sonst manuell.">
               <select id="b-mode" className={inputCls} defaultValue="hybrid">
@@ -87,7 +91,7 @@ export function SettingsPanel({ hours, employees, salonName, phone, address, sit
               <Toggle id="t-waitlist" label="Warteliste aktivieren" hint="Freiwerdende Termine werden Wartenden angeboten" />
             </div>
           </Card>
-        )}
+        </>)}
 
         {tab === "zeiten" && (
           <Card title="Öffnungszeiten & Pausenregeln" action={save}>
@@ -185,7 +189,6 @@ export function SettingsPanel({ hours, employees, salonName, phone, address, sit
                 <div className="divide-y divide-dash-border">
                   <Toggle id="v-team" label="Team-Seite (/team)" hint="Derzeit ausgeblendet – Inhalte bleiben erhalten" defaultOn={site.features.teamPageVisible} />
                   <Toggle id="v-careers" label="Karriere-Seite (/karriere)" defaultOn={site.features.careersPageVisible} />
-                  <Toggle id="v-callback" label="Formular „Termin anfragen & Rückruf erhalten“" defaultOn={site.features.callbackFormVisible} />
                   <Toggle id="v-application" label="Bewerbungsformular" defaultOn={site.features.applicationFormVisible} />
                 </div>
               </Card>

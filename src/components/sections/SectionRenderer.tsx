@@ -25,6 +25,10 @@ import { CreditsSection, LegalTextSection } from "./legal";
 import { PriceListSection, ServiceListSection } from "./services";
 import { ApplicationForm } from "@/components/forms/ApplicationForm";
 import { CallbackForm } from "@/components/forms/CallbackForm";
+import { BookingModeSlot } from "@/components/booking/BookingModeSlot";
+import { dashboardPreviewEnabled } from "@/features/dashboard/preview-gate";
+import { showsOnlineBooking, showsRequestForm, type BookingMode } from "@/lib/booking-rules";
+import { BookingDisabledNotice } from "./BookingDisabledNotice";
 import { TeamSection } from "./TeamSection";
 import { WalkInAnnouncement } from "./WalkInAnnouncement";
 
@@ -41,6 +45,19 @@ export async function SectionRenderer({ page }: { page: Page }) {
   const categoryBySlug = new Map(categories.map((c) => [c.slug, c]));
   const allServices = await getServices();
   const servicesFor = async (a: Parameters<typeof getServices>[0]) => getServices(a);
+
+  /**
+   * Booking mode (business.booking.mode). In production the server decides and hidden sections
+   * are not rendered at all. In development / the protected client demo the sections are
+   * wrapped in a client slot so the owner can preview other modes (browser-local, unsaved).
+   */
+  const mode = business.booking.mode as BookingMode;
+  const bookingSlot = (kind: "request" | "online", node: ReactNode) => {
+    const disabled = <BookingDisabledNotice phone={chrome.phone} walkIn={chrome.walkIn} />;
+    if (dashboardPreviewEnabled) return <BookingModeSlot kind={kind} serverMode={mode} disabledNotice={disabled}>{node}</BookingModeSlot>;
+    if (kind === "request") return showsRequestForm(mode) ? node : mode === "DISABLED" ? disabled : null;
+    return showsOnlineBooking(mode) ? node : null;
+  };
 
   /** "tel:" in CMS content is shorthand for the salon phone number. */
   const resolveHref = (href: string) => (href === "tel:" ? chrome.phone.href : href);
@@ -211,7 +228,9 @@ export async function SectionRenderer({ page }: { page: Page }) {
         return <LocationSection section={section} mapsUrl={chrome.mapsUrl} addressLine={chrome.addressLine} />;
 
       case "booking-flow":
-        return (
+        // Wizard + architecture preserved; shown only in ONLINE_ONLY / BOTH. It stays a
+        // non-operational preview until business.booking.onlineBookingActive (backend) is true.
+        return bookingSlot("online",
           <BookingFlowSection
             section={section}
             categories={categories.map((c) => ({ slug: c.slug, label: c.label }))}
@@ -220,7 +239,7 @@ export async function SectionRenderer({ page }: { page: Page }) {
             hours={business.hours}
             phone={chrome.phone}
             walkIn={business.walkIn}
-          />
+          />,
         );
 
       case "legal-text":
@@ -263,8 +282,7 @@ export async function SectionRenderer({ page }: { page: Page }) {
         return <WalkInAnnouncement section={section} walkIn={chrome.walkIn} />;
 
       case "callback-form":
-        if (!settings.features.callbackFormVisible) return null;
-        return (
+        return bookingSlot("request",
           <section id="rueckruf" aria-label={section.title} className="scroll-mt-28 bg-bone py-20 md:py-28">
             <div className="container-luxe max-w-5xl">
               <CallbackForm
@@ -276,7 +294,7 @@ export async function SectionRenderer({ page }: { page: Page }) {
                 phone={chrome.phone}
               />
             </div>
-          </section>
+          </section>,
         );
 
       case "application-form":

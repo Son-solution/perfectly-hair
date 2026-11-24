@@ -85,13 +85,15 @@ function writePref(key: string, value: string) {
 /* ------------------------------------------------------------------ shell */
 
 export function DashboardShell({
-  area, userName, userRole, badges = {}, notifications, children,
+  area, userName, userRole, badges = {}, notifications, demo = false, children,
 }: {
   area: "admin" | "staff";
   userName: string;
   userRole: string;
   badges?: Record<string, number>;
   notifications?: NotificationItem[];
+  /** Protected client demo: shows "Kundenvorschau" + logout. */
+  demo?: boolean;
   children: ReactNode;
 }) {
   const pathname = usePathname();
@@ -202,7 +204,7 @@ export function DashboardShell({
             <Icon name="menu" />
           </button>
           <span className="hidden rounded-full border border-dashed border-dash-muted px-2.5 py-0.5 text-[0.625rem] font-semibold uppercase tracking-[0.16em] text-dash-muted sm:inline">
-            Lokale Vorschau · keine Anmeldung
+            {demo ? "Kundenvorschau · Demodaten" : "Lokale Vorschau · keine Anmeldung"}
           </span>
           <div className="ml-auto flex items-center gap-1 md:gap-2">
             {area === "admin" && (
@@ -226,6 +228,11 @@ export function DashboardShell({
             >
               <Icon name={theme === "dark" ? "sun" : "moon"} />
             </button>
+            {demo && (
+              <form method="post" action="/demo-zugang/logout">
+                <button type="submit" className="rounded-md px-2.5 py-2 text-xs font-medium text-dash-text hover:bg-dash-subtle">Abmelden</button>
+              </form>
+            )}
             <div className="ml-1 flex items-center gap-2.5 border-l border-dash-border pl-3">
               <Avatar name={userName} size={32} />
               <span className="hidden leading-tight md:block">

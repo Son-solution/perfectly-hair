@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getBusiness, getPage } from "@/content/repository";
+import { demoMode } from "@/features/demo/config";
 import { SectionRenderer } from "./SectionRenderer";
 
 /** Renders a published CMS page by slug ("" = homepage); unpublished/hidden → 404. */
@@ -18,6 +19,7 @@ export async function pageMetadata(slug: string): Promise<Metadata> {
     ...(page.seo.title ? { title: page.seo.title } : {}),
     description: page.seo.description || business.description,
     alternates: { canonical: slug ? `/${slug}` : "/" },
-    robots: page.seo.noindex ? { index: false } : undefined,
+    // Only set robots when needed, so an `undefined` never overrides the layout default.
+    ...(demoMode ? { robots: { index: false, follow: false } } : page.seo.noindex ? { robots: { index: false } } : {}),
   };
 }

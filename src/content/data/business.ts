@@ -24,7 +24,13 @@ export const business: Business = {
   ],
   holidays: [],
   social: [],
-  booking: { onlineBookingActive: false, cancellationPolicy: null, approvalMode: null },
+  booking: {
+    // Owner decision: for now only appointment requests (callback). Online booking hidden, wizard kept.
+    mode: "REQUEST_ONLY",
+    onlineBookingActive: false, // engine not connected — must stay false until Phase 5B is tested
+    cancellationPolicy: null,
+    approvalMode: null,
+  },
   walkIn: {
     enabled: true,
     // Herren: Di–Do mit Termin, Fr & Sa ohne Termin. Damen und Kinder unverändert.
@@ -81,7 +87,6 @@ export const siteSettings: SiteSettings = {
   features: {
     teamPageVisible: false, // Team-Seite vorerst ausgeblendet (Inhalte/Modelle bleiben erhalten)
     careersPageVisible: true,
-    callbackFormVisible: true,
     applicationFormVisible: true,
   },
   notificationEmail: null, // wird in Phase 5B im Admin hinterlegt

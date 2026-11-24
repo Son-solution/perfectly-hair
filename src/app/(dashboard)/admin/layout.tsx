@@ -1,4 +1,5 @@
 import { DashboardShell } from "@/components/dashboard/Shell";
+import { demoReady } from "@/features/demo/config";
 import type { NotificationItem } from "@/components/dashboard/NotificationCenter";
 import { fmtDate, fmtTime } from "@/features/dashboard/calc";
 import { navBadges, newApplications, openAppointmentRequests, openCallbacks, openCorrectionRequests, openLeaveRequests } from "@/features/dashboard/metrics";
@@ -37,7 +38,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   ].sort((a, b) => b.at.localeCompare(a.at));
 
   return (
-    <DashboardShell area="admin" userName="Admin (Demo)" userRole="Admin · Vorschau" badges={badges} notifications={notifications}>
+    <DashboardShell area="admin" userName="Admin (Demo)" userRole="Admin · Vorschau" badges={badges} notifications={notifications} demo={demoReady}>
       {children}
     </DashboardShell>
   );

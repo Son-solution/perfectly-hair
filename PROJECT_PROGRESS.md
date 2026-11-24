@@ -275,6 +275,24 @@ Checkpoint before: git tag `pre-phase5a1`. Details: `docs/DASHBOARDS.md` §6, `d
     - Render-time Date in ApplicationsBoard.
     - Params outside Suspense on the employee profile (added loading.tsx).
 
+## Phase 5A.2 — Booking mode + protected client demo (2026-11-24)
+- **Booking mode:** `business.booking.mode`, default REQUEST_ONLY.
+  - The public site shows only the request form; the wizard is kept but hidden (not even rendered in production).
+  - Admin "Buchungsmodus" setting with a browser-local preview of all four modes; the walk-in rule applies in every mode.
+- **Client demo:** password gate in `src/proxy.ts` with HMAC-signed expiring HttpOnly cookies, rate limit, logout, fail-closed and noindex. It activates only with `DEMO_ENVIRONMENT=client-demo` (Vercel Preview, branch `client-demo`). See `docs/CLIENT_DEMO.md`.
+- **Tests:**
+  - Modes: REQUEST_ONLY, ONLINE_ONLY, BOTH, DISABLED and ending the preview all correct.
+  - Normal production: wizard absent from the HTML, /demo-zugang 404, dashboards 404, no noindex change.
+  - Demo build:
+    - every route redirects to login (including images and the sitemap);
+    - wrong password shows an error, and lockout after 5 attempts;
+    - open-redirect attempts are blocked;
+    - Secure, HttpOnly cookie that JS cannot read; tampered and forged cookies are rejected;
+    - dashboards 200 with noindex and no-store;
+    - logout works;
+    - fail-closed (weak or missing credentials) returns 503 everywhere;
+    - real browser flow on mobile 390 px OK.
+
 ## Information needed from the owner
 
 1. Which prices apply to Damen / Herren / Kinder, plus missing services and prices

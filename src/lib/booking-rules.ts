@@ -42,3 +42,34 @@ export function walkInDaysLabel(policy: WalkInPolicy | null | undefined, audienc
   const days = policy?.rules.find((r) => r.audience === audience)?.weekdays ?? [];
   return days.map((d) => names[d]).join(" & ");
 }
+
+/* ------------------------------------------------------------------ booking mode (Phase 5A.2) */
+
+/**
+ * Which booking channels the public website offers. Source: `business.booking.mode`
+ * (Admin → Einstellungen → Buchungseinstellungen in Phase 5B). Default: REQUEST_ONLY.
+ * The walk-in policy applies in every mode.
+ */
+export const BOOKING_MODES = ["REQUEST_ONLY", "ONLINE_ONLY", "BOTH", "DISABLED"] as const;
+export type BookingMode = (typeof BOOKING_MODES)[number];
+
+export const BOOKING_MODE_LABEL: Record<BookingMode, string> = {
+  REQUEST_ONLY: "Nur Terminanfragen",
+  ONLINE_ONLY: "Online-Terminbuchung",
+  BOTH: "Beide Optionen",
+  DISABLED: "Buchungen deaktiviert",
+};
+
+export const BOOKING_MODE_HINT: Record<BookingMode, string> = {
+  REQUEST_ONLY: "Kunden senden eine Anfrage, der Salon ruft zurück. Kein Termin wird automatisch vergeben.",
+  ONLINE_ONLY: "Kunden buchen freie Zeiten direkt. Erst möglich, wenn Backend, Verfügbarkeitsprüfung und Doppelbuchungsschutz getestet sind.",
+  BOTH: "Anfrageformular und Online-Buchung nebeneinander. Online-Teil erst nach Backend-Freigabe.",
+  DISABLED: "Weder Anfrage noch Online-Buchung. Die Website verweist auf Telefon und Laufkundschaft.",
+};
+
+export const isBookingMode = (v: unknown): v is BookingMode => typeof v === "string" && (BOOKING_MODES as readonly string[]).includes(v);
+export const showsRequestForm = (m: BookingMode) => m === "REQUEST_ONLY" || m === "BOTH";
+export const showsOnlineBooking = (m: BookingMode) => m === "ONLINE_ONLY" || m === "BOTH";
+
+/** Browser-local preview key (demo only): lets the owner try modes without saving anything. */
+export const BOOKING_MODE_PREVIEW_KEY = "ph-booking-mode-preview";

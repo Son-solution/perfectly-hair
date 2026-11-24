@@ -152,3 +152,13 @@ hidden in print.
 - **Manifest:** `start_url: /staff`, `display: standalone`, monochrome icons; no push until the
   notification consent flow exists.
 - **Logout:** clear caches on sign-out (`caches.delete`) and `localStorage` keys except theme.
+
+## 7. Phase 5A.2
+
+- **Booking mode:** Admin → Einstellungen → **Buchungseinstellungen** → "Buchungsmodus".
+  - The four modes are described in `src/lib/booking-rules.ts`; the saved value lives in `business.booking.mode` (REQUEST_ONLY).
+  - "Auf der Website ansehen" writes the choice only to this browser's localStorage and opens /termin with a preview banner; "Vorschau beenden" resets it.
+  - The preview override exists only in development and the protected demo.
+  - Online modes show "Backend erforderlich".
+  - Requests will go to the admin dashboard and to the salon e-mail (`siteSettings.notificationEmail`) in Phase 5B.
+- **Protected online demo:** see `docs/CLIENT_DEMO.md`. The dashboards are reachable there behind the password gate; the header shows "Kundenvorschau · Demodaten" and an "Abmelden" button.
