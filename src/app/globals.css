@@ -184,6 +184,45 @@
   }
 }
 
+/* ------------------------------------------------------------------
+   Dashboard tokens (Phase 5A) — monochrome light / dark, scoped to .dash
+------------------------------------------------------------------- */
+.dash {
+  --dash-bg: #f4f4f4;
+  --dash-surface: #ffffff;
+  --dash-raised: #fafafa;
+  --dash-border: #e3e3e3;
+  --dash-strong: #0a0a0a;
+  --dash-text: #0a0a0a;
+  --dash-muted: #6b6b6b;
+  --dash-subtle: #efefef;
+  --dash-invert: #ffffff;
+  color-scheme: light;
+}
+.dash[data-theme="dark"] {
+  --dash-bg: #0a0a0a;
+  --dash-surface: #141414;
+  --dash-raised: #1a1a1a;
+  --dash-border: #2a2a2a;
+  --dash-strong: #fafafa;
+  --dash-text: #f2f2f2;
+  --dash-muted: #9a9a9a;
+  --dash-subtle: #202020;
+  --dash-invert: #0a0a0a;
+  color-scheme: dark;
+}
+@theme inline {
+  --color-dash-bg: var(--dash-bg);
+  --color-dash-surface: var(--dash-surface);
+  --color-dash-raised: var(--dash-raised);
+  --color-dash-border: var(--dash-border);
+  --color-dash-strong: var(--dash-strong);
+  --color-dash-text: var(--dash-text);
+  --color-dash-muted: var(--dash-muted);
+  --color-dash-subtle: var(--dash-subtle);
+  --color-dash-invert: var(--dash-invert);
+}
+
 /* Pause every CSS loop inside a section that is off-screen or in a hidden tab. */
 [data-paused="true"],
 [data-paused="true"] *,

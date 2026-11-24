@@ -200,3 +200,18 @@ export async function getSiteChrome(): Promise<SiteChrome> {
     onlineBookingActive: b.booking.onlineBookingActive,
   };
 }
+
+/** All pages incl. drafts/hidden/noindex — for the admin CMS overview only (read-only). */
+export async function listAllPages(): Promise<Page[]> {
+  return load().pages;
+}
+
+/** All services incl. hidden ones — for the admin CMS overview only (read-only). */
+export async function listAllServices(): Promise<Service[]> {
+  return [...load().services].sort(byOrder);
+}
+
+/** Media library — for the admin CMS overview only (read-only). */
+export async function listMedia(): Promise<MediaAsset[]> {
+  return [...load().media.values()];
+}

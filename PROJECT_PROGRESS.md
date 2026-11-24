@@ -4,7 +4,7 @@ Resume point after any interruption: read this file, then `git log --oneline`.
 
 ## Current status
 
-**Phase 4 — 3D prototype (/3d-preview): built, then POSTPONED by the owner (2026-11-23). Not integrated into the homepage.**
+**Phase 5A — Admin + Staff dashboard frontends (demo data, local-only preview): complete, awaiting owner review. Phase 4 3D prototype postponed.**
 
 3D on hold. Phase 4.1 (free Sketchfab hair/beard upgrade) was investigated but not started. Blocked on: Sketchfab download needs the owner's login (API 401); Blender not installed. "Bearded Man" (CC BY 4.0, ~30k tris, 18 textures) looks usable; "Male Fashion Hair Collection 02" (CC BY 4.0) has only 1 texture for 27 materials on Sketchfab (alpha maps likely missing), and no confirmed fade style. Project pushed to GitHub: https://github.com/Son-solution/Perfectly-hair (branch main).
 Last update: 2026-11-23
@@ -208,6 +208,17 @@ Checkpoint before: git tag `pre-phase4`. Details: `docs/3D_EXPERIENCE.md`.
   mobile stage below the fold.
 - Missing for final quality: a licensed head model WITH a modern fade haircut (see
   `docs/3D_EXPERIENCE.md` §C), plus testing on real GPU devices (headless runs at ~3 fps).
+
+## Phase 5A — Dashboard frontends ✅ (2026-11-24)
+Checkpoint before: git tag `pre-phase5a`. Details: `docs/DASHBOARDS.md`.
+
+- 15 routes: /admin (overview, appointments, employees, employee profile, attendance, payroll, leave, website, settings) and /staff (overview, appointments, attendance, schedule, leave, compensation).
+- **Local-only:** production builds without `DASHBOARD_PREVIEW=local` return 404 for all dashboard routes (verified). No auth yet; role switch is display only.
+- Demo data (fictional names, labelled DEMO), Zod-validated, behind a repository interface for Supabase; staff functions return own data only.
+- Rules implemented in UI: corrections append (original kept, reason required, audit history); payroll adjustments need reason + approval, no automatic deductions; staff cannot edit finalized time entries (correction request instead).
+- Monochrome light/dark design, collapsible sidebar, mobile drawer, staff bottom tab bar, native dialogs (focus trap, Esc), keyboard tabs.
+- Tests: typecheck ✅ lint ✅ build ✅; 12 dashboard pages × 1440/768/390 no overflow; interaction tests (correction w/o reason blocked, audit shows original/reason/actor; appointment confirm requires staff, cancel requires reason; time clock state machine; dark mode); homepage HTML identical before/after; public routes 200.
+- Requires Phase 5B before production: Supabase Auth, proxy, server checks, RLS, server time for clock events, audit log, legal review (see DASHBOARDS.md §5).
 
 ### Known limitations of testing
 - Reliable visual testing method: drive Edge via DevTools protocol (scratch script `cdp-shot.mjs`):
