@@ -16,6 +16,8 @@ const audiencePage = (slug: "herren" | "damen" | "kinder", label: string, seoTit
   sections: [
     // page-hero content for audience pages comes from the category (single source of truth)
     { id: `${slug}-hero`, type: "page-hero", visible: true, eyebrow: "", title: "", italic: null, intro: null, imageId: null, ctas: [] },
+    // Herren: walk-in announcement (texts from business.walkIn). Damen/Kinder unchanged.
+    ...(slug === "herren" ? [{ id: "herren-walkin", type: "walk-in-announcement", visible: true, variant: "card", tone: "light" } satisfies Section] : []),
     { id: `${slug}-principles`, type: "principles", visible: true, audience: slug, eyebrow: "Unser Ansatz", title: "Sorgfalt", italic: "in jedem Detail." },
     { id: `${slug}-band`, type: "marquee", visible: true, words: [label, "Wiesbaden", "Rheinstraße 33"], tone: "dark" },
     {
@@ -51,6 +53,7 @@ export const pages: Page[] = [
         titleLines: ["Drei Welten.", "*Ein Atelier.*"],
         intro: "Herren, Damen und Kinder – jede Welt mit eigenem Charakter. Bewegen Sie die Maus über die Bilder oder tippen Sie auf eine Welt.",
       },
+      { id: "home-walkin", type: "walk-in-announcement", visible: true, variant: "band", tone: "light" },
       {
         id: "home-story", type: "editorial-story", visible: true,
         eyebrow: "Das Atelier",
@@ -237,10 +240,57 @@ export const pages: Page[] = [
         intro: "Aktuell vereinbaren Sie Ihren Termin telefonisch. Die Online-Buchung befindet sich im Aufbau.", imageId: null,
         ctas: [{ label: "Jetzt anrufen", href: "tel:", variant: "solid" }],
       },
+      { id: "termin-walkin", type: "walk-in-announcement", visible: true, variant: "card", tone: "light" },
+      {
+        id: "termin-callback", type: "callback-form", visible: true,
+        eyebrow: "Rückruf",
+        title: "Termin anfragen & Rückruf erhalten",
+        description: "Teilen Sie uns Ihren Wunschtermin mit. Wir melden uns persönlich bei Ihnen.",
+        disclaimer: "Ihre Anfrage ist noch keine verbindliche Terminbestätigung.",
+        privacyText: "Ich habe die Datenschutzerklärung gelesen und bin einverstanden, dass meine Angaben zur Bearbeitung meiner Anfrage verwendet werden.",
+        unavailableNotice: "Das Anfrageformular ist noch nicht aktiv. Es werden keine Daten gesendet oder gespeichert. Bitte rufen Sie uns an – wir sind gern für Sie da.",
+      },
       {
         id: "termin-flow", type: "booking-flow", visible: true,
         notice: "Die Online-Terminbuchung ist noch nicht aktiv. Sie sehen eine Vorschau des Ablaufs – es wird kein Termin gebucht und es werden keine Daten übermittelt.",
       },
+    ],
+  },
+
+  /* ---------------------------------------------------------------- karriere */
+  // Visibility: siteSettings.features.careersPageVisible. No salaries, benefits or vacancies are stated.
+  {
+    slug: "karriere", status: "published", visible: true,
+    seo: { title: "Karriere", description: "Arbeiten bei Perfectly Hair by Gabriel in Wiesbaden – jetzt initiativ bewerben.", noindex: false },
+    sections: [
+      {
+        id: "karriere-hero", type: "page-hero", visible: true, eyebrow: "Karriere",
+        title: "Werden Sie Teil", italic: "unseres Teams.",
+        intro: "Sie lieben Ihr Handwerk und arbeiten gern mit Menschen? Wir freuen uns, Sie kennenzulernen.",
+        imageId: "herren-cut", ctas: [{ label: "Zur Bewerbung", href: "#bewerbung", variant: "solid" }],
+      },
+      {
+        id: "karriere-intro", type: "editorial-split", visible: true, eyebrow: "Über uns",
+        titleLines: ["Ein Salon", "für die *ganze Familie.*"],
+        paragraphs: [
+          "Perfectly Hair by Gabriel ist ein Friseursalon für Damen, Herren und Kinder in der Rheinstraße 33 in Wiesbaden.",
+          "Wir arbeiten mit Ruhe und Sorgfalt und nehmen uns Zeit für unsere Kundinnen und Kunden. Wenn Sie diese Haltung teilen, senden Sie uns gern Ihre Bewerbung – auch initiativ.",
+        ],
+        imageIds: ["salon-detail", "salon-facade"], tone: "light",
+      },
+      {
+        id: "karriere-form", type: "application-form", visible: true,
+        eyebrow: "Bewerbung",
+        title: "Jetzt bewerben",
+        intro: "Erzählen Sie uns kurz von sich. Einen Lebenslauf können Sie optional als PDF beifügen.",
+        positions: ["Friseur/in", "Barbier/in", "Auszubildende/r", "Initiativbewerbung"],
+        employmentOptions: ["Vollzeit", "Teilzeit", "Minijob", "Ausbildung", "Noch offen"],
+        experienceOptions: ["Keine", "Unter 1 Jahr", "1–2 Jahre", "3–5 Jahre", "Mehr als 5 Jahre"],
+        cvMaxMb: 5,
+        privacyText: "Ich habe die Datenschutzhinweise zur Bewerbung gelesen und bin einverstanden, dass meine Angaben zur Bearbeitung meiner Bewerbung verwendet werden.",
+        unavailableNotice: "Das Bewerbungsformular ist noch nicht aktiv. Es werden keine Daten oder Dateien gesendet oder gespeichert. Bitte bewerben Sie sich bis dahin persönlich im Salon oder telefonisch.",
+      },
+      { id: "karriere-contact", type: "contact-details", visible: true, eyebrow: "Salon" },
     ],
   },
 

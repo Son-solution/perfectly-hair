@@ -59,6 +59,12 @@ export function ContactDetailsSection({
                 );
               })}
             </ul>
+            {chrome.walkIn && (
+              <div className="mt-8 border-l border-ink pl-5">
+                <p className="font-display text-xl italic leading-snug">{chrome.walkIn.title}</p>
+                <p className="mt-2 max-w-md text-sm leading-relaxed text-graphite">{chrome.walkIn.text}</p>
+              </div>
+            )}
             <div className="mt-10">
               <ButtonLink href={chrome.phone.href}>{`Anrufen: ${chrome.phone.display}`}</ButtonLink>
             </div>

@@ -115,6 +115,19 @@ export const business = z.object({
     cancellationPolicy: z.string().nullable(),
     approvalMode: z.enum(["auto", "manual", "hybrid"]).nullable(),
   }),
+  /**
+   * Walk-in policy (Phase 5A.1). On these weekdays the audience is served WITHOUT
+   * appointments: online booking and callback requests are blocked for it, and the
+   * announcement is shown on the site. Server-side enforcement required in Phase 5B.
+   */
+  walkIn: z.object({
+    enabled: z.boolean(),
+    rules: z.array(z.object({ audience: audienceSlug, weekdays: z.array(z.number().int().min(1).max(7)).min(1) })),
+    title: z.string(),
+    text: z.string(),
+    /** Shown in the booking flow / callback form instead of time slots. */
+    bookingNotice: z.string(),
+  }),
   legal: z.object({
     ownerName: z.string().nullable(),
     vatId: z.string().nullable(),
@@ -207,6 +220,15 @@ export const siteSettings = z.object({
   appearance: z.enum(["noir"]),
   stockLabel: z.string(),
   placeholderLabel: z.string(),
+  /** Visibility switches (admin-editable in Phase 5B). Hidden pages return 404 and leave the sitemap. */
+  features: z.object({
+    teamPageVisible: z.boolean(),
+    careersPageVisible: z.boolean(),
+    callbackFormVisible: z.boolean(),
+    applicationFormVisible: z.boolean(),
+  }),
+  /** Internal recipient for callback/application notifications. null = not configured yet. */
+  notificationEmail: z.email().nullable(),
 });
 export type SiteSettings = z.infer<typeof siteSettings>;
 
@@ -349,6 +371,31 @@ export const section = z.discriminatedUnion("type", [
     ctaLabel: z.string(),
     fallbackImageId: id,
     assetNotice: z.string(),
+  }),
+  /** Walk-in announcement. Texts come from business.walkIn (single source); only layout here. */
+  sectionBase.extend({ type: z.literal("walk-in-announcement"), variant: z.enum(["band", "card"]), tone: z.enum(["light", "dark"]) }),
+  /** "Termin anfragen & Rückruf erhalten" — non-operational until the Phase 5B backend exists. */
+  sectionBase.extend({
+    type: z.literal("callback-form"),
+    eyebrow: z.string(),
+    title: z.string(),
+    description: z.string(),
+    disclaimer: z.string(),
+    privacyText: z.string(),
+    unavailableNotice: z.string(),
+  }),
+  /** Job application form (Karriere). Options are editable; no salaries/benefits are invented. */
+  sectionBase.extend({
+    type: z.literal("application-form"),
+    eyebrow: z.string(),
+    title: z.string(),
+    intro: z.string(),
+    positions: z.array(z.string()).min(1),
+    employmentOptions: z.array(z.string()).min(1),
+    experienceOptions: z.array(z.string()).min(1),
+    cvMaxMb: z.number().int().min(1).max(20),
+    privacyText: z.string(),
+    unavailableNotice: z.string(),
   }),
 ]);
 export type Section = z.infer<typeof section>;

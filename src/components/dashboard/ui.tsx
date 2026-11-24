@@ -11,9 +11,9 @@ export function btn(variant: ButtonVariant = "secondary", size: "sm" | "md" = "m
     "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-strong disabled:pointer-events-none disabled:opacity-40",
     size === "sm" ? "h-8 px-3 text-xs" : "h-10 px-4 text-sm",
     variant === "primary" && "bg-dash-strong text-dash-invert hover:opacity-90",
-    variant === "secondary" && "border border-dash-border bg-dash-surface text-dash-text hover:bg-dash-subtle",
+    variant === "secondary" && "border border-dash-border bg-dash-field text-dash-text hover:bg-dash-subtle",
     variant === "ghost" && "text-dash-muted hover:bg-dash-subtle hover:text-dash-text",
-    variant === "danger" && "border border-dash-strong bg-dash-surface text-dash-text hover:bg-dash-strong hover:text-dash-invert",
+    variant === "danger" && "border border-dash-strong bg-dash-field text-dash-text hover:bg-dash-strong hover:text-dash-invert",
   );
 }
 
@@ -156,9 +156,9 @@ export function Field({ label, hint, error, children, htmlFor }: { label: string
   );
 }
 export const inputCls =
-  "h-10 w-full rounded-md border border-dash-border bg-dash-surface px-3 text-sm text-dash-text placeholder:text-dash-muted focus:border-dash-strong focus:outline-none";
+  "h-10 w-full rounded-md border border-dash-border bg-dash-field px-3 text-sm text-dash-text placeholder:text-dash-muted focus:border-dash-strong focus:outline-none";
 export const textareaCls =
-  "w-full rounded-md border border-dash-border bg-dash-surface px-3 py-2 text-sm text-dash-text placeholder:text-dash-muted focus:border-dash-strong focus:outline-none";
+  "w-full rounded-md border border-dash-border bg-dash-field px-3 py-2 text-sm text-dash-text placeholder:text-dash-muted focus:border-dash-strong focus:outline-none";
 
 export function Avatar({ name, size = 36 }: { name: string; size?: number }) {
   const initials = name.split(/\s+/).filter((p) => /^\p{L}/u.test(p)).map((p) => p[0].toUpperCase()).slice(0, 2).join("");

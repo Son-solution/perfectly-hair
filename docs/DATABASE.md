@@ -179,3 +179,90 @@ RLS
 - **Protected settings:** `site_settings.appearance` and the logo media can be changed only
   by a Super Admin.
 - **Cache:** publishing triggers `revalidateTag('content:<entity>')` from the Server Action.
+
+## 7. Phase 5A.1 additions — walk-in policy, callback requests, applications, customers
+
+### Walk-in policy (server-side enforcement REQUIRED)
+Source today: `business.walkIn` (content layer). Table: `business_settings.walk_in jsonb`
+`{ enabled, rules: [{ audience, weekdays int[] }], title, text, booking_notice }`.
+
+- **Herren:** Tuesday–Thursday bookable. Friday and Saturday are walk-in only.
+- **Damen and Kinder:** unchanged.
+- **Sunday and Monday:** closed (`opening_hours`).
+
+The UI blocks those days in three places: the booking flow, the callback form and the admin
+"Neuer Termin" dialog. That is guidance only. Phase 5B must reject such requests on the server:
+
+- `book_appointment()` and `create_callback_request()` call `is_walk_in_only(audience, date)`
+  and raise `WALK_IN_ONLY`.
+- The admin Server Action may create `source = 'walk_in'` entries only for today (customer
+  present). Phone bookings on walk-in days are rejected.
+
+### New tables
+| Table | Key columns | Notes |
+| --- | --- | --- |
+| `customers` | `id`, `name`, `phone`, `email`, `audience`, `consent_at`, `consent_source`, `created_at`, `deleted_at` | DSGVO: export (Art. 15), erasure (Art. 17) → anonymise, keep appointments for accounting |
+| `customer_notes` | `id`, `customer_id`, `text`, `created_by`, `created_at` | Append-only. RLS: `customers.notes` permission. No health data without explicit consent |
+| `appointments` (+columns) | `customer_id` fk, `source` enum (`online`, `telefon`, `walk_in`, `rueckruf`), `callback_request_id` fk | Source shown in admin |
+| `callback_requests` | `id`, `received_at`, `name`, `phone`, `email`, `audience`, `service_id`, `preferred_date`, `preferred_time`, `alternative_time`, `message`, `status` enum, `assignee_id`, `appointment_id`, `ip_hash`, `user_agent_hash` | Status: neu / in_bearbeitung / rueckruf_erfolgt / termin_vereinbart / nicht_erreicht / abgelehnt |
+| `callback_request_events` | `request_id`, `at`, `by`, `status`, `note` | Status history, append-only |
+| `callback_request_notes` | `request_id`, `text`, `created_by`, `created_at` | Internal |
+| `job_applications` | `id`, `received_at`, `first_name`, `last_name`, `email`, `phone`, `position`, `employment`, `experience`, `message`, `cv_path`, `status` enum, `delete_after` | Admin-only RLS (`applications.manage`). Staff never see applications |
+| `job_application_notes` | `application_id`, `text`, `created_by`, `created_at` | Confidential |
+| `commission_rules` | `employee_id`, `enabled` (default false), `percent` 0–50, `updated_by` | Preview only, never changes payroll automatically. Super Admin only |
+| `notifications` | as §2 + `kind` (termin / anfrage / bewerbung / zeit / urlaub), `read_at` per user | In-app centre (bell + unread count), Realtime |
+
+### Callback requests — server rules (Phase 5B)
+1. Parse with `callbackRequestSchema` (`src/features/forms/schemas.ts`) using **server time**:
+   - required fields;
+   - phone format;
+   - date between today and today + 90 days;
+   - opening hours;
+   - walk-in rule.
+2. **Spam protection:** honeypot field, minimum fill time, and Cloudflare Turnstile or hCaptcha
+   (consent-free mode).
+3. **Rate limiting:** 5 per hour per IP hash and per phone number (Upstash or a Postgres table).
+4. **Duplicate prevention:** same phone + date + service within 24 h → merge into the open request.
+5. **Notification:** in-app notification plus a short e-mail to `site_settings.notification_email`
+   (no personal data beyond name and preferred date, link to the admin).
+6. **No reservation:** a request never blocks a slot. It becomes an appointment only in the admin,
+   after an availability check (`book_appointment()` with exclusion constraint), with status
+   `termin_vereinbart` and `appointment_id` set.
+7. **Retention:** delete requests 6 months after closure unless converted (the proposal must be
+   confirmed).
+
+### Job applications — server rules (Phase 5B)
+- **Storage bucket `applications`:**
+  - private, no public URLs;
+  - path `{application_id}/cv.pdf`;
+  - MIME `application/pdf` only, at most `cvMaxMb` (5 MB), checked on the server (magic bytes
+    `%PDF`);
+  - virus scan recommended.
+- **Access:** admins only, via signed URLs (60 s) created in a Server Action. Every access is
+  written to `audit_log`.
+- **E-mail:** sent to `notification_email` with name, position and a link only. **The CV is never
+  attached.**
+- **Retention:**
+  - rejected → `delete_after = decided_at + 6 months` (AGG claim period, proposal);
+  - accepted → move to the personnel file;
+  - a daily job deletes the rows and storage objects after `delete_after`.
+- **Privacy notice for applicants:** to be added to /datenschutz (purpose, legal basis § 26 BDSG,
+  retention, rights).
+- **Same protections as callbacks:** rate limiting, honeypot and server-side validation
+  (`applicationSchema`).
+
+## 8. Metric definitions (shared by overview, badges and reports)
+Implemented in `src/features/dashboard/metrics.ts`. Phase 5B moves these into SQL views, so the
+numbers stay identical.
+
+| Metric | Definition |
+| --- | --- |
+| Termine heute | Date = today, status not in (cancelled, rejected) |
+| Offene Terminanfragen | Status pending, date ≥ today (same as the nav badge) |
+| Bestätigt (kommend) | Status confirmed, date ≥ today |
+| Rückrufwünsche offen | Callback status in (neu, in_bearbeitung, nicht_erreicht) |
+| Abgeschlossen | Status completed in the period |
+| Stornos | Cancelled + rejected in the period. No-shows are counted separately |
+| Gearbeitete Stunden | Effective attendance (latest correction) minus breaks, finished days only |
+| Geschätzter Terminwert | Sum of catalogue prices of completed appointments. **Not revenue** |
+| Tatsächlich kassiert | Only from a connected POS/cash register (TSE). Not available, never invented |

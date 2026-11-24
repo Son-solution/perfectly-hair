@@ -152,16 +152,33 @@ export async function getStockMedia(): Promise<MediaAsset[]> {
   return [...load().media.values()].filter((m) => m.credit);
 }
 
+/**
+ * Pages that can be switched off via `siteSettings.features` (admin setting in Phase 5B).
+ * A switched-off page returns 404 (noindex), leaves the sitemap and every navigation list.
+ */
+const FEATURE_GATED: Record<string, keyof SiteSettings["features"]> = {
+  team: "teamPageVisible",
+  karriere: "careersPageVisible",
+};
+function featureEnabled(slug: string): boolean {
+  const flag = FEATURE_GATED[slug];
+  return !flag || load().settings.features[flag];
+}
+/** Href of a gated page that is currently switched off ("/team" while hidden). */
+function isHiddenHref(href: string): boolean {
+  return href.startsWith("/") && !featureEnabled(href.slice(1).split(/[?#]/)[0]);
+}
+
 /** Published + visible page, or null (→ notFound). Future: `{ preview: true }` returns drafts. */
 export async function getPage(slug: string): Promise<Page | null> {
   const p = load().pages.find((x) => x.slug === slug);
-  if (!p || p.status !== "published" || !p.visible) return null;
+  if (!p || p.status !== "published" || !p.visible || !featureEnabled(slug)) return null;
   return { ...p, sections: p.sections.filter((s) => s.visible) };
 }
 
 export async function getPublishedSlugs(): Promise<string[]> {
   return load()
-    .pages.filter((p) => p.status === "published" && p.visible && !p.seo.noindex)
+    .pages.filter((p) => p.status === "published" && p.visible && !p.seo.noindex && featureEnabled(p.slug))
     .map((p) => p.slug);
 }
 
@@ -188,16 +205,17 @@ export async function getSiteChrome(): Promise<SiteChrome> {
     addressLine: `${b.address.street}, ${b.address.postalCode} ${b.address.city}`,
     mapsUrl: mapsUrlFor(b),
     hoursLines: summarizeHours(b.hours),
-    primaryNav: n.primary,
-    secondaryNav: n.secondary,
+    primaryNav: n.primary.filter((l) => !isHiddenHref(l.href)),
+    secondaryNav: n.secondary.filter((l) => !isHiddenHref(l.href)),
     cta: n.cta,
     legalNav: n.legal,
-    menu: n.menu.map((m) => ({ label: m.label, href: m.href, primary: m.primary, image: media.get(m.imageId)! })),
+    menu: n.menu.filter((m) => !isHiddenHref(m.href)).map((m) => ({ label: m.label, href: m.href, primary: m.primary, image: media.get(m.imageId)! })),
     footerTagline: s.footerTagline,
     bandWords: s.footerBandWords,
     stockLabel: s.stockLabel,
     placeholderLabel: s.placeholderLabel,
     onlineBookingActive: b.booking.onlineBookingActive,
+    walkIn: b.walkIn.enabled ? { title: b.walkIn.title, text: b.walkIn.text } : null,
   };
 }
 

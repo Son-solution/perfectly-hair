@@ -4,7 +4,9 @@ import { useMemo, useState } from "react";
 import { ConfirmDialog, Dialog, Segmented, useToast } from "@/components/dashboard/interactive";
 import { Badge, Card, EmptyState, StatusBadge, Table, Td, Th, btn, inputCls } from "@/components/dashboard/ui";
 import { conflictIds, fmtDate, fmtEuro, fmtTime, toMin } from "@/features/dashboard/calc";
-import { STATUS_LABEL, type Appointment, type AppointmentStatus, type Employee } from "@/features/dashboard/domain";
+import { SOURCE_LABEL, STATUS_LABEL, type Appointment, type AppointmentStatus, type Customer, type Employee } from "@/features/dashboard/domain";
+import type { HourRow, WalkInPolicy } from "@/lib/booking-rules";
+import { NewAppointmentDialog, type CatalogueEntry } from "./NewAppointmentDialog";
 import { cn } from "@/lib/utils";
 
 type View = "liste" | "tag" | "woche" | "monat";
@@ -21,15 +23,22 @@ const mondayOf = (date: string) => {
 };
 
 export function AppointmentsBoard({
-  initial, employees, today, actor, initialStatus,
+  initial, employees, today, actor, initialStatus, initialNew = false, customers, catalogue, hours, walkIn, nowTime,
 }: {
   initial: Appointment[];
   employees: Employee[];
   today: string;
   actor: string;
   initialStatus?: string | null;
+  initialNew?: boolean;
+  customers: Pick<Customer, "id" | "name" | "phone">[];
+  catalogue: Record<string, CatalogueEntry>;
+  hours: HourRow[];
+  walkIn: WalkInPolicy | null;
+  nowTime: string;
 }) {
   const [items, setItems] = useState(initial);
+  const [newOpen, setNewOpen] = useState(initialNew);
   const [view, setView] = useState<View>("liste");
   const [cursor, setCursor] = useState(today);
   const [status, setStatus] = useState<AppointmentStatus | "alle">(
@@ -88,6 +97,7 @@ export function AppointmentsBoard({
       {/* Toolbar */}
       <div className="mb-4 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
         <div className="flex flex-wrap items-center gap-2">
+          <button type="button" className={btn("primary")} onClick={() => setNewOpen(true)}>+ Neuer Termin</button>
           <Segmented label="Ansicht" value={view} onChange={setView} options={[{ id: "liste", label: "Liste" }, { id: "tag", label: "Tag" }, { id: "woche", label: "Woche" }, { id: "monat", label: "Monat" }]} />
           {view !== "liste" && (
             <div className="flex items-center gap-1">
@@ -136,7 +146,7 @@ export function AppointmentsBoard({
                         {fmtDate(a.start)} · {fmtTime(a.start)}
                       </button>
                     </Td>
-                    <Td>{a.customerName}</Td>
+                    <Td>{a.customerName}<span className="block text-xs text-dash-muted">{SOURCE_LABEL[a.source]}</span></Td>
                     <Td>{a.serviceName}<span className="block text-xs text-dash-muted">{a.durationMin} Min. (Demo)</span></Td>
                     <Td className={cn(!a.employeeId && "text-dash-muted italic")}>{name(a.employeeId)}</Td>
                     <Td><span className="flex flex-wrap items-center gap-1.5"><StatusBadge status={a.status} />{conflicts.has(a.id) && <Badge tone="solid">Konflikt</Badge>}</span></Td>
@@ -290,7 +300,7 @@ export function AppointmentsBoard({
           <div className="grid gap-6 md:grid-cols-2">
             <dl className="space-y-3 text-sm">
               <div><dt className="text-xs text-dash-muted">Status</dt><dd className="mt-1 flex gap-2"><StatusBadge status={open.status} />{conflicts.has(open.id) && <Badge tone="solid">Konflikt</Badge>}</dd></div>
-              <div><dt className="text-xs text-dash-muted">Kunde</dt><dd>{open.customerName} · {open.customerPhone}</dd></div>
+              <div><dt className="text-xs text-dash-muted">Kunde</dt><dd>{open.customerName} · <a className="underline underline-offset-2" href={`tel:${open.customerPhone.replace(/[^+0-9]/g, "")}`}>{open.customerPhone}</a>{open.customerId && <> · <a className="underline underline-offset-2" href={`/admin/customers?id=${open.customerId}`}>Profil</a></>}<span className="block text-xs text-dash-muted">{SOURCE_LABEL[open.source]}</span></dd></div>
               <div><dt className="text-xs text-dash-muted">Bereich</dt><dd className="capitalize">{open.audience}</dd></div>
               <div><dt className="text-xs text-dash-muted">Preis</dt><dd>{open.priceCents !== null ? fmtEuro(open.priceCents) : "—"}</dd></div>
               {open.note && <div><dt className="text-xs text-dash-muted">Hinweis</dt><dd>{open.note}</dd></div>}
@@ -339,6 +349,21 @@ export function AppointmentsBoard({
           if (confirm === "reject") update(open.id, { status: "rejected", cancelReason: reason }, "Abgelehnt", reason);
           else update(open.id, { status: "cancelled", cancelReason: reason }, "Storniert", reason);
         }}
+      />
+      <NewAppointmentDialog
+        key={newOpen ? "open" : "closed"}
+        open={newOpen}
+        onClose={() => setNewOpen(false)}
+        onCreate={(a) => { setItems((list) => [...list, a].sort((x, y) => x.start.localeCompare(y.start))); toast(`Termin angelegt (${SOURCE_LABEL[a.source]}) – Demo, nicht gespeichert.`); setOpenId(a.id); }}
+        employees={employees}
+        customers={customers}
+        catalogue={catalogue}
+        appointments={items}
+        hours={hours}
+        walkIn={walkIn}
+        today={today}
+        nowTime={nowTime}
+        actor={actor}
       />
       {toastNode}
     </>

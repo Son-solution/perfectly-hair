@@ -1,5 +1,7 @@
 import Link from "next/link";
-import { Avatar, Badge, Card, DemoBanner, PageHeader, Table, Td, Th, btn } from "@/components/dashboard/ui";
+import { Suspense } from "react";
+import { AddEmployee, AddEmployeeFromUrl } from "@/components/dashboard/admin/AddEmployee";
+import { Avatar, Badge, Card, DemoBanner, PageHeader, Table, Td, Th } from "@/components/dashboard/ui";
 import { effective, fmtDuration, monthTotals } from "@/features/dashboard/calc";
 import { ROLE_LABEL } from "@/features/dashboard/domain";
 import { DEMO, listAttendance, listEmployees } from "@/features/dashboard/repository";
@@ -13,7 +15,7 @@ export default async function EmployeesPage() {
         eyebrow="Betrieb"
         title="Mitarbeiter"
         description="Verzeichnis, Rollen, Dienstpläne und Stunden im laufenden Monat."
-        actions={<button type="button" className={btn("primary")} disabled title="Verfügbar nach Anbindung (Phase 5B)">Mitarbeiter anlegen</button>}
+        actions={<Suspense fallback={<AddEmployee />}><AddEmployeeFromUrl /></Suspense>}
       />
       <DemoBanner />
       <Card>

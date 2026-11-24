@@ -187,28 +187,47 @@
 /* ------------------------------------------------------------------
    Dashboard tokens (Phase 5A) — monochrome light / dark, scoped to .dash
 ------------------------------------------------------------------- */
+/* Light ("Grau") theme — gray-dominant, no pure-white surfaces (Phase 5A.1).
+   Contrast (WCAG): text #202020 on card #E5E5E5 ≈ 13:1; muted #4D4D4D on #E5E5E5 ≈ 6.9:1,
+   on #D4D4D4 ≈ 5.8:1; button text #F0F0F0 on #353535 ≈ 10.9:1; sidebar text #E6E6E6 on #252525 ≈ 13:1. */
 .dash {
-  --dash-bg: #f4f4f4;
-  --dash-surface: #ffffff;
-  --dash-raised: #fafafa;
-  --dash-border: #e3e3e3;
-  --dash-strong: #0a0a0a;
-  --dash-text: #0a0a0a;
-  --dash-muted: #6b6b6b;
-  --dash-subtle: #efefef;
-  --dash-invert: #ffffff;
+  --dash-bg: #d4d4d4;
+  --dash-surface: #e5e5e5;
+  --dash-raised: #dcdcdc;
+  --dash-field: #efefef;
+  --dash-border: #bdbdbd;
+  --dash-strong: #353535;
+  --dash-text: #202020;
+  --dash-muted: #4d4d4d;
+  --dash-subtle: #d0d0d0;
+  --dash-invert: #f0f0f0;
+  --dash-header: #bebebe;
+  --dash-sidebar: #252525;
+  --dash-sidebar-text: #e6e6e6;
+  --dash-sidebar-muted: #a6a6a6;
+  --dash-sidebar-hover: #333333;
+  --dash-sidebar-active: #d4d4d4;
+  --dash-sidebar-active-text: #202020;
   color-scheme: light;
 }
 .dash[data-theme="dark"] {
-  --dash-bg: #0a0a0a;
-  --dash-surface: #141414;
-  --dash-raised: #1a1a1a;
-  --dash-border: #2a2a2a;
-  --dash-strong: #fafafa;
-  --dash-text: #f2f2f2;
-  --dash-muted: #9a9a9a;
-  --dash-subtle: #202020;
-  --dash-invert: #0a0a0a;
+  --dash-bg: #0e0e0e;
+  --dash-surface: #181818;
+  --dash-raised: #1e1e1e;
+  --dash-field: #121212;
+  --dash-border: #2e2e2e;
+  --dash-strong: #e8e8e8;
+  --dash-text: #ededed;
+  --dash-muted: #a3a3a3;
+  --dash-subtle: #242424;
+  --dash-invert: #111111;
+  --dash-header: #141414;
+  --dash-sidebar: #080808;
+  --dash-sidebar-text: #e6e6e6;
+  --dash-sidebar-muted: #8f8f8f;
+  --dash-sidebar-hover: #1c1c1c;
+  --dash-sidebar-active: #e8e8e8;
+  --dash-sidebar-active-text: #111111;
   color-scheme: dark;
 }
 @theme inline {
@@ -221,6 +240,14 @@
   --color-dash-muted: var(--dash-muted);
   --color-dash-subtle: var(--dash-subtle);
   --color-dash-invert: var(--dash-invert);
+  --color-dash-field: var(--dash-field);
+  --color-dash-header: var(--dash-header);
+  --color-dash-sidebar: var(--dash-sidebar);
+  --color-dash-sidebar-text: var(--dash-sidebar-text);
+  --color-dash-sidebar-muted: var(--dash-sidebar-muted);
+  --color-dash-sidebar-hover: var(--dash-sidebar-hover);
+  --color-dash-sidebar-active: var(--dash-sidebar-active);
+  --color-dash-sidebar-active-text: var(--dash-sidebar-active-text);
 }
 
 /* Pause every CSS loop inside a section that is off-screen or in a hidden tab. */

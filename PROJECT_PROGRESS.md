@@ -4,7 +4,7 @@ Resume point after any interruption: read this file, then `git log --oneline`.
 
 ## Current status
 
-**Phase 5A — Admin + Staff dashboard frontends (demo data, local-only preview): complete, awaiting owner review. Phase 4 3D prototype postponed.**
+**Phase 5A.1 — dashboard refinement, Herren walk-in policy, hidden /team, /karriere, callback form: complete, awaiting owner approval before Phase 5B (Supabase + Auth). Phase 4 3D prototype postponed.**
 
 3D on hold. Phase 4.1 (free Sketchfab hair/beard upgrade) was investigated but not started. Blocked on: Sketchfab download needs the owner's login (API 401); Blender not installed. "Bearded Man" (CC BY 4.0, ~30k tris, 18 textures) looks usable; "Male Fashion Hair Collection 02" (CC BY 4.0) has only 1 texture for 27 materials on Sketchfab (alpha maps likely missing), and no confirmed fade style. Project pushed to GitHub: https://github.com/Son-solution/Perfectly-hair (branch main).
 Last update: 2026-11-23
@@ -236,6 +236,45 @@ Checkpoint before: git tag `pre-phase5a`. Details: `docs/DASHBOARDS.md`.
   and type-checked but was not click-tested automatically — please check manually in `npm run dev`.
 - Canonical URLs use `NEXT_PUBLIC_SITE_URL` (default `http://localhost:3000`) — set the real domain at deployment.
 
+## Phase 5A.1 — Refinement + business rules ✅ (2026-11-24)
+Checkpoint before: git tag `pre-phase5a1`. Details: `docs/DASHBOARDS.md` §6, `docs/DATABASE.md` §7–8, `docs/CMS_ARCHITECTURE.md` §7.
+
+- **Grey dashboard theme.**
+  - Sidebar #252525, header #BEBEBE, background #D4D4D4, cards #E5E5E5, inputs #EFEFEF, primary #353535, text #202020.
+  - No pure-white surfaces; separate dark mode.
+- **Admin.**
+  - "Neuer Termin" for phone bookings and walk-ins, with an availability check.
+  - "Mitarbeiter hinzufügen".
+  - Kunden: list, profile, history, notes.
+  - Terminanfragen: statuses, click-to-call, conversion only via the availability check.
+  - Bewerbungen: statuses, notes, retention.
+  - Berichte & Statistiken: period filters, estimated value vs actual revenue, metric definitions, optional commission, CSV and PDF.
+  - Attendance CSV and PDF; notification centre with unread count; one shared metric module.
+- **Staff.** Time clock on the overview with Soll/Ist and total break; offline-disabled. Pending requests with accept/reject (reason required).
+- **Public site.**
+  - **Herren Friday/Saturday walk-in only.** Central rule in `business.walkIn`. The announcement shows on the homepage, the Herren page, the Termin page, contact hours, footer and menu. The booking flow and callback form block those days; Damen and Kinder are unaffected.
+  - **/team hidden** via `siteSettings.features.teamPageVisible`: 404 + noindex, removed from nav, menu, footer and sitemap. Components and models are kept.
+  - **/karriere:** intro, salon info and an application form (PDF CV checked locally, never uploaded). Added to nav, menu, footer and sitemap.
+  - **Termin:** "Termin anfragen & Rückruf erhalten" with full validation (phone, opening hours, date range, walk-in rule). It shows "Nicht gesendet" and makes no network request.
+- **Not done (by instruction):** no Supabase, no e-mails, no real data collection, no push or deploy.
+- **Tests (2026-11-24):**
+  - tsc ✅, eslint ✅, build ✅ (45 pages).
+  - Dashboard sweep: 19 routes × 1440/820/390, grey theme. No horizontal overflow, no pure-white surfaces, no console errors after fixes. Dark mode: 6 routes × 1440/390 clean.
+  - Interaction tests:
+    - Callback form: required fields; walk-in note; Herren Friday/Saturday, Monday and past dates blocked; Damen Friday 09:00–18:30 slots; "Nicht gesendet"; 0 network requests; no success text.
+    - Booking flow: Herren Friday/Saturday disabled, Damen unaffected.
+    - Karriere: .docx and > 5 MB rejected; valid PDF never read or uploaded; 0 network requests; no salary or benefit text.
+    - Neuer Termin: Herren Friday phone booking, future walk-in and overlap blocked; free slot created.
+    - Terminanfragen: click-to-call; reject requires a reason; conversion prefilled and blocked by the availability check (no auto-reservation).
+    - Notification centre: unread count 7, mark all read.
+    - Staff overview: clock state machine; reject requires a reason; accept works.
+  - Production: 20 dashboard routes + /team → 404; public routes 200; sitemap without /team and with /karriere. /3d-preview untouched.
+  - Bugs found and fixed during testing:
+    - Date rules were hidden while other fields were invalid.
+    - The detail dialog cleared the selection before reject/convert opened.
+    - Render-time Date in ApplicationsBoard.
+    - Params outside Suspense on the employee profile (added loading.tsx).
+
 ## Information needed from the owner
 
 1. Which prices apply to Damen / Herren / Kinder, plus missing services and prices
@@ -254,6 +293,6 @@ Checkpoint before: git tag `pre-phase5a`. Details: `docs/DASHBOARDS.md`.
 
 ## Next step (needs approval)
 
-Backend: Supabase project, migrations (docs/DATABASE.md), RLS, Auth + roles, repository → Supabase,
+Phase 5B — Supabase + Auth (needs explicit approval). Backend: Supabase project, migrations (docs/DATABASE.md), RLS, Auth + roles, repository → Supabase,
 Storage uploads, publish/revalidate, real booking engine behind `BookingGateway`; then Admin, Staff and
 Customer dashboards and notifications.

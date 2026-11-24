@@ -6,6 +6,7 @@ import { Badge, Card, EmptyState, Field, Stat, Table, Td, Th, btn, inputCls, tex
 import {
   FLAG_LABEL, effective, flags, fmtDate, fmtDuration, fmtTime, scheduledMinutes, workedMinutes, type AttendanceFlag,
 } from "@/features/dashboard/calc";
+import { downloadCsv, printAsPdf } from "@/components/dashboard/export";
 import { attendanceCorrection, type AttendanceRecord, type AttendanceValues, type Employee } from "@/features/dashboard/domain";
 
 type Filter = "alle" | AttendanceFlag;
@@ -44,6 +45,16 @@ export function AttendanceManager({ initial, employees, today, actor }: { initia
       };
     }));
     toast("Korrektur gespeichert – Original bleibt erhalten");
+  }
+
+  /** Export the CURRENT filter selection (effective values; corrections marked). */
+  function exportCsv() {
+    downloadCsv(`zeiterfassung-${from}_${to}-DEMO.csv`,
+      ["Mitarbeiter", "Datum", "Beginn", "Ende", "Pause (Min.)", "Ist", "Soll", "Korrigiert", "Hinweise"],
+      rows.map((r) => { const e = emp(r.employeeId); const v = effective(r); const w = workedMinutes(v);
+        return [`${e.firstName} ${e.lastName}`, r.date, v.clockIn?.slice(11, 16) ?? "", v.clockOut?.slice(11, 16) ?? "", v.breakMin, w === null ? "" : fmtDuration(w), fmtDuration(scheduledMinutes(e, r.date)), r.corrections.length ? "ja" : "nein", flags(r, e, today).map((x) => FLAG_LABEL[x]).join(", ")]; }),
+      "DEMO-DATEN – Zeiterfassung (wirksame Werte; Originale bleiben im Audit-Verlauf)");
+    toast("CSV erstellt (Demo-Daten).");
   }
 
   const editing = records.find((r) => r.id === editId) ?? null;
@@ -98,6 +109,8 @@ export function AttendanceManager({ initial, employees, today, actor }: { initia
               { id: "verspaetet", label: "Verspätet" }, { id: "korrigiert", label: "Korrigiert" },
             ]} />
             <button type="button" className={btn("secondary", "sm")} onClick={() => setAdding(true)}>Eintrag nachtragen</button>
+            <button type="button" className={btn("secondary", "sm") + " print:hidden"} onClick={exportCsv}>CSV</button>
+            <button type="button" className={btn("secondary", "sm") + " print:hidden"} onClick={printAsPdf}>PDF / Drucken</button>
           </div>
         </div>
 

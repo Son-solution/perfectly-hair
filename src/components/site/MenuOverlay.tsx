@@ -196,6 +196,7 @@ function MenuPanel({
               {chrome.hoursLines.map((l) => (
                 <span key={l} className="block">{l}</span>
               ))}
+              {chrome.walkIn && <span className="mt-2 block italic text-white">{chrome.walkIn.title}</span>}
             </p>
           </motion.div>
         </div>

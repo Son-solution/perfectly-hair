@@ -25,4 +25,6 @@ export type SiteChrome = {
   stockLabel: string;
   placeholderLabel: string;
   onlineBookingActive: boolean;
+  /** Walk-in announcement for hours blocks (from business.walkIn), or null when disabled. */
+  walkIn: { title: string; text: string } | null;
 };

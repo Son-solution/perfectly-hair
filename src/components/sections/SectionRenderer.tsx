@@ -9,7 +9,7 @@ import { MaskLines } from "@/components/motion/MaskLines";
 import { PageHero } from "@/components/site/PageHero";
 import {
   getBusiness, getCategories, getEmployees, getGallery, getMediaResolver, getModel3D, getServices,
-  getSiteChrome, getStockMedia,
+  getSiteChrome, getSiteSettings, getStockMedia,
 } from "@/content/repository";
 import type { Page, Section } from "@/content/schema";
 import { emphasis } from "@/lib/emphasis";
@@ -23,7 +23,10 @@ import {
 import { GalleryGridSection } from "./GalleryGridSection";
 import { CreditsSection, LegalTextSection } from "./legal";
 import { PriceListSection, ServiceListSection } from "./services";
+import { ApplicationForm } from "@/components/forms/ApplicationForm";
+import { CallbackForm } from "@/components/forms/CallbackForm";
 import { TeamSection } from "./TeamSection";
+import { WalkInAnnouncement } from "./WalkInAnnouncement";
 
 /**
  * Renders a CMS page: each section `type` maps to one presentation component.
@@ -31,9 +34,9 @@ import { TeamSection } from "./TeamSection";
  * never fetch data themselves. Unknown/invisible sections are skipped by the repository.
  */
 export async function SectionRenderer({ page }: { page: Page }) {
-  const [business, chrome, categories, employees, inspiration, portfolio, media, stock] = await Promise.all([
+  const [business, chrome, categories, employees, inspiration, portfolio, media, stock, settings] = await Promise.all([
     getBusiness(), getSiteChrome(), getCategories(), getEmployees(),
-    getGallery("inspiration"), getGallery("portfolio"), getMediaResolver(), getStockMedia(),
+    getGallery("inspiration"), getGallery("portfolio"), getMediaResolver(), getStockMedia(), getSiteSettings(),
   ]);
   const categoryBySlug = new Map(categories.map((c) => [c.slug, c]));
   const allServices = await getServices();
@@ -216,6 +219,7 @@ export async function SectionRenderer({ page }: { page: Page }) {
             employees={employees.filter((e) => e.bookable).map((e) => ({ id: e.id, name: e.name, audiences: e.audiences }))}
             hours={business.hours}
             phone={chrome.phone}
+            walkIn={business.walkIn}
           />
         );
 
@@ -254,6 +258,43 @@ export async function SectionRenderer({ page }: { page: Page }) {
 
       case "credits":
         return <CreditsSection section={section} stock={stock} />;
+
+      case "walk-in-announcement":
+        return <WalkInAnnouncement section={section} walkIn={chrome.walkIn} />;
+
+      case "callback-form":
+        if (!settings.features.callbackFormVisible) return null;
+        return (
+          <section id="rueckruf" aria-label={section.title} className="scroll-mt-28 bg-bone py-20 md:py-28">
+            <div className="container-luxe max-w-5xl">
+              <CallbackForm
+                texts={section}
+                categories={categories.map((c) => ({ slug: c.slug, label: c.label }))}
+                services={allServices.map((s) => ({ id: s.id, name: s.name, audiences: s.audiences }))}
+                hours={business.hours}
+                walkIn={business.walkIn}
+                phone={chrome.phone}
+              />
+            </div>
+          </section>
+        );
+
+      case "application-form":
+        if (!settings.features.applicationFormVisible) return null;
+        return (
+          <section id="bewerbung" aria-label={section.title} className="scroll-mt-28 bg-bone py-20 md:py-28">
+            <div className="container-luxe max-w-5xl">
+              <ApplicationForm
+                texts={section}
+                positions={section.positions}
+                employmentOptions={section.employmentOptions}
+                experienceOptions={section.experienceOptions}
+                cvMaxMb={section.cvMaxMb}
+                phone={chrome.phone}
+              />
+            </div>
+          </section>
+        );
 
       default: {
         const unreachable: never = section;

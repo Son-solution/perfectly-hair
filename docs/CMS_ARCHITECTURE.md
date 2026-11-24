@@ -50,7 +50,8 @@ display order, and `visible: false` hides a section. Available types:
 `hero-cinematic` · `audience-panels` · `editorial-story` · `cinematic-gallery` · `price-list` ·
 `booking-finale` · `page-hero` · `principles` · `service-list` · `audience-index` ·
 `other-audiences` · `marquee` · `notice` · `editorial-split` · `values` · `team` ·
-`gallery-grid` · `contact-details` · `location` · `booking-flow` · `legal-text` · `credits`
+`gallery-grid` · `contact-details` · `location` · `booking-flow` · `legal-text` · `credits` ·
+`hair-3d` · `walk-in-announcement` · `callback-form` · `application-form` (Phase 5A.1)
 
 Content conventions an editor can use:
 - `*text*` inside headlines renders as an italic accent (no HTML is ever interpreted).
@@ -136,3 +137,29 @@ Enforcement plan:
 - A role change is possible only by a Super Admin (trigger).
 
 Details: `docs/DATABASE.md`.
+
+## 7. Phase 5A.1 — settings that are admin-editable later (no second architecture)
+
+All of these live in the existing content layer (`src/content/data/*`, validated by
+`src/content/schema.ts`) and appear read-only under Admin → Einstellungen → "Website & Formulare".
+
+| Setting | Source today | Effect |
+| --- | --- | --- |
+| Walk-in days and texts | `business.walkIn` | Booking flow, callback form and the admin "Neuer Termin" block those days. The `walk-in-announcement` section (home, Herren, Termin), footer, menu and contact hours show the texts |
+| Team page visible | `siteSettings.features.teamPageVisible` (currently **false**) | Hidden: /team returns 404 (noindex), drops out of the sitemap, and navigation, menu and footer are filtered automatically (`getSiteChrome`). Team components and models are kept |
+| Careers page visible | `siteSettings.features.careersPageVisible` | Same mechanism for /karriere |
+| Callback form visible | `siteSettings.features.callbackFormVisible` | Renders `callback-form` sections or skips them |
+| Application form visible | `siteSettings.features.applicationFormVisible` | Renders `application-form` sections or skips them |
+| Notification recipient | `siteSettings.notificationEmail` (null) | E-mail hints for new requests and applications (Phase 5B, no attachments) |
+| Application form options | `application-form` section: positions, employment, experience, `cvMaxMb`, texts | Karriere form. No salaries or benefits invented |
+| Callback form texts | `callback-form` section | Termin page |
+
+Page gating: `FEATURE_GATED` in `src/content/repository.ts` maps `slug → feature flag`.
+Shared rules: `src/lib/booking-rules.ts` (`isWalkInOnly`, `bookableWeekdays`, `hoursOn`). Form contracts:
+`src/features/forms/schemas.ts`, which the Phase 5B Server Actions reuse on the server.
+
+**Public forms are non-operational:**
+- They validate locally, then state "Nicht gesendet".
+- They make no network request and use no storage.
+- The selected PDF is never read or uploaded.
+- There is no success message.

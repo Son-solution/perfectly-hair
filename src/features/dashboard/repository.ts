@@ -1,8 +1,9 @@
 import "server-only";
 import { z } from "zod";
 import {
-  appointment, attendanceRecord, employee, leaveRequest, payrollAdjustment, payrollProfile,
-  type Appointment, type AttendanceRecord, type Employee, type LeaveRequest, type PayrollAdjustment, type PayrollProfile,
+  appointment, attendanceRecord, callbackRequest, commissionRule, customer, employee, jobApplication, leaveRequest, payrollAdjustment, payrollProfile,
+  type Appointment, type AttendanceRecord, type CallbackRequest, type CommissionRule, type Customer, type Employee, type JobApplication,
+  type LeaveRequest, type PayrollAdjustment, type PayrollProfile,
 } from "./domain";
 import * as mock from "./mock/data";
 
@@ -24,6 +25,13 @@ function data() {
     z.array(leaveRequest).parse(mock.leaveRequests);
     z.array(payrollProfile).parse(mock.payrollProfiles);
     z.array(payrollAdjustment).parse(mock.payrollAdjustments);
+    z.array(customer).parse(mock.customers);
+    z.array(callbackRequest).parse(mock.callbackRequests);
+    z.array(jobApplication).parse(mock.applications);
+    z.array(commissionRule).parse(mock.commissionRules);
+    // Reference checks: every appointment points at an existing customer.
+    const ids = new Set(mock.customers.map((c) => c.id));
+    for (const a of mock.appointments) if (a.customerId && !ids.has(a.customerId)) throw new Error(`Unbekannter Kunde ${a.customerId} in ${a.id}`);
     validated = true;
   }
   return mock;
@@ -58,6 +66,19 @@ export async function listPayrollAdjustments(): Promise<PayrollAdjustment[]> {
 }
 export async function getServiceCatalogue() {
   return data().serviceCatalogue;
+}
+export async function listCustomers(): Promise<Customer[]> {
+  return [...data().customers].sort((a, b) => a.name.localeCompare(b.name, "de"));
+}
+export async function listCallbackRequests(): Promise<CallbackRequest[]> {
+  return [...data().callbackRequests].sort((a, b) => b.receivedAt.localeCompare(a.receivedAt));
+}
+/** Admin-only (Phase 5B: RLS + private storage bucket). Never exposed to staff. */
+export async function listApplications(): Promise<JobApplication[]> {
+  return [...data().applications].sort((a, b) => b.receivedAt.localeCompare(a.receivedAt));
+}
+export async function listCommissionRules(): Promise<CommissionRule[]> {
+  return data().commissionRules;
 }
 
 /* ------------------------------------------------------------------ staff scope (own data only) */

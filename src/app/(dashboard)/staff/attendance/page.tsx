@@ -1,6 +1,6 @@
 import { TimeClock } from "@/components/dashboard/staff/TimeClock";
 import { DemoBanner, PageHeader } from "@/components/dashboard/ui";
-import { addDays, effective, isoWeekday, monthTotals, workedMinutes } from "@/features/dashboard/calc";
+import { addDays, effective, isoWeekday, monthTotals, scheduledMinutes, workedMinutes } from "@/features/dashboard/calc";
 import { DEMO, DEMO_STAFF_ID, getEmployee, listAttendanceForEmployee } from "@/features/dashboard/repository";
 
 export default async function StaffAttendancePage() {
@@ -23,6 +23,8 @@ export default async function StaffAttendancePage() {
         history={records}
         weekWorked={week}
         monthWorked={monthTotals(me, records, DEMO.today.slice(0, 7), DEMO.today).worked}
+        scheduledToday={scheduledMinutes(me, DEMO.today)}
+        shiftLabel={me.schedule[String(isoWeekday(DEMO.today))] ? `${me.schedule[String(isoWeekday(DEMO.today))]!.start}–${me.schedule[String(isoWeekday(DEMO.today))]!.end}` : null}
       />
     </>
   );

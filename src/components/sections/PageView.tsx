@@ -13,7 +13,7 @@ export async function PageView({ slug }: { slug: string }) {
 /** SEO metadata from the page's CMS fields. */
 export async function pageMetadata(slug: string): Promise<Metadata> {
   const [page, business] = await Promise.all([getPage(slug), getBusiness()]);
-  if (!page) return {};
+  if (!page) return { robots: { index: false, follow: false } }; // hidden / unpublished → 404 + noindex
   return {
     ...(page.seo.title ? { title: page.seo.title } : {}),
     description: page.seo.description || business.description,

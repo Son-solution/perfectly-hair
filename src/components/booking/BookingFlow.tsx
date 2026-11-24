@@ -8,6 +8,7 @@ import {
   customerDetails, unavailableGateway,
   type AvailabilityResult, type BookingDraft, type BookingGateway, type CustomerDetails,
 } from "@/features/booking/types";
+import { isWalkInOnly, type WalkInPolicy } from "@/lib/booking-rules";
 import { formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
@@ -19,6 +20,8 @@ export type BookingFlowProps = {
   services: Service[];
   employees: { id: string; name: string; audiences: string[] }[];
   openWeekdays: number[];
+  /** Walk-in policy from business.walkIn: those audience/weekday combinations cannot be booked. */
+  walkIn?: WalkInPolicy | null;
   phone: { display: string; href: string };
   gateway?: BookingGateway;
 };
@@ -81,7 +84,7 @@ function Choice({ selected, onSelect, name, value, children }: { selected: boole
 }
 
 export function BookingFlow({
-  categories, services, employees, openWeekdays, phone, gateway = unavailableGateway, initial = {},
+  categories, services, employees, openWeekdays, walkIn = null, phone, gateway = unavailableGateway, initial = {},
 }: BookingFlowProps & { initial?: Initial }) {
   const [step, setStep] = useState(() => startStep(initial));
   const [draft, setDraft] = useState<BookingDraft>({
@@ -205,7 +208,7 @@ export function BookingFlow({
                 <legend><Heading headingRef={headingRef}>Für wen ist der Termin?</Heading></legend>
                 <div className="mt-10 grid gap-3 sm:grid-cols-3">
                   {categories.map((c) => (
-                    <Choice key={c.slug} name="kategorie" value={c.slug} selected={draft.category === c.slug} onSelect={() => set({ category: c.slug, serviceId: null, employeeId: null })}>
+                    <Choice key={c.slug} name="kategorie" value={c.slug} selected={draft.category === c.slug} onSelect={() => set({ category: c.slug, serviceId: null, employeeId: null, date: null, slot: null })}>
                       <span className="font-display text-3xl">{c.label}</span>
                     </Choice>
                   ))}
@@ -255,10 +258,17 @@ export function BookingFlow({
               <div>
                 <Heading headingRef={headingRef}>Wann passt es Ihnen?</Heading>
                 <p className="mt-4 max-w-xl text-graphite">Wählen Sie einen Wunschtag. Geschlossene Tage sind deaktiviert.</p>
+                {walkIn?.enabled && walkIn.rules.some((r) => r.audience === draft.category) && (
+                  <div role="note" className="mt-6 max-w-2xl border-l-2 border-ink bg-white px-5 py-4">
+                    <p className="font-display text-lg italic">{walkIn.title}</p>
+                    <p className="mt-1 text-sm leading-relaxed text-graphite">{walkIn.bookingNotice}</p>
+                  </div>
+                )}
                 <div className="mt-8 grid grid-cols-4 gap-2 sm:grid-cols-7">
                   {days.map((d) => {
                     const iso = isoDate(d);
-                    const isOpen = open.has(isoWeekday(d));
+                    const walkInDay = open.has(isoWeekday(d)) && isWalkInOnly(walkIn, draft.category, isoWeekday(d));
+                    const isOpen = open.has(isoWeekday(d)) && !walkInDay;
                     const selected = draft.date === iso;
                     return (
                       <button
@@ -267,15 +277,15 @@ export function BookingFlow({
                         disabled={!isOpen}
                         onClick={() => set({ date: iso, slot: null })}
                         aria-pressed={selected}
-                        aria-label={d.toLocaleDateString("de-DE", { weekday: "long", day: "numeric", month: "long" }) + (isOpen ? "" : ", geschlossen")}
+                        aria-label={d.toLocaleDateString("de-DE", { weekday: "long", day: "numeric", month: "long" }) + (walkInDay ? ", ohne Termin – einfach vorbeikommen" : isOpen ? "" : ", geschlossen")}
                         className={cn(
                           "flex flex-col items-center border py-3 transition-colors duration-300",
-                          selected ? "border-ink bg-ink text-white" : isOpen ? "border-mist hover:border-ink" : "cursor-not-allowed border-transparent text-ash line-through",
+                          selected ? "border-ink bg-ink text-white" : isOpen ? "border-mist hover:border-ink" : walkInDay ? "cursor-not-allowed border-dashed border-ash text-stone" : "cursor-not-allowed border-transparent text-ash line-through",
                         )}
                       >
                         <span className="text-[0.625rem] uppercase tracking-[0.2em]">{d.toLocaleDateString("de-DE", { weekday: "short" })}</span>
                         <span className="mt-1 font-display text-2xl">{d.getDate()}</span>
-                        <span className="text-[0.625rem] uppercase tracking-[0.12em] opacity-70">{d.toLocaleDateString("de-DE", { month: "short" })}</span>
+                        <span className="text-[0.625rem] uppercase tracking-[0.12em] opacity-70">{walkInDay ? "ohne Termin" : d.toLocaleDateString("de-DE", { month: "short" })}</span>
                       </button>
                     );
                   })}

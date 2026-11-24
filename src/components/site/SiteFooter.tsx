@@ -83,6 +83,11 @@ export function SiteFooter({ chrome }: { chrome: SiteChrome }) {
               <li key={l}>{l}</li>
             ))}
           </ul>
+          {chrome.walkIn && (
+            <p className="mt-5 max-w-xs border-l border-white/25 pl-4 text-sm leading-relaxed text-white/75">
+              <span className="block font-display text-base italic text-white">{chrome.walkIn.title}</span>
+            </p>
+          )}
         </div>
       </div>
 

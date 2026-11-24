@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 import { LogoMark } from "@/components/brand/LogoMark";
 import { cn } from "@/lib/utils";
+import { NotificationCenter, type NotificationItem } from "./NotificationCenter";
 import { Avatar } from "./ui";
 
 /* ------------------------------------------------------------------ icons (stroke, currentColor) */
@@ -25,6 +26,12 @@ const PATHS: Record<string, string> = {
   sun: "M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10M12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4",
   moon: "M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8",
   external: "M14 4h6v6M20 4l-9 9M18 14v5H5V6h5",
+  phone: "M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2",
+  user: "M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8",
+  chart: "M4 20V10M10 20V4M16 20v-7M22 20H2",
+  inbox: "M3 13h5l2 3h4l2-3h5M5 5h14l2 8v6H3v-6z",
+  bell: "M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 0 0 3.4 0",
+  plus: "M12 5v14M5 12h14",
 };
 export function Icon({ name, className }: { name: keyof typeof PATHS | string; className?: string }) {
   return (
@@ -42,12 +49,18 @@ const ADMIN_NAV: { group: string; items: NavItem[] }[] = [
   { group: "Betrieb", items: [
     { href: "/admin", label: "Übersicht", icon: "overview" },
     { href: "/admin/appointments", label: "Termine", icon: "calendar" },
+    { href: "/admin/callbacks", label: "Terminanfragen", icon: "phone" },
+    { href: "/admin/customers", label: "Kunden", icon: "user" },
     { href: "/admin/employees", label: "Mitarbeiter", icon: "people" },
     { href: "/admin/attendance", label: "Zeiterfassung", icon: "clock" },
     { href: "/admin/leave", label: "Abwesenheiten", icon: "leave" },
     { href: "/admin/payroll", label: "Lohnvorbereitung", icon: "wallet" },
   ] },
+  { group: "Auswertung", items: [
+    { href: "/admin/reports", label: "Berichte & Statistiken", icon: "chart" },
+  ] },
   { group: "Verwaltung", items: [
+    { href: "/admin/applications", label: "Bewerbungen", icon: "inbox" },
     { href: "/admin/website", label: "Website", icon: "website" },
     { href: "/admin/settings", label: "Einstellungen", icon: "settings" },
   ] },
@@ -72,12 +85,13 @@ function writePref(key: string, value: string) {
 /* ------------------------------------------------------------------ shell */
 
 export function DashboardShell({
-  area, userName, userRole, badges = {}, children,
+  area, userName, userRole, badges = {}, notifications, children,
 }: {
   area: "admin" | "staff";
   userName: string;
   userRole: string;
   badges?: Record<string, number>;
+  notifications?: NotificationItem[];
   children: ReactNode;
 }) {
   const pathname = usePathname();
@@ -101,7 +115,7 @@ export function DashboardShell({
     <nav aria-label={area === "admin" ? "Admin-Navigation" : "Mitarbeiter-Navigation"} className="flex-1 overflow-y-auto px-3 py-4">
       {groups.map((g) => (
         <div key={g.group} className="mb-6">
-          {!compact && <p className="mb-2 px-3 text-[0.625rem] font-semibold uppercase tracking-[0.18em] text-dash-muted">{g.group}</p>}
+          {!compact && <p className="mb-2 px-3 text-[0.625rem] font-semibold uppercase tracking-[0.18em] text-dash-sidebar-muted">{g.group}</p>}
           <ul className="space-y-0.5">
             {g.items.map((item) => {
               const active = isActive(item.href);
@@ -114,7 +128,7 @@ export function DashboardShell({
                     title={compact ? item.label : undefined}
                     className={cn(
                       "group relative flex h-10 items-center gap-3 rounded-md px-3 text-sm transition-colors",
-                      active ? "bg-dash-strong text-dash-invert" : "text-dash-muted hover:bg-dash-subtle hover:text-dash-text",
+                      active ? "bg-dash-sidebar-active font-medium text-dash-sidebar-active-text" : "text-dash-sidebar-text/80 hover:bg-dash-sidebar-hover hover:text-dash-sidebar-text",
                       compact && "justify-center px-0",
                     )}
                   >
@@ -124,7 +138,7 @@ export function DashboardShell({
                       <span className={cn(
                         "rounded-full text-[0.625rem] font-semibold tabular-nums",
                         compact ? "absolute right-1.5 top-1.5 h-2 w-2 bg-current text-transparent" : "px-1.5 py-0.5",
-                        !compact && (active ? "bg-dash-invert text-dash-strong" : "bg-dash-strong text-dash-invert"),
+                        !compact && (active ? "bg-dash-sidebar text-dash-sidebar-text" : "bg-dash-sidebar-active text-dash-sidebar-active-text"),
                       )}>
                         {compact ? "" : badge}
                       </span>
@@ -140,12 +154,12 @@ export function DashboardShell({
   );
 
   const brand = (compact: boolean) => (
-    <div className={cn("flex h-16 items-center gap-3 border-b border-dash-border px-5", compact && "justify-center px-0")}>
-      <LogoMark decorative className="h-8 w-8 text-dash-text" />
+    <div className={cn("flex h-16 items-center gap-3 border-b border-white/10 px-5", compact && "justify-center px-0")}>
+      <LogoMark decorative className="h-8 w-8 text-dash-sidebar-text" />
       {!compact && (
         <span className="leading-tight">
-          <span className="block font-display text-base text-dash-text">Perfectly Hair</span>
-          <span className="block text-[0.625rem] uppercase tracking-[0.2em] text-dash-muted">{area === "admin" ? "Verwaltung" : "Mitarbeiter"}</span>
+          <span className="block font-display text-base text-dash-sidebar-text">Perfectly Hair</span>
+          <span className="block text-[0.625rem] uppercase tracking-[0.2em] text-dash-sidebar-muted">{area === "admin" ? "Verwaltung" : "Mitarbeiter"}</span>
         </span>
       )}
     </div>
@@ -154,15 +168,15 @@ export function DashboardShell({
   return (
     <div data-theme={theme} className="dash min-h-dvh bg-dash-bg font-sans text-dash-text">
       {/* Desktop sidebar */}
-      <aside className={cn("fixed inset-y-0 left-0 z-30 hidden flex-col border-r border-dash-border bg-dash-surface transition-[width] duration-300 lg:flex", collapsed ? "w-[72px]" : "w-64")}>
+      <aside className={cn("fixed inset-y-0 left-0 z-30 hidden flex-col bg-dash-sidebar print:!hidden text-dash-sidebar-text transition-[width] duration-300 lg:flex", collapsed ? "w-[72px]" : "w-64")}>
         {brand(collapsed)}
         {navList(collapsed)}
-        <div className="border-t border-dash-border p-3">
+        <div className="border-t border-white/10 p-3">
           <button
             type="button"
             onClick={() => { const v = !collapsed; setCollapsed(v); writePref("dash-collapsed", v ? "1" : "0"); }}
             aria-label={collapsed ? "Seitenleiste ausklappen" : "Seitenleiste einklappen"}
-            className="flex h-9 w-full items-center justify-center gap-2 rounded-md text-xs text-dash-muted hover:bg-dash-subtle hover:text-dash-text"
+            className="flex h-9 w-full items-center justify-center gap-2 rounded-md text-xs text-dash-sidebar-muted hover:bg-dash-sidebar-hover hover:text-dash-sidebar-text"
           >
             <Icon name="chevron" className={cn("transition-transform", collapsed && "rotate-180")} />
             {!collapsed && "Einklappen"}
@@ -174,16 +188,16 @@ export function DashboardShell({
       {mobileOpen && (
         <div className="fixed inset-0 z-40 lg:hidden" role="dialog" aria-modal="true" aria-label="Navigation">
           <button type="button" aria-label="Navigation schließen" className="absolute inset-0 bg-black/50" onClick={() => setMobileOpen(false)} />
-          <aside className="absolute inset-y-0 left-0 flex w-72 flex-col bg-dash-surface shadow-2xl">
+          <aside className="absolute inset-y-0 left-0 flex w-72 flex-col bg-dash-sidebar text-dash-sidebar-text shadow-2xl">
             {brand(false)}
             {navList(false)}
           </aside>
         </div>
       )}
 
-      <div className={cn("transition-[padding] duration-300", collapsed ? "lg:pl-[72px]" : "lg:pl-64")}>
+      <div className={cn("transition-[padding] duration-300 print:!pl-0", collapsed ? "lg:pl-[72px]" : "lg:pl-64")}>
         {/* Top bar */}
-        <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-dash-border bg-dash-surface/90 px-4 backdrop-blur md:px-8">
+        <header className="sticky top-0 z-20 flex h-16 print:hidden items-center gap-3 border-b border-dash-border bg-dash-header px-4 md:px-8">
           <button type="button" onClick={() => setMobileOpen(true)} aria-label="Navigation öffnen" className="-ml-1 rounded-md p-2 text-dash-text hover:bg-dash-subtle lg:hidden">
             <Icon name="menu" />
           </button>
@@ -191,6 +205,12 @@ export function DashboardShell({
             Lokale Vorschau · keine Anmeldung
           </span>
           <div className="ml-auto flex items-center gap-1 md:gap-2">
+            {area === "admin" && (
+              <Link href="/admin/appointments?neu=1" className="mr-1 inline-flex h-9 items-center gap-2 rounded-md bg-dash-strong px-3 text-sm font-medium text-dash-invert hover:opacity-90">
+                <Icon name="plus" /><span className="hidden sm:inline">Neuer Termin</span>
+              </Link>
+            )}
+            {notifications && <NotificationCenter items={notifications} />}
             <Link
               href={area === "admin" ? "/staff" : "/admin"}
               className="hidden rounded-md px-3 py-2 text-xs text-dash-muted hover:bg-dash-subtle hover:text-dash-text md:inline-flex"
@@ -223,7 +243,7 @@ export function DashboardShell({
 
       {/* Staff: mobile bottom tab bar (mobile-first) */}
       {area === "staff" && (
-        <nav aria-label="Schnellnavigation" className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 border-t border-dash-border bg-dash-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden">
+        <nav aria-label="Schnellnavigation" className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 print:hidden border-t border-dash-border bg-dash-header pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden">
           {STAFF_NAV.slice(0, 5).map((item) => {
             const active = isActive(item.href);
             return (

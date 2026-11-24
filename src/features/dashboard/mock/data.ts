@@ -4,7 +4,8 @@
  * Generated deterministically around a fixed demo date so prerendering stays stable.
  */
 import type {
-  Appointment, AppointmentStatus, AttendanceRecord, Employee, LeaveRequest, PayrollAdjustment, PayrollProfile,
+  Appointment, AppointmentSource, AppointmentStatus, AttendanceRecord, CallbackRequest, CommissionRule, Customer, Employee,
+  JobApplication, LeaveRequest, PayrollAdjustment, PayrollProfile,
 } from "../domain";
 
 export const DEMO_TODAY = "2026-11-24"; // Tuesday
@@ -165,14 +166,17 @@ function buildAppointments(): Appointment[] {
           : r < 0.68 ? "confirmed" : r < 0.88 ? "pending" : r < 0.94 ? "cancelled" : "rejected";
         n++;
         const audience = e.audiences[Math.floor(rnd() * e.audiences.length)];
+        const wd = isoWeekday(date);
+        // Policy: Herren on Friday/Saturday are walk-in only (no bookings) → shown as Laufkundschaft.
+        const source: AppointmentSource = audience === "herren" && (wd === 5 || wd === 6) ? "walk_in" : n % 5 === 0 ? "telefon" : n % 11 === 0 ? "walk_in" : "online";
         out.push({
-          id: `t${n}`, customerName: CUSTOMERS[n % CUSTOMERS.length], customerPhone: `0170 000 ${pad(n % 100)}${pad((n * 7) % 100)}`,
+          id: `t${n}`, customerId: `k${(n % CUSTOMERS.length) + 1}`, source, customerName: CUSTOMERS[n % CUSTOMERS.length], customerPhone: `0170 000 1${pad((n % CUSTOMERS.length) + 10)}`,
           audience, serviceId: sid, serviceName: sv.name, employeeId: status === "pending" && rnd() < 0.3 ? null : e.id,
           start: `${date}T${t}`, durationMin: sv.durationMin, status, priceCents: sv.priceCents,
           note: rnd() < 0.15 ? "Demo-Hinweis: Kunde wünscht kurze Beratung vorab." : null,
           cancelReason: status === "cancelled" ? "Demo: Kunde hat telefonisch abgesagt." : status === "rejected" ? "Demo: Zeitfenster nicht verfügbar." : null,
           history: [
-            { at: `${date}T08:00`, by: "Online-Anfrage (Demo)", action: "Angefragt", note: null },
+            { at: `${date}T08:00`, by: source === "online" ? "Online-Anfrage (Demo)" : DEMO_ADMIN, action: source === "online" ? "Angefragt" : source === "walk_in" ? "Laufkundschaft erfasst" : "Telefonisch erfasst", note: null },
             ...(status !== "pending" ? [{ at: `${date}T08:20`, by: DEMO_ADMIN, action: status === "rejected" ? "Abgelehnt" : status === "cancelled" ? "Storniert" : "Bestätigt", note: null }] : []),
           ],
         });
@@ -182,8 +186,8 @@ function buildAppointments(): Appointment[] {
   }
   // Deliberate conflict for the demo: overlapping bookings for Jonas tomorrow 11:00
   out.push(
-    { id: "tc1", customerName: "Kunde X. (Demo)", customerPhone: "0170 000 9901", audience: "herren", serviceId: "haarschnitt", serviceName: "Haarschnitt", employeeId: "e2", start: "2026-11-25T11:00", durationMin: 30, status: "confirmed", priceCents: 2000, note: null, cancelReason: null, history: [{ at: "2026-11-23T09:00", by: DEMO_ADMIN, action: "Bestätigt", note: null }] },
-    { id: "tc2", customerName: "Kunde Y. (Demo)", customerPhone: "0170 000 9902", audience: "herren", serviceId: "bartrasur", serviceName: "Bartrasur", employeeId: "e2", start: "2026-11-25T11:15", durationMin: 20, status: "pending", priceCents: 1000, note: null, cancelReason: null, history: [{ at: "2026-11-24T07:45", by: "Online-Anfrage (Demo)", action: "Angefragt", note: null }] },
+    { id: "tc1", customerId: "k9", source: "telefon", customerName: "Kunde X. (Demo)", customerPhone: "0170 000 9901", audience: "herren", serviceId: "haarschnitt", serviceName: "Haarschnitt", employeeId: "e2", start: "2026-11-25T11:00", durationMin: 30, status: "confirmed", priceCents: 2000, note: null, cancelReason: null, history: [{ at: "2026-11-23T09:00", by: DEMO_ADMIN, action: "Bestätigt", note: null }] },
+    { id: "tc2", customerId: "k10", source: "online", customerName: "Kunde Y. (Demo)", customerPhone: "0170 000 9902", audience: "herren", serviceId: "bartrasur", serviceName: "Bartrasur", employeeId: "e2", start: "2026-11-25T11:15", durationMin: 20, status: "pending", priceCents: 1000, note: null, cancelReason: null, history: [{ at: "2026-11-24T07:45", by: "Online-Anfrage (Demo)", action: "Angefragt", note: null }] },
   );
   return out;
 }
@@ -211,3 +215,42 @@ export const payrollAdjustments: PayrollAdjustment[] = [
 ];
 
 export const serviceCatalogue = SERVICES;
+
+/* ------------------------------------------------------------------ customers */
+
+const CUSTOMER_AUDIENCE: Customer["audience"][] = ["herren", "damen", "kinder", "herren", "damen", "herren", "damen", "kinder"];
+export const customers: Customer[] = [
+  ...CUSTOMERS.map((name, i): Customer => ({
+    id: `k${i + 1}`, name, phone: `0170 000 1${pad(i + 10)}`, email: i % 3 === 0 ? `kunde${i + 1}@example.com` : null,
+    audience: CUSTOMER_AUDIENCE[i], createdAt: `2026-0${(i % 9) + 1}-1${i}`, consent: true,
+    notes: i === 1 ? [{ id: "kn1", at: "2026-10-02T10:15", by: DEMO_ADMIN, text: "Demo: bevorzugt Termine am Vormittag." }]
+      : i === 4 ? [{ id: "kn2", at: "2026-09-18T15:40", by: DEMO_ADMIN, text: "Demo: Hautverträglichkeitstest vor Färben durchgeführt (unauffällig)." }] : [],
+  })),
+  { id: "k9", name: "Kunde X. (Demo)", phone: "0170 000 9901", email: null, audience: "herren", createdAt: "2026-11-23", consent: true, notes: [] },
+  { id: "k10", name: "Kunde Y. (Demo)", phone: "0170 000 9902", email: "kunde.y@example.com", audience: "herren", createdAt: "2026-11-24", consent: true, notes: [] },
+];
+
+/* ------------------------------------------------------------------ callback requests */
+
+const cbHist = (at: string, status: CallbackRequest["status"], note: string | null = null, by = "Website-Formular (Demo)") => ({ at, by, status, note });
+export const callbackRequests: CallbackRequest[] = [
+  { id: "r1", receivedAt: "2026-11-24T08:12", name: "Interessentin M. (Demo)", phone: "0170 000 5501", email: "m.demo@example.com", audience: "damen", serviceId: "faerben", serviceName: "Färben", preferredDate: "2026-11-27", preferredTime: "10:00", alternativeTime: "14:00", message: "Demo: Ansatz nachfärben, ca. 2 cm.", status: "neu", assigneeId: null, appointmentId: null, notes: [], history: [cbHist("2026-11-24T08:12", "neu")] },
+  { id: "r2", receivedAt: "2026-11-24T07:30", name: "Interessent P. (Demo)", phone: "0170 000 5502", email: null, audience: "herren", serviceId: "haarschnitt", serviceName: "Haarschnitt", preferredDate: "2026-11-26", preferredTime: "17:00", alternativeTime: null, message: null, status: "neu", assigneeId: null, appointmentId: null, notes: [], history: [cbHist("2026-11-24T07:30", "neu")] },
+  { id: "r3", receivedAt: "2026-11-23T18:05", name: "Elternteil K. (Demo)", phone: "0170 000 5503", email: "k.demo@example.com", audience: "kinder", serviceId: "haarschnitt", serviceName: "Haarschnitt", preferredDate: "2026-11-28", preferredTime: "11:00", alternativeTime: "12:00", message: "Demo: Zwei Kinder, 6 und 9 Jahre.", status: "in_bearbeitung", assigneeId: "e5", appointmentId: null, notes: [{ id: "rn1", at: "2026-11-24T09:05", by: DEMO_ADMIN, text: "Demo: Zwei aufeinanderfolgende Slots prüfen." }], history: [cbHist("2026-11-23T18:05", "neu"), cbHist("2026-11-24T09:05", "in_bearbeitung", null, DEMO_ADMIN)] },
+  { id: "r4", receivedAt: "2026-11-22T12:40", name: "Interessentin S. (Demo)", phone: "0170 000 5504", email: null, audience: "damen", serviceId: "waschen-styling", serviceName: "Waschen & Styling", preferredDate: "2026-11-25", preferredTime: "09:30", alternativeTime: null, message: null, status: "nicht_erreicht", assigneeId: "e5", appointmentId: null, notes: [{ id: "rn2", at: "2026-11-23T10:00", by: DEMO_ADMIN, text: "Demo: 2× angerufen, Mailbox." }], history: [cbHist("2026-11-22T12:40", "neu"), cbHist("2026-11-23T10:00", "nicht_erreicht", "Mailbox", DEMO_ADMIN)] },
+  { id: "r5", receivedAt: "2026-11-21T16:20", name: "Interessent T. (Demo)", phone: "0170 000 5505", email: "t.demo@example.com", audience: "herren", serviceId: "bartrasur", serviceName: "Bartrasur", preferredDate: "2026-11-25", preferredTime: "12:00", alternativeTime: null, message: null, status: "termin_vereinbart", assigneeId: "e5", appointmentId: "tc1", notes: [], history: [cbHist("2026-11-21T16:20", "neu"), cbHist("2026-11-22T09:10", "rueckruf_erfolgt", null, DEMO_ADMIN), cbHist("2026-11-22T09:12", "termin_vereinbart", "Verfügbarkeit geprüft, Termin angelegt.", DEMO_ADMIN)] },
+  { id: "r6", receivedAt: "2026-11-20T10:02", name: "Interessentin W. (Demo)", phone: "0170 000 5506", email: null, audience: "damen", serviceId: "augenbrauen-zupfen", serviceName: "Augenbrauen zupfen", preferredDate: "2026-11-21", preferredTime: "18:30", alternativeTime: null, message: null, status: "abgelehnt", assigneeId: "e5", appointmentId: null, notes: [], history: [cbHist("2026-11-20T10:02", "neu"), cbHist("2026-11-20T11:00", "abgelehnt", "Wunschzeit außerhalb der Öffnungszeiten, Alternative angeboten – kein Interesse.", DEMO_ADMIN)] },
+];
+
+/* ------------------------------------------------------------------ job applications */
+
+export const applications: JobApplication[] = [
+  { id: "b1", receivedAt: "2026-11-23T20:14", firstName: "Bewerberin", lastName: "Eins (Demo)", email: "bewerbung1@example.com", phone: "0170 000 7701", position: "Friseur/in", employment: "Vollzeit", experience: "3–5 Jahre", message: "Demo: Schwerpunkt Damenhaarschnitte und Farbe.", cvFileName: "lebenslauf-demo-1.pdf", status: "neu", notes: [], deleteAfter: null },
+  { id: "b2", receivedAt: "2026-11-20T09:40", firstName: "Bewerber", lastName: "Zwei (Demo)", email: "bewerbung2@example.com", phone: "0170 000 7702", position: "Barbier/in", employment: "Teilzeit", experience: "1–2 Jahre", message: null, cvFileName: null, status: "in_pruefung", notes: [{ id: "bn1", at: "2026-11-21T11:00", by: DEMO_ADMIN, text: "Demo: Probearbeit am Samstag denkbar." }], deleteAfter: null },
+  { id: "b3", receivedAt: "2026-11-12T14:05", firstName: "Bewerberin", lastName: "Drei (Demo)", email: "bewerbung3@example.com", phone: "0170 000 7703", position: "Ausbildung", employment: "Ausbildung", experience: "Keine", message: "Demo: Praktikum im Salon absolviert.", cvFileName: "lebenslauf-demo-3.pdf", status: "gespraech", notes: [{ id: "bn2", at: "2026-11-15T10:00", by: DEMO_ADMIN, text: "Demo: Gespräch am 26.11. um 14 Uhr." }], deleteAfter: null },
+  { id: "b4", receivedAt: "2026-10-02T08:30", firstName: "Bewerber", lastName: "Vier (Demo)", email: "bewerbung4@example.com", phone: "0170 000 7704", position: "Friseur/in", employment: "Minijob", experience: "Mehr als 5 Jahre", message: null, cvFileName: "lebenslauf-demo-4.pdf", status: "abgelehnt", notes: [], deleteAfter: "2027-04-15" },
+];
+
+/* ------------------------------------------------------------------ commission (optional, off by default) */
+
+export const commissionRules: CommissionRule[] = employees.filter((e) => e.role === "staff").map((e) => ({ employeeId: e.id, enabled: false, percent: 0 }));

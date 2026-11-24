@@ -42,8 +42,19 @@ export const appointmentEvent = z.object({
   note: z.string().nullable(),
 });
 
+export const appointmentSource = z.enum(["online", "telefon", "walk_in", "rueckruf"]);
+export type AppointmentSource = z.infer<typeof appointmentSource>;
+export const SOURCE_LABEL: Record<AppointmentSource, string> = {
+  online: "Online-Anfrage",
+  telefon: "Telefonisch",
+  walk_in: "Laufkundschaft",
+  rueckruf: "Aus Terminanfrage",
+};
+
 export const appointment = z.object({
   id: z.string(),
+  customerId: z.string().nullable(),
+  source: appointmentSource,
   customerName: z.string(),
   customerPhone: z.string(),
   audience: z.enum(["herren", "damen", "kinder"]),
@@ -130,6 +141,98 @@ export const payrollAdjustment = z.object({
   reviewedBy: z.string().nullable(),
 });
 export type PayrollAdjustment = z.infer<typeof payrollAdjustment>;
+
+/* ------------------------------------------------------------------ customers */
+
+export const customer = z.object({
+  id: z.string(),
+  name: z.string(),
+  phone: z.string(),
+  email: z.email().nullable(),
+  audience: z.enum(["herren", "damen", "kinder"]),
+  createdAt: z.string(),
+  /** Consent to store contact data (DSGVO Art. 6). Phase 5B: timestamp + source. */
+  consent: z.boolean(),
+  /** Internal notes — visible only with permission customers.notes. */
+  notes: z.array(z.object({ id: z.string(), at: z.string(), by: z.string(), text: z.string() })),
+});
+export type Customer = z.infer<typeof customer>;
+
+/* ------------------------------------------------------------------ callback requests ("Termin anfragen & Rückruf erhalten") */
+
+export const callbackStatus = z.enum(["neu", "in_bearbeitung", "rueckruf_erfolgt", "termin_vereinbart", "nicht_erreicht", "abgelehnt"]);
+export type CallbackStatus = z.infer<typeof callbackStatus>;
+export const CALLBACK_STATUS_LABEL: Record<CallbackStatus, string> = {
+  neu: "Neu",
+  in_bearbeitung: "In Bearbeitung",
+  rueckruf_erfolgt: "Rückruf erfolgt",
+  termin_vereinbart: "Termin vereinbart",
+  nicht_erreicht: "Nicht erreicht",
+  abgelehnt: "Abgelehnt",
+};
+
+export const callbackRequest = z.object({
+  id: z.string(),
+  receivedAt: z.string(),
+  name: z.string(),
+  phone: z.string(),
+  email: z.email().nullable(),
+  audience: z.enum(["herren", "damen", "kinder"]),
+  serviceId: z.string(),
+  serviceName: z.string(),
+  preferredDate: z.string(), // YYYY-MM-DD
+  preferredTime: z.string(), // HH:MM
+  alternativeTime: z.string().nullable(),
+  message: z.string().nullable(),
+  status: callbackStatus,
+  assigneeId: z.string().nullable(),
+  appointmentId: z.string().nullable(),
+  notes: z.array(z.object({ id: z.string(), at: z.string(), by: z.string(), text: z.string() })),
+  history: z.array(z.object({ at: z.string(), by: z.string(), status: callbackStatus, note: z.string().nullable() })),
+});
+export type CallbackRequest = z.infer<typeof callbackRequest>;
+
+/* ------------------------------------------------------------------ job applications (Karriere) */
+
+export const applicationStatus = z.enum(["neu", "in_pruefung", "gespraech", "angenommen", "abgelehnt"]);
+export type ApplicationStatus = z.infer<typeof applicationStatus>;
+export const APPLICATION_STATUS_LABEL: Record<ApplicationStatus, string> = {
+  neu: "Neu",
+  in_pruefung: "In Prüfung",
+  gespraech: "Vorstellungsgespräch",
+  angenommen: "Angenommen",
+  abgelehnt: "Abgelehnt",
+};
+
+export const jobApplication = z.object({
+  id: z.string(),
+  receivedAt: z.string(),
+  firstName: z.string(),
+  lastName: z.string(),
+  email: z.email(),
+  phone: z.string(),
+  position: z.string(),
+  employment: z.string(),
+  experience: z.string(),
+  message: z.string().nullable(),
+  /** Phase 5B: path in the PRIVATE storage bucket "applications" — never a public URL. */
+  cvFileName: z.string().nullable(),
+  status: applicationStatus,
+  notes: z.array(z.object({ id: z.string(), at: z.string(), by: z.string(), text: z.string() })),
+  /** Retention: delete 6 months after the process ends unless consent to keep on file. */
+  deleteAfter: z.string().nullable(),
+});
+export type JobApplication = z.infer<typeof jobApplication>;
+
+/* ------------------------------------------------------------------ commission (optional) */
+
+export const commissionRule = z.object({
+  employeeId: z.string(),
+  enabled: z.boolean(),
+  /** Percent of the ESTIMATED service value of completed appointments. Preview only. */
+  percent: z.number().min(0).max(50),
+});
+export type CommissionRule = z.infer<typeof commissionRule>;
 
 /* ------------------------------------------------------------------ labels */
 

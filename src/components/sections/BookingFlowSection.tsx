@@ -2,10 +2,11 @@ import { Suspense } from "react";
 import { BookingFlow, BookingFlowFromUrl, type BookingFlowProps } from "@/components/booking/BookingFlow";
 import { Reveal } from "@/components/motion";
 import type { Business, SectionOf, Service } from "@/content/schema";
+import type { WalkInPolicy } from "@/lib/booking-rules";
 import { openWeekdays } from "@/lib/hours";
 
 export function BookingFlowSection({
-  section, categories, services, employees, hours, phone,
+  section, categories, services, employees, hours, phone, walkIn,
 }: {
   section: SectionOf<"booking-flow">;
   categories: BookingFlowProps["categories"];
@@ -13,8 +14,9 @@ export function BookingFlowSection({
   employees: BookingFlowProps["employees"];
   hours: Business["hours"];
   phone: BookingFlowProps["phone"];
+  walkIn: WalkInPolicy;
 }) {
-  const props: BookingFlowProps = { categories, services, employees, phone, openWeekdays: [...openWeekdays(hours)] };
+  const props: BookingFlowProps = { categories, services, employees, phone, walkIn, openWeekdays: [...openWeekdays(hours)] };
   return (
     <section aria-label="Online-Buchung (Vorschau)" className="bg-bone py-20 md:py-32">
       <div className="container-luxe max-w-5xl">

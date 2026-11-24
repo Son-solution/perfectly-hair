@@ -25,6 +25,14 @@ export const business: Business = {
   holidays: [],
   social: [],
   booking: { onlineBookingActive: false, cancellationPolicy: null, approvalMode: null },
+  walkIn: {
+    enabled: true,
+    // Herren: Di–Do mit Termin, Fr & Sa ohne Termin. Damen und Kinder unverändert.
+    rules: [{ audience: "herren", weekdays: [5, 6] }],
+    title: "Freitag & Samstag – Herren ohne Termin",
+    text: "Freitags und samstags sind Herren auch ohne vorherige Terminvereinbarung herzlich willkommen. Einfach vorbeikommen – wir freuen uns auf Ihren Besuch!",
+    bookingNotice: "Für Herren vergeben wir freitags und samstags keine Termine – kommen Sie einfach ohne Anmeldung vorbei. Für einen festen Termin wählen Sie bitte Dienstag bis Donnerstag.",
+  },
   legal: { ownerName: null, vatId: null, chamber: null, registrationNumber: null },
 };
 
@@ -38,9 +46,9 @@ export const navigation: Navigation = {
   secondary: [
     { label: "Leistungen", href: "/leistungen" },
     { label: "Preise", href: "/preise" },
-    { label: "Team", href: "/team" },
     { label: "Galerie", href: "/galerie" },
     { label: "Salon", href: "/salon" },
+    { label: "Karriere", href: "/karriere" },
     { label: "Kontakt", href: "/kontakt" },
   ],
   cta: { label: "Termin", href: "/termin" },
@@ -51,8 +59,8 @@ export const navigation: Navigation = {
     { label: "Leistungen", href: "/leistungen", imageId: "herren-shears", primary: false },
     { label: "Preise", href: "/preise", imageId: "herren-cut", primary: false },
     { label: "Galerie", href: "/galerie", imageId: "damen-curls", primary: false },
-    { label: "Team", href: "/team", imageId: "team-placeholder", primary: false },
     { label: "Salon", href: "/salon", imageId: "salon-interior", primary: false },
+    { label: "Karriere", href: "/karriere", imageId: "team-placeholder", primary: false },
     { label: "Kontakt", href: "/kontakt", imageId: "kinder-clipper", primary: false },
     { label: "Termin", href: "/termin", imageId: "damen-hair-wash", primary: false },
   ],
@@ -70,4 +78,11 @@ export const siteSettings: SiteSettings = {
   appearance: "noir",
   stockLabel: "Symbolbild",
   placeholderLabel: "Bild folgt",
+  features: {
+    teamPageVisible: false, // Team-Seite vorerst ausgeblendet (Inhalte/Modelle bleiben erhalten)
+    careersPageVisible: true,
+    callbackFormVisible: true,
+    applicationFormVisible: true,
+  },
+  notificationEmail: null, // wird in Phase 5B im Admin hinterlegt
 };
