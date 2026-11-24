@@ -4,14 +4,16 @@ import { useState } from "react";
 import { ConfirmDialog, Dialog, Tabs, useToast } from "@/components/dashboard/interactive";
 import { Card, EmptyState, StatusBadge, btn } from "@/components/dashboard/ui";
 import { fmtDate, fmtTime } from "@/features/dashboard/calc";
-import type { Appointment } from "@/features/dashboard/domain";
+import type { Appointment, Employee } from "@/features/dashboard/domain";
+import { DayView } from "./DayView";
 
 /** Own appointments only. Accept/reject/cancel visible only when the salon policy allows it. */
-export function MyAppointments({ initial, today, me, canDecide, canCancel }: {
+export function MyAppointments({ initial, today, me, canDecide, canCancel, schedule, leave, nowTime }: {
   initial: Appointment[]; today: string; me: string; canDecide: boolean; canCancel: boolean;
+  nowTime: string; schedule: Employee["schedule"]; leave: { from: string; to: string; label: string }[];
 }) {
   const [items, setItems] = useState(initial);
-  const [tab, setTab] = useState("heute");
+  const [tab, setTab] = useState("tag");
   const [openId, setOpenId] = useState<string | null>(null);
   const [confirm, setConfirm] = useState<null | "reject" | "cancel">(null);
   const { toast, toastNode } = useToast();
@@ -28,16 +30,17 @@ export function MyAppointments({ initial, today, me, canDecide, canCancel }: {
     toast(`${action}.`);
   };
 
-  const shown = lists[tab];
+  const shown = lists[tab] ?? [];
   const byDay = shown.reduce<Record<string, Appointment[]>>((acc, a) => { (acc[a.start.slice(0, 10)] ??= []).push(a); return acc; }, {});
 
   return (
     <>
       <Tabs label="Terminlisten" value={tab} onChange={setTab} tabs={[
-        { id: "heute", label: "Heute", count: lists.heute.length }, { id: "anfragen", label: "Anfragen", count: lists.anfragen.length },
+        { id: "tag", label: "Tagesansicht" }, { id: "heute", label: "Heute", count: lists.heute.length }, { id: "anfragen", label: "Anfragen", count: lists.anfragen.length },
         { id: "anstehend", label: "Anstehend" }, { id: "verlauf", label: "Verlauf" },
       ]} />
-      <div className="mt-4 space-y-4">
+      {tab === "tag" && <div className="mt-4"><DayView appointments={items} today={today} nowTime={nowTime} schedule={schedule} leave={leave} onOpen={setOpenId} /></div>}
+      <div className={tab === "tag" ? "hidden" : "mt-4 space-y-4"}>
         {shown.length === 0 && <EmptyState title="Keine Termine in dieser Ansicht" />}
         {Object.entries(byDay).slice(0, 14).map(([day, list]) => (
           <Card key={day} title={fmtDate(day, { weekday: "long", day: "numeric", month: "long" })} padded={false}>

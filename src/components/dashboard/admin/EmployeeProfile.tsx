@@ -11,6 +11,7 @@ import {
   type Appointment, type AttendanceRecord, type Employee, type LeaveRequest, type PayrollAdjustment, type PayrollProfile,
 } from "@/features/dashboard/domain";
 import { PERMISSION_LABEL, ROLE_PERMISSIONS } from "@/features/dashboard/permissions";
+import { EmployeeAccess } from "./EmployeeAccess";
 
 const WEEKDAYS = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"];
 
@@ -52,6 +53,14 @@ export function EmployeeProfile({
           </p>
         </div>
       </header>
+
+      <EmployeeAccess
+        name={`${e.firstName} ${e.lastName}`}
+        email={e.email}
+        initiallyActive={e.active}
+        today={today}
+        futureAppointments={appointments.filter((a) => a.start.slice(0, 10) >= today && (a.status === "confirmed" || a.status === "pending")).length}
+      />
 
       <div className="mb-6 grid grid-cols-2 gap-3 xl:grid-cols-4">
         <Stat label="Stunden diesen Monat" value={fmtDuration(t.worked)} hint={`Soll ${fmtDuration(t.scheduled)}`} />
