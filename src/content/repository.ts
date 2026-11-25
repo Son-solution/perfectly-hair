@@ -111,13 +111,10 @@ export async function getCategory(slug: AudienceSlug): Promise<Category | undefi
   return (await getCategories()).find((c) => c.slug === slug);
 }
 
-/**
- * Visible services. With an audience: services assigned to it PLUS services the salon has not
- * assigned yet (flyer items), so nothing is hidden by missing data.
- */
+/** Visible services. With an audience: only services offered for it (`prices[audience].available`). */
 export async function getServices(audience?: AudienceSlug | null): Promise<Service[]> {
   return load()
-    .services.filter((s) => s.visible && (!audience || s.audiences.length === 0 || s.audiences.includes(audience)))
+    .services.filter((s) => s.visible && (!audience || s.prices[audience].available))
     .sort(byOrder);
 }
 

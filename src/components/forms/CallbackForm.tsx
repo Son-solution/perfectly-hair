@@ -45,7 +45,7 @@ export function CallbackForm({ texts, categories, services, hours, walkIn, phone
     // a changed field drops its old error (re-checked on the next submit)
     setErrors((e) => { const n = { ...e }; for (const k of Object.keys(patch)) delete n[k as keyof Values]; return n; });
   };
-  const serviceOptions = services.filter((s) => !v.category || s.audiences.length === 0 || s.audiences.includes(v.category));
+  const serviceOptions = services.filter((s) => !v.category || s.audiences.includes(v.category));
   const open = v.date ? hoursOn(hours, v.date) : null;
   const walkInDay = !!v.date && !!v.category && isWalkInOnly(walkIn, v.category, isoWeekdayOf(v.date));
   const slots = useMemo(() => {

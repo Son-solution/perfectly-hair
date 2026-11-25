@@ -31,7 +31,8 @@ create type outbox_status   as enum ('queued', 'sending', 'sent', 'failed');
 | Table | Key columns | Notes |
 | --- | --- | --- |
 | `service_categories` | `id`, `audience`, `slug`, `name`, `description`, `sort_order`, `is_active` | e.g. Damen → Schnitt, Farbe… |
-| `services` | `id`, `category_id`, `slug`, `name`, `description`, `duration_min`, `buffer_before_min`, `buffer_after_min`, `price_cents`, `price_is_from bool`, `requires_approval bool`, `is_active` | Same service name may exist per audience with different price. |
+| `services` | `id`, `slug`, `name`, `description`, `buffer_before_min`, `buffer_after_min`, `requires_approval bool`, `sort_order`, `is_visible` | One row per service; prices live in `service_prices` (Phase 5A.3). |
+| `service_prices` | `service_id`, `audience` (herren/damen/kinder), `is_available bool`, `price_cents` (null = auf Anfrage, 0–100000), `price_is_from bool`, `duration_min` (5–480, null = offen), `updated_by`, `updated_at` | PK (`service_id`, `audience`). Exactly three rows per service. Booking uses the price and duration of the booked audience; changes go to `audit_log` |
 | `staff_services` | `staff_id`, `service_id`, `duration_override_min`, `price_override_cents` | Which staff may perform which service. |
 
 ### Scheduling

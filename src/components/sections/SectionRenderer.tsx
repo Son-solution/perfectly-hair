@@ -14,6 +14,7 @@ import {
 import type { Page, Section } from "@/content/schema";
 import { emphasis } from "@/lib/emphasis";
 import { formatPrice } from "@/lib/format";
+import { offeredAudiences } from "@/lib/pricing";
 import { BookingFlowSection } from "./BookingFlowSection";
 import { ContactDetailsSection, LocationSection } from "./contact";
 import {
@@ -266,7 +267,7 @@ export async function SectionRenderer({ page }: { page: Page }) {
                 id: h.id, label: h.label, text: h.text, position: h.position, normal: h.normal,
                 service: {
                   name: sv.name,
-                  price: sv.priceCents !== null ? formatPrice(sv.priceCents, sv.priceIsFrom) : null,
+                  price: ((p) => (p.priceCents !== null ? formatPrice(p.priceCents, p.priceIsFrom) : null))(sv.prices[section.category]),
                   href: `/termin?kategorie=${section.category}&leistung=${sv.id}`,
                 },
               };
@@ -288,7 +289,7 @@ export async function SectionRenderer({ page }: { page: Page }) {
               <CallbackForm
                 texts={section}
                 categories={categories.map((c) => ({ slug: c.slug, label: c.label }))}
-                services={allServices.map((s) => ({ id: s.id, name: s.name, audiences: s.audiences }))}
+                services={allServices.map((s) => ({ id: s.id, name: s.name, audiences: offeredAudiences(s) }))}
                 hours={business.hours}
                 walkIn={business.walkIn}
                 phone={chrome.phone}

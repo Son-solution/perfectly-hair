@@ -160,15 +160,25 @@ export const category = z.object({
 });
 export type Category = z.infer<typeof category>;
 
+/**
+ * Price of a service for ONE audience (Herren / Damen / Kinder) — every audience has its own
+ * price, "ab"-flag and duration. `available: false` = service not offered for this audience.
+ * `priceCents: null` = "Preis auf Anfrage" (never invented).
+ */
+export const audiencePrice = z.object({
+  available: z.boolean(),
+  priceCents: z.number().int().nonnegative().max(100000).nullable(),
+  priceIsFrom: z.boolean(),
+  durationMin: z.number().int().min(5).max(480).nullable(),
+});
+export type AudiencePrice = z.infer<typeof audiencePrice>;
+
 export const service = z.object({
   id,
-  name: z.string(),
+  name: z.string().min(2),
   description: z.string().nullable(),
-  /** Empty = the salon has not assigned this service to a category yet. */
-  audiences: z.array(audienceSlug),
-  priceCents: z.number().int().nonnegative().nullable(),
-  priceIsFrom: z.boolean(),
-  durationMin: z.number().int().positive().nullable(),
+  /** Separate price per audience (Phase 5A.3). Admin-editable under Leistungen & Preise. */
+  prices: z.object({ herren: audiencePrice, damen: audiencePrice, kinder: audiencePrice }),
   employeeIds: z.array(id),
   source: z.enum(["flyer", "salon"]),
   order: z.number().int(),

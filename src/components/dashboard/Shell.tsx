@@ -32,6 +32,7 @@ const PATHS: Record<string, string> = {
   inbox: "M3 13h5l2 3h4l2-3h5M5 5h14l2 8v6H3v-6z",
   bell: "M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 0 0 3.4 0",
   plus: "M12 5v14M5 12h14",
+  tag: "M3 12V3h9l9 9-9 9zM7.5 7.5h.01",
 };
 export function Icon({ name, className }: { name: keyof typeof PATHS | string; className?: string }) {
   return (
@@ -60,6 +61,7 @@ const ADMIN_NAV: { group: string; items: NavItem[] }[] = [
     { href: "/admin/reports", label: "Berichte & Statistiken", icon: "chart" },
   ] },
   { group: "Verwaltung", items: [
+    { href: "/admin/services", label: "Leistungen & Preise", icon: "tag" },
     { href: "/admin/applications", label: "Bewerbungen", icon: "inbox" },
     { href: "/admin/website", label: "Website", icon: "website" },
     { href: "/admin/settings", label: "Einstellungen", icon: "settings" },

@@ -54,13 +54,19 @@ export const categories: Category[] = [
 ];
 
 /**
- * Services exactly as printed on the flyer. The flyer does not say which audience they apply
- * to → `audiences: []`. Durations unknown → `null`. No employees known → `[]`.
+ * Services with a SEPARATE price per audience (Herren / Damen / Kinder).
+ * Starting values = the flyer prices (the flyer has one price per service), copied to every
+ * audience so the site shows exactly what it showed before. The salon sets the real
+ * per-audience prices, availability and durations in Admin → Leistungen & Preise.
+ * Durations unknown → `null`. No employees known → `[]`.
  */
-const flyer = (id: string, name: string, priceCents: number, priceIsFrom: boolean, order: number): Service => ({
-  id, name, description: null, audiences: [], priceCents, priceIsFrom,
-  durationMin: null, employeeIds: [], source: "flyer", order, visible: true,
-});
+const flyer = (id: string, name: string, priceCents: number, priceIsFrom: boolean, order: number): Service => {
+  const p = { available: true, priceCents, priceIsFrom, durationMin: null };
+  return {
+    id, name, description: null, prices: { herren: { ...p }, damen: { ...p }, kinder: { ...p } },
+    employeeIds: [], source: "flyer", order, visible: true,
+  };
+};
 
 export const services: Service[] = [
   flyer("haarschnitt", "Haarschnitt", 2000, false, 1),

@@ -36,7 +36,7 @@ Rules
 | Navigation (primary, secondary, CTA, menu with images, legal) | `navigation` | `data/business.ts` | `navigation_items` |
 | Site settings (footer tagline, band words, labels, appearance preset) | `siteSettings` | `data/business.ts` | `site_settings` |
 | Categories Damen/Herren/Kinder (texts, images, principles, order, visibility) | `category` | `data/catalogue.ts` | `service_categories` |
-| Services (name, description, audiences, price, from-price, duration, employees, order, visibility) | `service` | `data/catalogue.ts` | `services`, `staff_services` |
+| Services (name, description, **per-audience prices** `prices.{herren,damen,kinder}` = available, price, from-price, duration; employees, order, visibility) | `service` + `audiencePrice` | `data/catalogue.ts` | `services`, `service_prices`, `staff_services` |
 | Employees (name, role, bio, image, specializations, bookable) | `employee` | `data/catalogue.ts` | `staff_members` (+ `profiles`) |
 | Gallery (image, group, ratio, caption, collection, order) | `galleryItem` | `data/catalogue.ts` | `gallery_images` |
 | Media library (src, alt, focal point, credit) | `mediaAsset` | `data/media.ts` | `media_assets` + Storage bucket `media` |
@@ -163,3 +163,28 @@ Shared rules: `src/lib/booking-rules.ts` (`isWalkInOnly`, `bookableWeekdays`, `h
 - They make no network request and use no storage.
 - The selected PDF is never read or uploaded.
 - There is no success message.
+
+## 8. Per-audience prices (Phase 5A.3)
+
+Every service has its **own price for Herren, Damen and Kinder**: `service.prices.<audience>` =
+`{ available, priceCents (null = "Preis auf Anfrage"), priceIsFrom, durationMin }`.
+
+Starting values: the flyer price, copied to all three audiences. The site therefore shows exactly
+what it showed before until the salon edits the prices. Nothing is invented.
+
+| Where | What is shown |
+| --- | --- |
+| Herren / Damen / Kinder pages (`service-list` with audience) | Only services offered for that audience, with that audience's price and duration |
+| Homepage price list, `/preise`, `/leistungen` | Table with one column per audience; "–" means not offered |
+| Request form (Termin) | After choosing an area, only the services offered for it |
+| Booking wizard (hidden, kept) | Services and price for the chosen area |
+| 3D preview | Price for the section's category |
+
+**Helpers:** `src/lib/pricing.ts` (`priceLabel`, `offeredAudiences`, `priceSummary`).
+
+**Editing:** Admin → **Leistungen & Preise** (`/admin/services`).
+- Per audience: offered yes/no, price in € (empty = auf Anfrage), "ab", duration (5–480 min).
+- Also: name, visibility, order, and adding new services.
+- Validation, discard changes and change log are included.
+- Saving is a demo until Phase 5B. Then a Server Action with `website.manage` runs, plus Zod
+  `audiencePrice` validation, `audit_log`, and `revalidateTag('content:services')`.

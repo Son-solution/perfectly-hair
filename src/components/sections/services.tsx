@@ -5,7 +5,7 @@ import { MaskLines } from "@/components/motion/MaskLines";
 import { ButtonLink } from "@/components/ui/primitives";
 import type { Category, SectionOf, Service } from "@/content/schema";
 import { emphasis } from "@/lib/emphasis";
-import { formatPrice } from "@/lib/format";
+import { AUDIENCES, AUDIENCE_LABEL, priceLabel, type AudienceKey } from "@/lib/pricing";
 import { cn } from "@/lib/utils";
 
 /** Booking deep link: preselects category + service in the booking flow. */
@@ -21,8 +21,9 @@ function Eyebrow({ children, dark }: { children: string; dark?: boolean }) {
   );
 }
 
-/** One price row. Whole row is a link into the booking preview with this service preselected. */
-function ServiceRow({ service, audience, dark, index }: { service: Service; audience?: string | null; dark?: boolean; index: number }) {
+/** One price row for ONE audience. Whole row links into the booking preview with this service preselected. */
+function ServiceRow({ service, audience, dark, index }: { service: Service; audience: AudienceKey; dark?: boolean; index: number }) {
+  const p = service.prices[audience];
   return (
     <Reveal as="li" delay={index * 0.05}>
       <Link
@@ -39,17 +40,51 @@ function ServiceRow({ service, audience, dark, index }: { service: Service; audi
             className={cn("h-px flex-1 origin-left scale-x-50 transition-transform duration-700 ease-luxe group-hover:scale-x-100", dark ? "bg-white/20" : "bg-mist")}
           />
         </span>
-        <span className="font-display text-2xl tabular-nums md:text-3xl">
-          {service.priceCents !== null ? formatPrice(service.priceCents, service.priceIsFrom) : "Preis auf Anfrage"}
-        </span>
+        <span className="font-display text-2xl tabular-nums md:text-3xl">{priceLabel(p)}</span>
         <span className={cn("text-xs uppercase tracking-[0.2em]", dark ? "text-white/50" : "text-stone")}>
-          {service.durationMin ? `${service.durationMin} Min.` : ""}
+          {p.durationMin ? `${p.durationMin} Min.` : ""}
         </span>
         <span className={cn("text-[0.625rem] uppercase tracking-[0.24em] opacity-60 transition-opacity group-hover:opacity-100", dark ? "text-white" : "text-ink")}>
           Termin anfragen →
         </span>
       </Link>
     </Reveal>
+  );
+}
+
+/**
+ * Audience-neutral price table: one row per service, one column per audience (Herren, Damen,
+ * Kinder). "–" = not offered for this audience.
+ */
+function PriceMatrix({ services, dark }: { services: Service[]; dark?: boolean }) {
+  const muted = dark ? "text-white/50" : "text-stone";
+  const line = dark ? "border-white/15" : "border-mist";
+  const cols = "grid grid-cols-[minmax(0,1fr)_repeat(3,minmax(3.75rem,auto))] items-baseline gap-x-3 sm:gap-x-6 md:grid-cols-[minmax(0,1fr)_repeat(3,minmax(7.5rem,auto))]";
+  return (
+    <div role="table" aria-label="Preise nach Bereich">
+      <div role="row" className={cn(cols, "border-b pb-3 text-[0.625rem] uppercase tracking-[0.2em] sm:text-eyebrow", line, muted)}>
+        <span role="columnheader">Leistung</span>
+        {AUDIENCES.map((a) => <span key={a} role="columnheader" className="text-right">{AUDIENCE_LABEL[a]}</span>)}
+      </div>
+      <ul>
+        {services.map((s, i) => (
+          <Reveal as="li" key={s.id} delay={i * 0.05}>
+            <Link href={bookingHref(s.id)} role="row" className={cn(cols, "group border-b py-5 md:py-6", line)}>
+              <span role="rowheader" className="min-w-0 text-base transition-[font-style] group-hover:italic sm:text-lg md:text-xl">{s.name}</span>
+              {AUDIENCES.map((a) => {
+                const label = priceLabel(s.prices[a]);
+                return (
+                  <span key={a} role="cell" className={cn("whitespace-nowrap text-right font-display tabular-nums", label === "Preis auf Anfrage" ? "text-xs sm:text-sm" : "text-lg sm:text-2xl md:text-3xl", !label && muted)}>
+                    {label === null ? <><span aria-hidden="true">–</span><span className="sr-only">nicht angeboten</span></>
+                      : label.startsWith("ab ") ? <><span className="text-[0.55em] italic">ab </span>{label.slice(3)}</> : label}
+                  </span>
+                );
+              })}
+            </Link>
+          </Reveal>
+        ))}
+      </ul>
+    </div>
   );
 }
 
@@ -96,11 +131,7 @@ export function PriceListSection({
           )}
         </div>
         <div className="lg:col-span-6 lg:col-start-7">
-          <ul>
-            {services.map((s, i) => (
-              <ServiceRow key={s.id} service={s} index={i} />
-            ))}
-          </ul>
+          <PriceMatrix services={services} />
           <p className="mt-8 max-w-xl text-sm leading-relaxed text-stone">
             {section.note}{" "}
             <a href={phone.href} className="underline underline-offset-4">
@@ -135,11 +166,15 @@ export function ServiceListSection({
           {section.intro && <p className="mt-8 max-w-md leading-relaxed text-white/70">{section.intro}</p>}
         </div>
         <div className="lg:col-span-6 lg:col-start-7">
-          <ul>
-            {services.map((s, i) => (
-              <ServiceRow key={s.id} service={s} audience={category?.slug} dark index={i} />
-            ))}
-          </ul>
+          {category ? (
+            <ul>
+              {services.map((s, i) => (
+                <ServiceRow key={s.id} service={s} audience={category.slug} dark index={i} />
+              ))}
+            </ul>
+          ) : (
+            <PriceMatrix services={services} dark />
+          )}
           <p className="mt-8 max-w-xl text-sm leading-relaxed text-white/55">{section.note}</p>
         </div>
       </div>

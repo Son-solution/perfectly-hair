@@ -9,10 +9,11 @@ import {
   type AvailabilityResult, type BookingDraft, type BookingGateway, type CustomerDetails,
 } from "@/features/booking/types";
 import { isWalkInOnly, type WalkInPolicy } from "@/lib/booking-rules";
-import { formatPrice } from "@/lib/format";
+import { AUDIENCES, priceLabel, priceSummary, type AudienceKey } from "@/lib/pricing";
 import { cn } from "@/lib/utils";
 
 const ease = [0.22, 1, 0.36, 1] as const;
+const isAudience = (v: string): v is AudienceKey => (AUDIENCES as readonly string[]).includes(v);
 const STEPS = ["Bereich", "Leistung", "Mitarbeiter", "Termin", "Ihre Daten", "Übersicht"] as const;
 
 export type BookingFlowProps = {
@@ -103,7 +104,7 @@ export function BookingFlow({
   const open = useMemo(() => new Set(openWeekdays), [openWeekdays]);
 
   const categoryServices = services.filter(
-    (s) => !draft.category || s.audiences.length === 0 || s.audiences.includes(draft.category as never),
+    (s) => !draft.category || !isAudience(draft.category) || s.prices[draft.category].available,
   );
   const categoryEmployees = employees.filter((e) => !draft.category || e.audiences.includes(draft.category));
   const service = services.find((s) => s.id === draft.serviceId);
@@ -225,13 +226,13 @@ export function BookingFlow({
                       <span className="flex flex-1 flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
                         <span className="text-lg">{s.name}</span>
                         <span className="font-display text-2xl tabular-nums">
-                          {s.priceCents !== null ? formatPrice(s.priceCents, s.priceIsFrom) : "Preis auf Anfrage"}
+                          {draft.category && isAudience(draft.category) ? priceLabel(s.prices[draft.category]) : priceSummary(s)}
                         </span>
                       </span>
                     </Choice>
                   ))}
                 </div>
-                <p className="mt-5 text-sm text-stone">Preise laut Flyer, nicht nach Damen, Herren und Kindern unterschieden. Dauer wird vom Salon ergänzt.</p>
+                <p className="mt-5 text-sm text-stone">Preise für den gewählten Bereich. Je nach Haarlänge und Aufwand kann der Preis abweichen.</p>
               </fieldset>
             )}
 
@@ -345,7 +346,7 @@ export function BookingFlow({
                   {[
                     ["Bereich", category?.label ?? "–"],
                     ["Leistung", service?.name ?? "–"],
-                    ["Preis", service && service.priceCents !== null ? formatPrice(service.priceCents, service.priceIsFrom) : "–"],
+                    ["Preis", service ? (draft.category && isAudience(draft.category) ? priceLabel(service.prices[draft.category]) ?? "–" : priceSummary(service)) : "–"],
                     ["Mitarbeiter", employee?.name ?? "Keine Präferenz"],
                     ["Wunschtag", draft.date ? new Date(`${draft.date}T12:00:00`).toLocaleDateString("de-DE", { weekday: "long", day: "numeric", month: "long" }) : "–"],
                     ["Uhrzeit", "wird telefonisch abgestimmt"],

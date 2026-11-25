@@ -1,7 +1,7 @@
 import { Badge, Card, PageHeader, Table, Td, Th, btn } from "@/components/dashboard/ui";
 import { getBusiness, getCategories, getEmployees, getGallery, listAllPages, listAllServices, listMedia } from "@/content/repository";
 import { summarizeHours } from "@/lib/hours";
-import { formatPrice } from "@/lib/format";
+import { AUDIENCES, priceLabel } from "@/lib/pricing";
 
 const PAGE_LABEL: Record<string, string> = {
   "": "Startseite", herren: "Herren", damen: "Damen", kinder: "Kinder", leistungen: "Leistungen", preise: "Preise", team: "Team",
@@ -64,16 +64,14 @@ export default async function AdminWebsitePage() {
       </div>
 
       <div className="mt-4 grid gap-4 xl:grid-cols-3">
-        <Card className="xl:col-span-2" title="Leistungen & Preise" description="Quelle: Flyer · Zuordnung zu Herren/Damen/Kinder folgt" action={edit}>
+        <Card className="xl:col-span-2" title="Leistungen & Preise" description="Eigener Preis je Bereich – bearbeiten unter „Leistungen & Preise“" action={<a href="/admin/services" className="text-xs font-medium underline underline-offset-2">Bearbeiten →</a>}>
           <Table label="Leistungen">
-            <thead><tr><Th>Leistung</Th><Th>Bereiche</Th><Th>Preis</Th><Th>Dauer</Th><Th>Sichtbar</Th></tr></thead>
+            <thead><tr><Th>Leistung</Th><Th>Herren</Th><Th>Damen</Th><Th>Kinder</Th><Th>Sichtbar</Th></tr></thead>
             <tbody>
               {services.map((s) => (
                 <tr key={s.id}>
                   <Td className="font-medium">{s.name}</Td>
-                  <Td>{s.audiences.length ? s.audiences.join(", ") : <span className="text-dash-muted">nicht zugeordnet</span>}</Td>
-                  <Td className="tabular-nums">{s.priceCents !== null ? formatPrice(s.priceCents, s.priceIsFrom) : "auf Anfrage"}</Td>
-                  <Td>{s.durationMin ? `${s.durationMin} Min.` : <span className="text-dash-muted">fehlt</span>}</Td>
+                  {AUDIENCES.map((a) => <Td key={a} className="tabular-nums">{priceLabel(s.prices[a]) ?? <span className="text-dash-muted">–</span>}<span className="block text-xs text-dash-muted">{s.prices[a].available ? (s.prices[a].durationMin ? s.prices[a].durationMin + " Min." : "Dauer fehlt") : ""}</span></Td>)}
                   <Td>{s.visible ? "Ja" : "Nein"}</Td>
                 </tr>
               ))}
