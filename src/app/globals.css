@@ -208,6 +208,8 @@
   --dash-sidebar-hover: #333333;
   --dash-sidebar-active: #d4d4d4;
   --dash-sidebar-active-text: #202020;
+  --dash-sidebar-scroll: #5a5a5a; /* scrollbar thumb on the dark sidebar */
+  --dash-sidebar-scroll-hover: #7a7a7a;
   color-scheme: light;
 }
 .dash[data-theme="dark"] {
@@ -228,6 +230,8 @@
   --dash-sidebar-hover: #1c1c1c;
   --dash-sidebar-active: #e8e8e8;
   --dash-sidebar-active-text: #111111;
+  --dash-sidebar-scroll: #3a3a3a;
+  --dash-sidebar-scroll-hover: #555555;
   color-scheme: dark;
 }
 @theme inline {
@@ -248,6 +252,17 @@
   --color-dash-sidebar-hover: var(--dash-sidebar-hover);
   --color-dash-sidebar-active: var(--dash-sidebar-active);
   --color-dash-sidebar-active-text: var(--dash-sidebar-active-text);
+}
+
+/* Sidebar scrollbar: slim, in sidebar colours (the default light scrollbar clashed with #252525). */
+@utility dash-sidebar-scroll {
+  color-scheme: dark;
+  scrollbar-width: thin;
+  scrollbar-color: var(--dash-sidebar-scroll) transparent;
+  &::-webkit-scrollbar { width: 8px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb { background: var(--dash-sidebar-scroll); border-radius: 9999px; border: 2px solid var(--dash-sidebar); }
+  &::-webkit-scrollbar-thumb:hover { background: var(--dash-sidebar-scroll-hover); }
 }
 
 /* Pause every CSS loop inside a section that is off-screen or in a hidden tab. */

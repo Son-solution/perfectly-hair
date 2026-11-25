@@ -114,7 +114,7 @@ export function DashboardShell({
   const groups = area === "admin" ? ADMIN_NAV : [{ group: "Mein Bereich", items: STAFF_NAV }];
 
   const navList = (compact: boolean) => (
-    <nav aria-label={area === "admin" ? "Admin-Navigation" : "Mitarbeiter-Navigation"} className="flex-1 overflow-y-auto px-3 py-4">
+    <nav aria-label={area === "admin" ? "Admin-Navigation" : "Mitarbeiter-Navigation"} className="dash-sidebar-scroll flex-1 overflow-y-auto px-3 py-4">
       {groups.map((g) => (
         <div key={g.group} className="mb-6">
           {!compact && <p className="mb-2 px-3 text-[0.625rem] font-semibold uppercase tracking-[0.18em] text-dash-sidebar-muted">{g.group}</p>}
