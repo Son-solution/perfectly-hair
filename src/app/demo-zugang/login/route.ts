@@ -25,16 +25,23 @@ export async function POST(request: NextRequest) {
   const form = await request.formData().catch(() => null);
   const target = safeTarget(form?.get("weiter"));
 
-  if (isRateLimited(ip)) return back(request, { fehler: "gesperrt", weiter: target });
+  const mobile = /Mobile|Android|iPhone|iPad/i.test(request.headers.get("user-agent") ?? "");
+  // Outcome log for diagnosis (Vercel runtime logs). Never logs the password or the IP.
+  const logOutcome = (result: "ok" | "falsch" | "gesperrt") => console.info(JSON.stringify({ evt: "demo-login", result, mobile }));
 
-  const password = String(form?.get("passwort") ?? "");
+  if (isRateLimited(ip)) { logOutcome("gesperrt"); return back(request, { fehler: "gesperrt", weiter: target }); }
+
+  // Trim + NFC: phone keyboards/autofill may add a trailing space or decomposed characters.
+  const password = String(form?.get("passwort") ?? "").trim().normalize("NFC");
   if (!passwordMatches(password, cfg.password)) {
     recordFailure(ip);
+    logOutcome("falsch");
     await new Promise((r) => setTimeout(r, 800)); // slow down guessing
     return back(request, { fehler: "1", weiter: target });
   }
 
   clearFailures(ip);
+  logOutcome("ok");
   const res = NextResponse.redirect(new URL(target, request.url), 303);
   res.cookies.set({
     name: DEMO_COOKIE,
